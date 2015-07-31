@@ -1,0 +1,93 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="TopAjax-elt">
+	<template>
+			<iron-ajax
+				id="ajaxElt"
+				url="[[sUrlAjax]]"
+				params='[[sParams]]'
+				contentType="[[contentType]]"
+				handle-as="[[handleAs]]"
+				verbose="[[verbose]]"
+				withCredentials="[[withCredentials]]"
+				method="[[method]]"
+				lastResponse="{{data}}"
+				on-response="handleResponse"
+				debounce-duration="[[debounceDuration]]">
+			</iron-ajax>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'TopAjax-elt',
+			
+			properties: {
+				sUrlAjax: String,
+				
+				contentType: {
+					type: String,
+					value: "application/xml"
+				},
+				
+				isAuto: {
+					type: Boolean,
+					value: false
+				},
+				
+				handleAs: {
+					type: String,
+					value: "text"
+				},
+				
+				sParams: {
+					type: Object,
+					value: {}
+				},
+				
+				method: {
+					type: String,
+					value: "GET"
+				},
+				
+				verbose: {
+					type: Boolean,
+					value: true
+				},
+				
+				withCredentials: {
+					type: Boolean,
+					value: true
+				},
+				
+				debounceDuration: {
+					type: String,
+					value: "300"
+				},
+				
+				data: {
+					type: Array,
+					notify: true
+				},
+				
+				e: {
+					type: Array,
+					notify: true
+				},
+				
+				request:{
+					type: Array,
+					notify: true
+				}
+			},
+			
+			generateRequest: function() { this.$.ajaxElt.generateRequest(); },
+			
+			handleResponse: function(e, request) {
+				this.request = request;
+				this.data = request.xhr.responseText;
+			}
+
+		});
+	</script>
+</dom-module>

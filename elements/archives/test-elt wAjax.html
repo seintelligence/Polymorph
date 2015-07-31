@@ -1,0 +1,102 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id='test-elt'>
+  <template>
+	<firebase-collection
+          order-by-child="height"
+          location="https://dinosaur-facts.firebaseio.com/dinosaurs"
+          data="{{dinosaurs}}"></firebase-collection>
+
+    <header>
+      <h1>Test Requirements</h1>
+    </header>
+    <section>
+
+	<button on-click="setajax">Click me</button>
+	<iron-ajax
+		id="ajax"
+		auto
+		on-response="hresponse"
+		debounce-duration="300"
+		verbose="1"
+		handle-as="text"></iron-ajax>
+		
+		<template id="t">
+			<div class="layout horizontal">{{data}}</div>
+		</template>
+		<div class="layout horizontal">
+			<div class="layout vertical">
+			  <template is="dom-repeat" items="{{ requirements }}">
+				<Requirements-elt name="{{ item.name }}" description="{{ item.description }}"></Requirements-elt>
+			  </template>
+			</div>
+			<div class="layout vertical">
+			  <template is="dom-repeat" items="{{ requirements }}">
+				<Requirements-elt name="{{ item.name }}" description="{{ item.description }}"></Requirements-elt>
+			  </template>
+			</div>
+		</div>
+    </section>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'test-elt',
+    properties: {
+      requirements: {
+        type: Array,
+        value: [
+          {
+            name: "EUR",
+            description: "fuck"
+          },
+		  {
+            name: "USD",
+            description: "1.0"
+          }
+        ]
+      },
+	  containers: {
+        type: Array,
+        value: [
+          {
+            name: "Test1",
+            description: "fuck",
+			ref: "Requirements-elt"
+          },
+		  {
+            name: "Test2",
+            description: "1.0",
+			ref: "Requirements-elt"
+          }
+        ]
+      }
+	},
+	setajax: function () {
+		this.$.ajax.method="GET";
+		this.$.ajax.url="http://EXT-1MY7:81/cockpit/req test asp CORS.asp";
+		this.$.ajax.params={
+			"sName": "admin",
+			"sPassword": "maubron0",
+			"sHost": "EXT-1MY7",
+			"sDomain": "Cognition Cockpit",
+			"sServer": "Production Server 1",
+			"sIsLogin": 1
+		};
+	},
+	hresponse: function( request ) {
+		console.log(request.detail.response);
+		console.log(this.$.ajax.lastResponse);
+	}
+  });
+  
+</script>

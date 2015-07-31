@@ -1,0 +1,43 @@
+<html>
+<head>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/jquery-ui.min.js"></script>
+<script src="scripts/gridstack.js/lodash.min.js"></script>
+<script src="scripts/gridstack.js/gridstack.js"></script>
+</head>
+<body>
+<div class="grid-stack">
+    <div class="grid-stack-item" 
+        data-gs-x="0" data-gs-y="0" 
+        data-gs-width="4" data-gs-height="2">
+            <div class="grid-stack-item-content" style="background-color:#FF2000">oo</div>
+    </div>
+    <div class="grid-stack-item" 
+        data-gs-x="4" data-gs-y="0" 
+        data-gs-width="4" data-gs-height="4">
+            <div class="grid-stack-item-content" style="background-color:#FF0000">bb</div>
+    </div>
+</div>
+<div class="grid-stack">
+    <div class="grid-stack-item" 
+        data-gs-x="0" data-gs-y="0" 
+        data-gs-width="4" data-gs-height="2">
+            <div class="grid-stack-item-content" style="background-color:#FF2000">oo</div>
+    </div>
+    <div class="grid-stack-item" 
+        data-gs-x="4" data-gs-y="0" 
+        data-gs-width="4" data-gs-height="4">
+            <div class="grid-stack-item-content" style="background-color:#FF0000">bb</div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+$(function () {
+    var options = {
+        cell_height: 80,
+        vertical_margin: 10,
+		animate: true
+    };
+    $('.grid-stack').gridstack(options);
+});
+</script>

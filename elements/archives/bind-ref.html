@@ -1,0 +1,41 @@
+<script>
+	Polymer({
+	  is: 'bind-ref',
+
+	  properties: {
+		ref: {
+		  type: String,
+		  observer: 'refChanged',
+		},
+	  },
+
+	  refChanged: function(newRef, oldRef) {
+		if (oldRef != undefined) {
+		  this._removeChildren();
+		  this._stamp();
+		}
+	  },
+
+	  _stamp: function() {
+		this._parent = Polymer.dom(this).parentNode;
+		var rootEl = this._parent;
+		while (Polymer.dom(rootEl).parentNode) {
+		  rootEl = Polymer.dom(rootEl).parentNode;
+		}
+
+		var tpl = Polymer.dom(rootEl).querySelector('#' + this.ref);
+		var tplRoot = tpl.stamp().root;
+		this._children = Array.prototype.slice.call(tplRoot.childNodes);
+		Polymer.dom(this._parent).insertBefore(tplRoot, this);
+	  },
+
+	  _removeChildren: function() {
+		for (var i = 0; i < this._children.length; i++) {
+		  Polymer.dom(this._parent).removeChild(this._children[i]);
+		}
+	  },
+
+	  attached: function() { this._stamp(); },
+	  detached: function() { this._removeChildren(); },
+	});
+</script>

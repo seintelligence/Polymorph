@@ -1,0 +1,67 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="../bower_components/firebase-element/firebase-collection.html">
+<link rel="import" href="../bower_components/firebase-element/firebase-document.html">
+
+<link rel="import" href="Function-elt.html">
+
+<dom-module id='Product-elt'>
+  <template>
+    <header>
+		<h1>{{name}}</h1>
+    </header>
+	<p>{{description}}</p>
+    <section>
+		<div class="layout horizontal">
+			<div class="layout vertical">
+			  <template is="dom-repeat" items="{{ children }}" filter="isFunction" observe="type" as="function">
+				<Function-elt Name="{{ function.name }}" Description="{{ function.description }}" Comment="{{ function.Comment }}"></Function-elt>
+			  </template>
+			</div>
+		</div>
+    </section>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'Product-elt',
+    properties: {
+      name: {
+        type: String,
+        value: "no name"
+      },
+	  description: {
+        type: String,
+        value: "no name"
+      },
+	  cockpitID: {
+        type: String,
+        value: "no name"
+      },
+	  comment: {
+        type: String,
+        value: "no comment"
+      },
+	  type: {
+        type: String,
+        value: "no type"
+      },
+	  children: {
+        type: Array,
+        value: [{name:"ol",description:"oo",type:"Function"},{name:"ol2",description:"oo",type:"Requirement"}]
+      }
+	},
+	isFunction: function(item) {
+		return item.type == 'Function';
+	}
+  });
+  
+</script>

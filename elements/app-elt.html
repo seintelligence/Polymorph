@@ -1,0 +1,140 @@
+<link rel="import" href="../bower_components/polymer/polymer.html"> <!-- Import Polymer element -->
+<link rel="import" href="d3js-tree-elt.html">
+<link rel="import" href="../bower_components/firebase-element/firebase-collection.html">
+
+<dom-module id="app-elt">
+	<template>
+		<firebase-collection
+		  location="https://blazing-fire-3873.firebaseio.com/DesignItems"
+		  data="{{firebaseData}}"></firebase-collection>
+		<!--<template is="dom-repeat" items="{{firebaseData}}" as="dataElt">
+			<h4>[[dataElt.__firebaseKey__]]</h4>
+			<span>{{dataElt.Name}}</span>
+		</template>-->
+		<d3js-tree data="{{firebaseData}}"></d3js-tree>
+	</template>
+	<script>
+		Polymer({
+
+		is: 'app-elt',
+
+		properties: {
+			firebaseData:
+			{
+				type: Array,
+				value: function() {	return [];}
+			},
+			d3data :
+			{		
+				type: Array,
+				notify: true,
+				value:	[	{
+						"Name": "Services",
+						"sRef": "d|0x00000016|2276|0|208bc|10000",
+						"children": [
+							{
+								"Name": "Service TIC",
+								"sRef": "d|0x00000016|1918|0|1b6c0|10000",
+								"children": [
+									{
+										"Name": "To Distribute Electrical Power",
+										"sRef": "d|0x00000016|1918|0|1ca50|10000",
+										"children": [
+											{
+												"Name": "Battery",
+												"sRef": "d|0x00000016|1918|0|1d770|10000"
+											 }
+										]
+									},
+									{
+										"Name": "To Sense Ignition Switch",
+										"sRef": "d|0x00000016|1918|0|1b180|10000",
+										"children": [
+											{
+												"Name": "Ignition Key Locker",
+												"sRef": "d|0x00000016|1918|0|1d620|10000"
+											 }
+										]
+									 },
+									{
+										"Name": "To Power Supply & Monitor Turn Indicators",
+										"sRef": "d|0x00000016|1918|0|1dcb0|10000",
+										"children": [
+											{
+												"Name": "BCM",
+												"sRef": "d|0x00000016|1918|0|17280|10000",
+												"children": [
+													{
+														"Name": "BCM_C1",
+														"sRef": "d|0x00000016|1918|0|188d0|10000",
+														"children": [
+															{"Name": "Pin1",
+																"sRef": "d|0x00000016|1918|0|18b70|10000", "size": 1390 },
+															{"Name": "Pin2",
+																"sRef": "d|0x00000016|1918|0|18cc0|10000", "size": 1390 },
+															{"Name": "Pin3",
+																"sRef": "d|0x00000016|1918|0|18e10|10000", "size": 1390 }
+														]
+													 },
+													{
+														"Name": "BCM_C2",
+														"sRef": "d|0x00000016|1918|0|18a20|10000"
+													 }
+												]
+											 }
+										]
+									 },
+									{
+										"Name": "To Provide Driver With Turn Ctrl Interface",
+										"sRef": "d|0x00000016|1918|0|1db60|10000",
+										"children": [
+											{
+												"Name": "Turn Ctrl Switch",
+												"sRef": "d|0x00000016|1918|0|194a0|10000"
+											 }
+										]
+									 },
+									{
+										"Name": "To Provide Driver With Blinker Tell Tale",
+										"sRef": "d|0x00000016|1918|0|1da10|10000",
+										"children": [
+											{
+												"Name": "Dashboard",
+												"sRef": "d|0x00000016|1918|0|1a5b0|10000"
+											 }
+										]
+									 },
+									{
+										"Name": "To Provide Turning  Information",
+										"sRef": "d|0x00000016|1918|0|1d230|10000",
+										"children": [
+											{
+												"Name": "Turn Indicators Light",
+												"sRef": "d|0x00000016|1918|0|195f0|10000"
+											 }
+										]
+									 }
+								]
+							 }
+						]
+					 }]
+				}
+		},
+
+		observers: ['firebaseUpdate(firebaseData.splices)'],
+
+		ready: function() {
+		},
+		  
+		firebaseUpdate: function(changeRecord) {
+			console.log("/firebaseUpdate");
+			if ( !changeRecord ) return;
+			changeRecord.indexSplices.forEach(function(s) {
+			  s.removed.forEach(function(user) {
+				console.log(user.Name + ' was removed');
+			  });
+			  console.log(s.addedCount + ' users were added');
+			}, this);
+		}
+	});
+	</script>

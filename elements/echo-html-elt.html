@@ -1,0 +1,47 @@
+<dom-module id="echo-html-elt">
+
+	<template>
+		<span>{{html}}</span>
+		<TopAjax-elt
+			id="ajaxCCImg"
+			s-Url-Ajax="http://ext-1my7:81/cockpit/ManagedDoc/d|0x00000016|1918|0|cbc3c0|10000/3007942420395836574074.png?sConID=3007942420395836574074&iVersion=-1&eoi&sName=admin&sPassword=maubron0"
+			s-Params='{}'
+			contentType="application/xml"
+			handleAs="blob"
+			verbose="true"
+			withCredentials="true"
+			method="GET"
+			data="{{AjaxCCImg}}"
+			debounceDuration="300">
+		</TopAjax-elt>
+	</template>
+
+	<script>
+		Polymer({
+		is: 'echo-html-elt',
+		properties: {
+			html: {
+				type: String,
+				value: 'html',
+				observer: '_changed'
+			},
+			
+			AjaxCCImg:
+			{
+				type: Array,
+				observer: '_ImgReceived'
+			},
+		},
+
+		ready: function() {
+			this.innerHTML = this.html;
+		},
+
+		_changed: function() {	this.$.ajaxCCImg.generateRequest(); this.innerHTML = this.html.replace("src=\"", "src=\"http://ext-1my7:81/cockpit/");},
+		
+		_ImgReceived: function(e) {  console.log("_ImgReceived");console.log(e); console.log(this.AjaxCCImg); }		
+		  
+		});
+	</script>
+
+</dom-module>

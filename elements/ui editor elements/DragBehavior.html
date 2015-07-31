@@ -1,0 +1,90 @@
+<style>
+	[draggable] {
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		user-select: none;
+	}
+	
+	.acceptingContainer {
+		border-radius: 5px;
+		box-shadow: inset 0 0 10px #95FF68;
+	}
+			
+	.refusingContainer {
+		border-radius: 5px;
+		box-shadow: inset 0 0 10px #FF6868;
+	}
+</style>
+<script>
+	DragBehavior = {
+
+		properties: {
+			uniqueID:
+			{
+			  type: Boolean,
+			  value: false,
+			  notify: true,
+			  observer: '_highlightChanged'
+			},
+			
+			UIElements:
+			{
+				type: Array,
+				value: []
+			},
+			
+			uniqueID:
+			{
+				value: 0
+			}
+		},
+
+		listeners: {
+			'dragstart': 'UIdragStart',
+			'dragenter': 'UIdragEnter',
+			'dragend': 'UIdragEnd',
+			'removeUIChildRequest': 'UIremoveChild'
+		},
+		
+		UIdragStart: function (ev) {
+			$srcElement = $(ev.srcElement);
+			$srcElement.addClass("dragged");
+			
+			ev.stopPropagation();
+			
+			// on garde l'id en mémoire
+			console.log("UIdragStart");
+			console.log(ev.target.id);
+			
+			ev.dataTransfer.setData("text/html", ev.target.id);
+		},
+		
+		UIdragEnd: function (ev) {
+			$srcElement = $(ev.srcElement);
+			$srcElement.css('opacity', '1');
+			
+			ev.stopPropagation();
+		},
+		
+		UIdragEnter: function (ev) {
+				$srcElement = $(ev.srcElement);
+				ev.stopPropagation();
+		},
+		
+		UIdragLeave: function (ev) {
+			$srcElement = $(ev.srcElement);
+			
+			$srcElement.removeClass("acceptingContainer");
+			$srcElement.removeClass("refusingContainer");
+			
+			//ev.stopPropagation();
+			ev.preventDefault();
+		},
+		
+		UIremoveChild: function (ev) {
+			ev.detail.node.remove();
+			this.sendToasterMsgDisplayRequest("component removed", "warning");
+		}
+    };
+</script>

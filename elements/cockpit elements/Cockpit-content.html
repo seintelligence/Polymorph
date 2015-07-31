@@ -1,0 +1,59 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="Service-elt.html">
+<link rel="import" href="Cockpit-interface-elt.html">
+
+<dom-module id="Cockpit-content">
+	<style>
+		.header {
+		  /* layout properties for a local DOM element */
+		  @apply(--layout-horizontal);
+		  @apply(--layout-center);
+		}
+		.container {
+		  min-width: 10em;
+		  padding: 1em 0.5em;
+		}
+		.container > div {
+		  margin-top: 0.5em;
+		  color: black;
+		  font-size: 10px;
+		}
+	</style>
+	<template>
+		
+		<Cockpit-interface-elt id="CallServices" data="{{services}}"></Cockpit-interface-elt>
+			
+		<div class="header">
+			<div class="center layout flex-1">&nbsp;</div>
+			<div class="container center layout flex-12">
+				<template is="dom-repeat" items="[[services]]" as="service">
+					<Service-elt data="{{service}}"></Service-elt>
+					<p>&nbsp;</p>
+				</template>
+			</div>
+			<div class="center layout flex-1">&nbsp;</div>
+		</div>
+		
+	</template>
+
+	<script>
+		Polymer({
+			is: 'Cockpit-content',
+			
+			properties: {
+			
+				services: {
+					type: Array
+				}
+				
+			},
+			
+			ready: function() {
+				this.$.CallServices.customRequest = "Breakdowns,Children,sPartReference|contains|RepFunctions/Groups,Children,Only Function";
+				this.$.CallServices.attrRequest = "sItemId,sDescription,sDetailedDescription,sUDA_DesignImplementation";
+				this.$.CallServices.generateRequest();
+			}
+	
+		});
+	</script>
+</dom-module>

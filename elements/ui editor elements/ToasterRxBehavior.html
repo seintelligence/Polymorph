@@ -1,0 +1,17 @@
+<script>
+	ToasterRxBehavior = {
+		displayToasterMessage: function(ev) {
+			var type = ev.detail.type;
+			var msg = ev.detail.msg;
+			
+			this.toasterMessage = type + ": " + msg;
+			
+			if (type == "error")
+				this.$.toasterError.show();
+			else if (type == "information")
+				this.$.toasterInformation.show();
+			else if (type == "warning")
+				this.$.toasterWarning.show();
+		}
+    };
+</script>

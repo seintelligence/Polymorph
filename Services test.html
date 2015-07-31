@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Services Experiments</title>
+		<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+		<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+		<link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
+		<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+	  
+		<link rel="import" href="elements/UtilitiesBehavior.html">
+	  
+		<link rel="stylesheet" href="bower_components/open-sans-fontface/open-sans.css">
+		<link rel="import" href="elements/Service-elt.html">
+		<link rel="import" href="elements/Cockpit-elt.html">
+		<style>
+		  * {
+			box-sizing: border-box;
+		  }
+		  body {
+			font-family: "Open Sans";
+		  }
+		  body > div > * {
+		  }
+		  html /deep/ h1,
+		  html /deep/ h2,
+		  html /deep/ h3 {
+			font-weight: 100;
+		  }
+		</style>
+	</head>
+	<body>
+	<!-- this aims at providing the navigation and connection features -->
+	<paper-toolbar>
+	  <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
+	  <div class="title">Eyessential</div>
+	  <paper-item on-click="{{login}}" hidden?="{{!statusKnown || user}}">Login</paper-item>
+		<paper-item on-click="{{logout}}" hidden?="{{!statusKnown || !user}}">Logout</paper-item>
+	  <paper-icon-button icon="more-vert" on-tap="moreAction"></paper-icon-button>
+	</paper-toolbar>
+	
+	<!-- this aims at providing the cockpit connection features -->
+	<Cockpit-elt></Cockpit-elt>
+	
+	<!-- this is the "service template" -->
+	<!--<Document-elt></Document-elt>-->
+	<dom-module id='Document-elt'>
+		<style>
+			.header {
+			  /* layout properties for a local DOM element */
+			  @apply(--layout-horizontal);
+			  @apply(--layout-center);
+			}
+			.container {
+			  min-width: 10em;
+			  padding: 1em 0.5em;
+			}
+			.container > div {
+			  margin-top: 0.5em;
+			  color: black;
+			  font-size: 10px;
+			}
+		</style>
+	  <template>
+		<div class="header">
+			<div class="center layout flex-1">&nbsp;</div>
+			<div class="container center layout flex-12">
+				<template is="dom-repeat" items="[[echoP(eltDataSet)]]" as="eltData">
+					<Service-elt data="{{arrayify(eltData)}}"></Service-elt>
+					<p>&nbsp;</p>
+				</template>
+			</div>
+			<div class="center layout flex-1">&nbsp;</div>
+		</div>
+	  </template>
+	</dom-module>
+<script>
+  Polymer({
+    is: 'Document-elt',
+		
+	behaviors: [UtilitiesBehavior],
+	
+    properties: {
+		eltDataSet: {
+			type: Array,
+			value: [
+				{
+					"name":"Service1",
+					"description":"This service aims at testing",
+					"type":"Service",
+					"children": [
+						{
+							"name":"Function1",
+							"description":"This function aims at oo",
+							"type":"Function",
+							"children": [
+								{
+									"name":"Requirement 1",
+									"target":"The ECU shall provide such signals ECU XXX",
+									"type":"Requirement"
+								},
+								{
+									"name":"Requirement 2",
+									"target":"The ECU shall provide 3 inputs",
+									"type":"Requirement"
+								}
+							]
+						},
+						{
+							"name":"Function2",
+							"description":"This function aims at aa",
+							"type":"Function",
+							"children": [{}],
+							"Predecessors": [{"name":"input1"}],
+							"Successors": [{"name":"output1"}]
+						}
+					]
+				},
+				{
+					"name":"Service2",
+					"description":"This service aims at testing also",
+					"type":"Service",
+					"children": [
+						{
+							"name":"Function1",
+							"description":"This function aims at oo",
+							"type":"Function",
+							"children": [{}]
+						},
+						{
+							"name":"Function2",
+							"description":"This function aims at aa",
+							"type":"Function",
+							"children": [{}]
+						}
+					]
+				}
+			]
+		}
+	}
+	
+  });
+</script>
+</body>
+</html>

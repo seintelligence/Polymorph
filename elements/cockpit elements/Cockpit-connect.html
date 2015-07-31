@@ -1,0 +1,165 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../TopAjax-elt.html">
+<link rel="import" href="../ui editor elements\layout-elt.html">
+
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-input/iron-input.html">
+
+<script type="text/javascript" src="../../scripts/xmlToJSON.js"></script>
+
+<dom-module id="Cockpit-connect">
+	<style>
+		:host {
+		  @apply(--layout-horizontal);
+			font-family: "Open Sans";
+		};
+		
+		input[is=iron-input] {
+		  box-sizing: border-box;
+		}
+
+		input, button {
+			font-size: 10px;
+			padding: 1em;
+			font-family: "Open Sans";
+			border-color: #FFFFFF;
+		}
+	</style>
+	
+	<template>
+		<!-- check if not connected -->
+		<template is="dom-if" if="[[!isConnected]]">
+			<span>Username</span>
+			<input is="iron-input" id="sName" prevent-invalid-input>
+			
+			<span>Password</span>
+			<input is="iron-input" id="sPassword" prevent-invalid-input>
+			
+			<paper-button title="Login" class="JSON_Filter_Buttons" on-click="LoginNow">
+				<iron-icon icon="cancel"></iron-icon>
+				<span>Login</span>
+			</paper-button>
+		</template>
+		
+		<!-- check if connected -->
+		<template is="dom-if" if="[[isConnected]]">
+			<span>Connected as </span>&nbsp;<span><b>{{loginParams.sName}}</b></span>
+			<paper-button title="Logout" raised class="JSON_Filter_Buttons" on-click="LogoutNow">
+				<iron-icon icon="cancel"></iron-icon>
+				<span>Logout</span>
+			</paper-button>
+		</template>
+		
+		<TopAjax-elt
+			id="ajaxLogin"
+			isAuto="true"
+			s-Url-Ajax="{{sUrlAjax}}"
+			s-Params='{{loginParams}}'
+			contentType="application/xml"
+			handleAs="text"
+			verbose="true"
+			withCredentials="true"
+			method="GET"
+			data="{{AjaxData}}"
+			debounceDuration="300">
+		</TopAjax-elt>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'Cockpit-connect',
+			
+			sASP_Adress: "req test asp CORS.asp",
+			
+			sAPI_Adress: "cockpitapiv2.ase",
+			
+			sProjectDescription: "FULL-LED-93X-MY17",
+			
+			ProjectList: ["BAJAJ EE System 90X (RC MY15 / Duke MY16)",
+						"BAJAJ EE System 93X (RC MY16 / Duke MY17)",
+						"FULL-LED-93X-MY17",
+						"ECU EPM44 MY16",
+						"ECU EPM44 MY17",
+						"FULL-LED-93X-MY17"],
+						
+			sThisFileName: "Req%20Management%20View%20v5.html",
+			
+			sHost: "EXT-1MY7",
+			
+			sDomain: "Cognition Cockpit",
+			
+			sServer: "Production Server 1",
+			
+			sPortal: "http://EXT-1MY7:81/cockpit/",
+			
+			properties: {
+				data: {
+					type: Array,
+					notify: true
+				},
+				
+				AjaxData: {
+					type: Array,
+					notify: true,
+					observer: 'handleResponse'
+				},
+				
+				sUrlAjax: {
+					type: String,
+					value: "http://ext-1my7:81/cockpit/req test asp CORS.asp"
+				},
+				
+				isConnected: {
+					type: Boolean,
+					value: false,
+					notify: true
+				},
+				
+				loginParams: {
+					type: Object,
+					value: {}
+				}
+			},
+			
+			LoginNow: function() {
+			
+				sName = this.$.sName;
+				sName = "admin";
+				
+				sPassword = this.$.sPassword;
+				sPassword = "maubron0";
+			
+				this.loginParams = {
+					"sName": sName,
+					"sPassword": sPassword,
+					"sHost": "EXT-1MY7",
+					"sDomain": "Cognition Cockpit",
+					"sServer": "Production Server 1",
+					"sIsLogin": "1"
+				};
+				
+				this.$.ajaxLogin.generateRequest();
+			},
+
+			LogoutNow: function() {
+				
+				this.loginParams = { "sIsLogout": "1" };
+				
+				this.$.ajaxLogin.generateRequest();
+				
+				this.isConnected = false;
+			},
+			
+			handleResponse: function() {
+				// Transform the login answer in a boolean connection status
+				console.log(this.AjaxData);
+				loginAnswer = this.AjaxData.split(">");
+				loginAnswer = loginAnswer[1].split("<");
+				loginAnswer = loginAnswer[1];
+				if ( loginAnswer == "user name=\"" + this.loginParams.sName + "\" /" )
+					this.isConnected = true;
+			},
+			
+		});
+	</script>
+</dom-module>

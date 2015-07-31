@@ -1,0 +1,147 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
+<dom-module id='currency-converter'>
+
+  <style>
+    :host {
+      display: block;
+      background-color: #fff;
+      padding: 10px;
+      box-shadow: 0 1px 5px rgba(0,0,0, 0.4);
+    }
+    .swap {
+      padding: 0.5em;
+      cursor: pointer;
+    }
+    .result-number {
+      font-weight: bold;
+    }
+  </style>
+
+  <template>
+
+    <header>
+      <h1>Currency Converter</h1>
+    </header>
+
+    <section>
+      <paper-input-container always-float-label="true">
+        <label>Amount</label>
+        <input is="iron-input" type="number" bind-value="{{ amount }}">
+      </paper-input-container>
+
+      <div class="layout horizontal center-center">
+        <paper-menu class="flex" selected="{{ fromCurrency }}">
+          <template is="dom-repeat" items="{{ currencies }}">
+            <paper-item>{{ item.name }}</paper-item>
+          </template>
+        </paper-menu>
+
+        <div class="swap" on-tap="swap">
+          <iron-icon icon="swap-horiz"></iron-icon>
+        </div>
+
+        <paper-menu class="flex" selected="{{ toCurrency }}">
+          <template is="dom-repeat" items="{{ currencies }}">
+            <paper-item>{{ item.name }}</paper-item>
+          </template>
+        </paper-menu>
+
+      </div>
+    </section>
+
+    <section class="result flex">
+      <p class="description">{{ description }}</p>
+      <p class="result-number">{{ result }}</p>
+    </section>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'currency-converter',
+
+    properties: {
+      currencies: {
+        type: Array,
+        value: [
+          {
+            name: "EUR",
+            relativeValue: 1.13085
+          }, {
+            name: "SEK",
+            relativeValue: 0.1189895
+          }, {
+            name: "USD",
+            relativeValue: 1.0
+          }, {
+            name: "NOK",
+            relativeValue: 0.1311897
+          }, {
+            name: "JPY",
+            relativeValue: 0.00836764
+          }
+        ]
+      },
+      amount: String,
+      toCurrency: Number,
+      fromCurrency: Number,
+      description: {
+        type: String,
+        computed: 'computeDescription(amount, currencies, fromCurrency, toCurrency)'
+      },
+      result: {
+        type: String,
+        computed: 'computeResult(amount, currencies, fromCurrency, toCurrency)'
+      }
+    },
+
+    computeDescription: function(amountStr, currencies,
+      fromCurrency, toCurrency) {
+        var amount = Number(amountStr);
+        if (typeof currencies === "object" &&
+          typeof (amount+fromCurrency+toCurrency) === "number") {
+          return amount + ' ' +
+            currencies[fromCurrency].name +
+            ' in ' +
+            currencies[toCurrency].name;
+        } else {
+          return '';
+        }
+    },
+
+    computeResult: function(amountStr, currencies,
+      fromCurrency, toCurrency) {
+      var amount = Number(amountStr);
+      if (typeof currencies === "object" &&
+          typeof (amount+fromCurrency+toCurrency) === "number") {
+        return (amount * (currencies[fromCurrency].relativeValue / currencies[toCurrency].relativeValue)).toFixed(2);
+      } else {
+        return '';
+      }
+    },
+
+    /**
+     * Filter for bringing numbers to a defined precision.
+     */
+    toFixed: function(value, precision) {
+      return Number(value).toFixed(precision);
+    },
+
+    /**
+     * Method that swaps the two selected currencies with each other.
+     */
+    swap: function () {
+      var temp = this.fromCurrency;
+      this.fromCurrency = this.toCurrency;
+      this.toCurrency = temp;
+    }
+  });
+</script>

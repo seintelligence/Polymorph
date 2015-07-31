@@ -1,0 +1,26 @@
+<script>
+	ModeChangedBehavior = {
+
+		properties: {
+			mode:
+			{
+				type: String,
+				value: "Operational",
+				notify: true
+			}
+		},
+
+		listeners: {
+			'UImodeChangedRequest': 'UImodeChange'
+		},
+		
+		sendModeChangedRequest: function() {
+			this.$.container.fire('UImodeChangedRequest', { "mode": this.mode });
+		},
+		
+		isMode: function(mode) { return this.mode == mode; this.sendModeChangedRequest();},
+		
+		UImodeChange: function (ev) { this.mode = ev.detail.mode;}
+		
+    };
+</script>

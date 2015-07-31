@@ -1,0 +1,85 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="DropBehaviour.html">
+
+<dom-module id='layout_cell-elt'>
+	<style>
+		[draggable] {
+			-moz-user-select: none;
+			-khtml-user-select: none;
+			-webkit-user-select: none;
+			user-select: none;
+		}
+		.development {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 16px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 300;
+			background-color: rgb(30, 100, 10);
+			font-family: "Open Sans";
+			margin: 5px;
+			padding: 5px;
+			width: 180px;
+			height: auto;
+			border-radius: 4px;
+		};
+		.operational {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 16px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 300;
+			background-color:rgb(240, 30, 240);
+			font-family: "Open Sans";
+			margin: 190px;
+			padding: 190px;
+			border-radius: 4px;
+		}
+	</style>
+  <template>
+  
+		<!-- Development -->
+		<template is="dom-if" if="[[isMode('Development', mode)]]">
+			<div class="layout horizontal flex development">oo</div>
+		</template>
+		
+		<!-- Operational -->
+		<template is="dom-if" if="[[isMode('Operational', mode)]]">
+			<div class="layout horizontal flex operational">oo</div>
+		</template>
+		
+		<!-- Icon -->
+		<template is="dom-if" if="[[isMode('Icon', mode)]]">
+			<div draggable="false" is="layout-cell-icon"></div>
+		</template>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'layout_cell-elt',
+	
+	behaviors: [DropBehavior],
+	
+	extends: 'div',
+	
+    properties: {
+		mode:
+		{
+			type: String,
+			value: "Operational",
+			notify: true
+		}
+	},
+	
+	isMode: function(mode) { return this.mode == mode;}
+  });
+</script>

@@ -1,0 +1,7 @@
+<script>
+	ToasterTxBehavior = {
+		sendToasterMsgDisplayRequest: function(msg, type) {
+			this.fire('toasterMessageRequest', { "msg": msg, "type": type });
+		}
+    };
+</script>

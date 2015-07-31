@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Experiments</title>
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="stylesheet" href="bower_components/open-sans-fontface/open-sans.css">
+  <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+  
+  <link rel="import" href="elements/product-elt.html">
+  <style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "Open Sans";
+  }
+  body > div > * {
+  }
+  html /deep/ h1,
+  html /deep/ h2,
+  html /deep/ h3 {
+    font-weight: 100;
+  }
+  </style>
+</head>
+<body class="layout horizontal wrap">
+  <div>
+    <product-elt name="ECU" description="this is a great product!"></product-elt>
+  </div>
+</body>
+</html>

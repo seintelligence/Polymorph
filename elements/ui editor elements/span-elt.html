@@ -1,0 +1,212 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="path_json_editor-cpt.html">
+
+<dom-module id='span-elt'>
+	<style>
+		
+		.development::hover {
+			border-radius: 5px;
+			box-shadow: inset 0 0 10px #95FF68;
+		}
+		
+		.development {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 16px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 300;
+			background-color:rgb(150, 150, 150);
+			font-family: "Open Sans";
+			margin: 5px;
+			padding: 5px;
+			border-radius: 4px;
+			border: 1px dotted black;
+		};
+		
+		.development .icons {
+			border: none;
+			cursor: pointer;
+		}
+		
+		.operational {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 16px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 300;
+			background-color:rgb(150, 150, 150);
+			font-family: "Open Sans";
+			margin: 5px;
+			padding: 5px;
+			min-height: 200px;
+			border-radius: 4px;
+		}
+	</style> 
+	<template>
+	  
+		<!-- Development -->
+		<div class="layout horizontal flex development" hidden$='[[!isMode("Development", mode)]]'>
+			<paper-dialog id="modal" modal="" role="dialog" tabindex="-1" aria-modal="true" class="x-scope paper-dialog-0" style="outline: none; box-sizing: border-box; position: static; display: none;" aria-hidden="true">
+				<h2>Filtering</h2>
+				<paper-dialog-scrollable>
+					<path_json_editor-cpt computed_nested_filter="{{computed_nested_filter}}" current_filter="{{current_filter}}"></path_json_editor-cpt>
+				</paper-dialog-scrollable>
+				<div class="buttons">
+					<paper-button dialog-dismiss>Cancel</paper-button>
+					<paper-button dialog-confirm>Accept</paper-button>
+				</div>
+			</paper-dialog>
+			
+			<div class="layout vertical flex">
+				<div class="layout horizontal flex development icons">
+					<div>
+						<iron-icon icon="filter-list" data-dialog="modal" on-click="clickHand"></iron-icon>
+						<span>{{computed_nested_filter}}</span>
+					</div>
+				</div>
+				<div id="container" class="layout vertical development">
+					<!-- check if no element is currently dragged -->
+					<template is="dom-if" if="[[_currentDragIsCompatible(0)]]">
+						<iron-icon icon="input"></iron-icon>
+					</template>
+					
+					<!-- check if currently dragged element is compatible -->
+					<template is="dom-if" if="[[_currentDragIsCompatible(1)]]">
+						<iron-icon icon="check-circle"></iron-icon>
+					</template>
+					
+					<!-- check if currently dragged element is not compatible -->
+					<template is="dom-if" if="[[_currentDragIsCompatible(2)]]">
+						<iron-icon icon="block"></iron-icon>
+					</template>
+					<content></content>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Operational -->
+		<div hidden$='[[!isMode("Operational", mode)]]'>		
+			<div class="layout horizontal flex operational">oo</div>
+		</div>
+		
+		<!-- Icon -->
+		<div hidden$='[[!isMode("Icon", mode)]]'>
+			<div draggable="false" is="layout-icon"></div>
+		</div>
+	</template>
+
+	<script>
+	  Polymer({
+		is: 'span-elt',
+		
+		behaviors: [DropBehavior],
+		
+		extends: 'div',
+		
+		properties: {
+			mode:
+			{
+				type: String,
+				value: "Operational",
+				notify: true
+			},
+			accepts:
+			{
+				type: String,
+				value: "*",
+				notify: true
+			},
+			provides:
+			{
+				type: String,
+				value: "",
+				notify: true
+			},
+			config:
+			{
+			
+			},
+			current_filter:
+			{
+				type: String,
+				value: "*",
+				notify: true
+			},
+			
+			computed_nested_filter:
+			{
+				type: String,
+				value: "*",
+				notify: true,
+				observer: "_getProvides"
+			},
+			
+			viewstructure:
+			{
+				type: Array,
+				value:
+				[
+					{
+						"id": "div1",
+						"type": ""
+					}
+				]
+			},
+			
+			uiElements:{
+				type: Array
+			},
+			
+			divUniqueId: 
+			{
+				type: Number,
+				value: 1
+			}
+		},
+		
+		isMode: function(mode) { console.log(this.mode);console.log(!(this.mode == mode));return this.mode == mode;},
+		
+		addLayoutCell: function() {
+			/*console.log("addLayoutCell");
+			console.log(this.id);
+			this.push( "viewstructure", JSON.parse("{\"id\": \"div" + this.divUniqueId + "\", \"type\": \"\"}"));
+			this.divUniqueId = this.divUniqueId + 1;
+			this.uiElements = this.viewstructure;
+			console.log(this.uiElements);
+			console.log(this.viewstructure);*/
+			
+		},
+		
+		listenerViewStructure: function(v) { console.log("listenerViewStructure"); return this.viewstructure;},
+
+		clickHand: function(e) {
+		  var button = e.target;
+		  while (!button.hasAttribute('data-dialog') && button !== document.body) button = button.parentElement;
+		  
+		  if (!button.hasAttribute('data-dialog')) return;
+
+		  var id = button.getAttribute('data-dialog');
+		  var dialog = document.getElementById(id);
+		  if (dialog) dialog.open();
+		},
+		
+		_getProvides: function() {
+			var sFilter = this.computed_nested_filter.split("/");
+			this.provides = sFilter[sFilter.length-1];
+		},
+		
+		_currentDragIsCompatible: function(type) {
+			if (type == 0)	return 1;
+			else return 0;
+		}
+	  });
+	</script>
+</dom-module>

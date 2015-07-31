@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	  <title>Services Experiments</title>
+	  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+	  
+	  
+	  <link rel="import" href="bower_components/polymer/polymer.html">
+	  
+	  <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+	  <link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
+	  <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+	  
+	  <link rel="stylesheet" href="bower_components/open-sans-fontface/open-sans.css">
+	  
+	  <link rel="import" href="elements/cockpit elements/Cockpit-connect.html">
+	  <link rel="import" href="elements/cockpit elements/Cockpit-content.html">
+	  <style>
+	  * {
+		box-sizing: border-box;
+	  }
+	  body {
+		font-family: "Open Sans";
+	  }
+	  body > div > * {
+	  }
+	  html /deep/ h1,
+	  html /deep/ h2,
+	  html /deep/ h3 {
+		font-weight: 100;
+	  }
+	  </style>
+	</head>
+	<body>
+	<Cockpit-test></Cockpit-test>
+	
+	<!-- Definition du module Cockpit test -->
+	<dom-module id="Cockpit-test">
+		<template>
+			<!-- this aims at providing the navigation and connection features -->
+			<paper-toolbar>
+			  <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
+				<div class="title">Eyessential</div>
+				<Cockpit-connect is-connected="{{isConnected}}"></Cockpit-connect>
+			  <paper-icon-button icon="more-vert" on-tap="moreAction"></paper-icon-button>
+			</paper-toolbar>
+			
+			<!-- check if connected -->
+			<template is="dom-if" if="[[isConnected]]">
+				<Cockpit-content></Cockpit-content> 
+			</template>
+	
+		</template>
+
+		<script>
+			Polymer({
+				is: 'Cockpit-test',
+				
+				properties: {
+				
+					isConnected: {
+						type: Boolean,
+						value: false
+					}
+					
+				}
+			});
+		</script>
+	</dom-module>
+	
+</body>
+</html>
