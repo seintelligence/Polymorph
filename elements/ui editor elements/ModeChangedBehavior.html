@@ -6,7 +6,8 @@
 			{
 				type: String,
 				value: "Operational",
-				notify: true
+				notify: true,
+				reflectToAttribute: true
 			}
 		},
 
@@ -14,13 +15,11 @@
 			'UImodeChangedRequest': 'UImodeChange'
 		},
 		
-		sendModeChangedRequest: function() {
-			this.$.container.fire('UImodeChangedRequest', { "mode": this.mode });
-		},
+		sendModeChangedRequest: function() { console.log(this.mode);this.$.container.fire('UImodeChangedRequest', { "mode": this.mode }); },
 		
 		isMode: function(mode) { return this.mode == mode; this.sendModeChangedRequest();},
 		
-		UImodeChange: function (ev) { this.mode = ev.detail.mode;}
+		UImodeChange: function (ev) { this.mode = ev.detail.mode; console.log(this.mode); }
 		
     };
 </script>

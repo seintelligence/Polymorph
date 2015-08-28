@@ -20,24 +20,41 @@
 	DropBehavior = {
 
 		properties: {
-			uniqueID:
+            // structure
+            structure:
+            {
+                type: Object,
+                notify: true,
+                value:{
+                    "id": "",
+                    "is": "",
+                    "config": {},
+                    "children": {}
+                }
+            },
+
+            /* UI configuration */
+            // id
+            id:
+            {
+                type: String,
+                value: 'no ID',
+                reflectToAttribute: true
+            },
+		
+            // Unique children Id reference
+			divUniqueID:
 			{
-			  type: Boolean,
-			  value: false,
-			  notify: true,
-			  observer: '_highlightChanged'
-			},
-			
-			UIElements:
-			{
-				type: Array,
-				value: []
-			},
-			
-			uniqueID:
-			{
+                type: Number,
 				value: 0
-			}
+			},
+			
+			/*parentcontainer:
+			{
+				type: Object,
+				reflectToAttribute: true
+			}*/
+			
 		},
 
 		listeners: {
@@ -45,10 +62,13 @@
 			dragleave: 'UIdragLeave',
 			drop: 'UIdrop'
 		},
+        
+        observers: [
+            //'updateJsonUIstructure2(structure.*)'
+        ],
 		
 		UIdragLeave: function (ev) {
-			console.log("UIdragLeave ext behaviour");
-			
+		
 			ev.stopPropagation();
 			ev.preventDefault();
 			
@@ -57,7 +77,6 @@
 		},
 
 		UIdragOver: function (ev) {	
-			console.log("UIdropOver ext behaviour");
 			
 			this.sendToasterMsgDisplayRequest("you can drop it here", "information");
 			
@@ -68,12 +87,17 @@
 		},
 		
 		UIdrop: function(ev) {
+			console.log("----------------------");
 			console.log("UIdrop ext behaviour");
 			
 			ev.stopPropagation();
 			ev.preventDefault();
 			
-			var data = ev.dataTransfer.getData("text/html");
+			var host = this,
+                data = ev.dataTransfer.getData("text/html"),
+				newId = this.id + "_" + this.increaseUniqueID(); /* We cannot use the same ID */
+				
+			//this.structure.children[newId] = { 'id': newId};
 			
 			// Remove the class "dragged" which makes the icon low opacity
 			$srcObject = document.getElementById(data);
@@ -82,27 +106,37 @@
 			this.toggleClass("acceptingContainer", 0, this.$.blockContainer);
 			this.toggleClass("refusingContainer", 0, this.$.blockContainer);
 			
-			var nodeCopy = document.createElement('div', data);			
+			var nodeCopy = document.createElement('div', data);
+				nodeCopy.id = newId;
+				nodeCopy.mode = "Development";
+				//nodeCopy.draggable = true;
+                // Not sure whether it is needed
+				//nodeCopy.parentcontainer = this.id;
+                // test related to add event listener to dynamically added cpt (https://stackoverflow.com/questions/30685452/bind-a-value-between-a-parent-and-a-child-element-where-child-element-is-created)
+				nodeCopy.addEventListener("structure-changed", function(e){
+                    console.log("/structure changed");
+                    host.set('structure.children.' + newId, this.structure);
+                    this.echoObject(host.structure);
+                    console.log(host);
+                });
 			
-			nodeCopy.id = this.id + "_" + this.increaseUniqueID(); /* We cannot use the same ID */
-			nodeCopy.mode = "Development";
-			nodeCopy.draggable = true;
-			nodeCopy.addEventListener("modechanged", function(ev){ nodeCopy.mode = this.mode;});
-			
-			this.UIElements.push(nodeCopy);
-			this.$.container.appendChild(nodeCopy);
-			
-			//Polymer.dom(nodeCopy).setAttribute("mode", "[[mode]]");
+			Polymer.dom(this.$.container).appendChild(nodeCopy);
 			this.sendToasterMsgDisplayRequest("dropped!", "information");
 		},
 		
-		increaseUniqueID: function() {
-			this.uniqueID = this.uniqueID + 1;
-			return this.uniqueID;
-		},
+        // test related to add event listener to dynamically added cpt (https://stackoverflow.com/questions/30685452/bind-a-value-between-a-parent-and-a-child-element-where-child-element-is-created)
+		structureChanged: function(value) { console.log("structureChanged");},
 		
-		sendRemoveUIChildRequest: function() {
-			this.fire('removeUIChildRequest', { "node": this });
-		}
+		increaseUniqueID: function() { return this.divUniqueID = this.divUniqueID + 1;},
+		
+		sendRemoveUIChildRequest: function() { this.fire('removeUIChildRequest', { "node": this });},
+        
+        attached: function() {
+            console.log("/attached");
+            this.echoObject(this.structure);
+            this.structure.is = this.is;
+            // Use set to trigger the observer
+            this.set('structure.id', this.id);
+        }
     };
 </script>

@@ -1,5 +1,18 @@
 <script>
 	ToasterRxBehavior = {
+	
+		properties: {
+				toasterMessage:
+				{
+					type: String,
+					value: ""
+				}
+		},
+		
+		listeners: {
+			'toasterMessageRequest': 'displayToasterMessage'
+		},
+		
 		displayToasterMessage: function(ev) {
 			var type = ev.detail.type;
 			var msg = ev.detail.msg;

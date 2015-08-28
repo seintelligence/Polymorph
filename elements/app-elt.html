@@ -1,5 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html"> <!-- Import Polymer element -->
-<link rel="import" href="d3js-tree-elt.html">
+<link rel="import" href="ui editor elements/d3js-tree-cpt.html">
 <link rel="import" href="../bower_components/firebase-element/firebase-collection.html">
 
 <dom-module id="app-elt">
@@ -11,7 +11,7 @@
 			<h4>[[dataElt.__firebaseKey__]]</h4>
 			<span>{{dataElt.Name}}</span>
 		</template>-->
-		<d3js-tree data="{{firebaseData}}"></d3js-tree>
+		<div is="d3js-tree-cpt" id="d3js-tree-cpt" data="{{firebaseData}}"></div>
 	</template>
 	<script>
 		Polymer({

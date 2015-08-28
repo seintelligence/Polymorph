@@ -1,13 +1,17 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
 <link rel="import" href="layout-icon.html">
+<link rel="import" href="cpt_icon-cpt.html">
+
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 
 <link rel="import" href="DropBehavior.html">
 <link rel="import" href="ModeChangedBehavior.html">
 <link rel="import" href="ToasterTxBehavior.html">
-<link rel="import" href="../UtilitiesBehavior.html">
 
 <dom-module id='layout-elt'>
 	<style>
@@ -38,8 +42,6 @@
 			margin: 1px;
 			padding: 5px;
 			height: auto;
-			border-radius: 4px;
-			border: 1px dotted rgb(150, 150, 150);
 		};
 		
 		.development .icons {
@@ -49,6 +51,10 @@
 		
 		.development .container {		
 			background-color:rgb(250, 250, 250);
+			border-radius: 4px;
+			border: 1px dotted rgb(150, 150, 150);
+			padding: 5px;
+			margin: 5px;
 		}
 		
 		.operational {
@@ -68,80 +74,89 @@
 			border-radius: 4px;
 			border-width: 1px
 		}
+		
 	</style> 
 	<template>
 		
 		<!-- Development -->
-		<div class="layout auto-vertical flex development" hidden$='[[!isMode("Development", mode)]]'>
-			
-			<div class="layout flex horizontal">
-				<!-- Filters control -->
-				<div class="development icons">
-					<iron-icon title="filter the parent source of data provided by this component to sub-ccomponent" icon="filter-list" data-dialog="modal" on-click="sendPathJsonEditorRequest"></iron-icon>
-				</div>
-				<!-- Filters computation -->
-				<div class="">
-					<span>filter:</span>
-					<span>{{computed_nested_filter}}</span>
-				</div>
-				<div class="">
-					&nbsp;
-				</div>
-				<!-- Provides computation -->
-				<div class="flex">
-					<span>Provides:</span>
-					<span>{{provides}}</span>
-				</div>
-				<!-- Flex control -->
-				<div class="layout horizontal development icons">
-					<iron-icon title="Switch to a flexible layout (take the remaining horizontal space) or not" id="iconLayoutFlex" icon="icons:fullscreen-exit" on-click="switchLayoutFlex"></iron-icon>
-				</div>
-				<!-- horizontal / vertical layout control -->
-				<div class="layout horizontal development icons">
-					<iron-icon title="Switch layout horizontal<=>vertical" id="iconLayoutHorizVert" icon="icons:swap-horiz" on-click="switchLayoutHorizVert"></iron-icon>
-				</div>
-				<!-- iterate layout control -->
-				<div class="layout horizontal development icons">
-					<iron-icon title="Switch to iterate the content over the found object or not (-)" id="iconLayoutIterate" icon="icons:autorenew" on-click="switchIterating"></iron-icon>
-				</div>
-				<!-- delete control -->
-				<div class="layout end-justified development icons">
-					<iron-icon title="Delete this component" id="iconLayoutDelete" icon="icons:delete" on-click="sendRemoveUIChildRequest"></iron-icon>
-				</div>
-			</div>
-			
-			<div id="blockContainer" class="layout vertical flex development container">
-				<div class="layout horizontal">
-					<div>
-						<!-- check if no element is currently dragged -->
-						<template is="dom-if" if="[[_currentDragIsCompatible(0)]]">
-							<iron-icon icon="input"></iron-icon>
-						</template>
-						
-						<!-- check if currently dragged element is compatible -->
-						<template is="dom-if" if="[[_currentDragIsCompatible(1)]]">
-							<iron-icon icon="check-circle"></iron-icon>
-						</template>
-						
-						<!-- check if currently dragged element is not compatible -->
-						<template is="dom-if" if="[[_currentDragIsCompatible(2)]]">
-							<iron-icon icon="block"></iron-icon>
-						</template>
+		<div draggable="false" class="layout auto-vertical flex development" hidden$='[[!isMode("Development", mode)]]'>
+			<paper-material elevation="1">
+				<div class="layout flex horizontal">
+					<!-- Filters control -->
+					<div class="development icons">
+						<iron-icon title="filter the parent source of data provided by this component to sub-ccomponent" icon="filter-list" data-dialog="modal" on-click="sendPathJsonEditorRequest"></iron-icon>
 					</div>
+					<!-- Filters computation -->
+					<div class="">
+						<span>filter:</span>
+						<span>{{computed_nested_filter}}</span>
+					</div>
+					<div class="">
+						&nbsp;
+					</div>
+					<!-- Provides computation -->
+					<div class="flex">
+						<span>Provides:</span>
+						<span>{{provides}}</span>
+					</div>
+					<!-- Flex control -->
+					<div class="layout horizontal development icons">
+						<iron-icon title="Switch to a flexible layout (take the remaining horizontal space) or not" id="iconLayoutFlex" icon="icons:fullscreen-exit" on-click="switchLayoutFlex"></iron-icon>
+					</div>
+					<!-- horizontal / vertical layout control -->
+					<div class="layout horizontal development icons">
+						<iron-icon title="Switch layout horizontal<=>vertical" id="iconLayoutHorizVert" icon="icons:swap-horiz" on-click="switchLayoutHorizVert"></iron-icon>
+					</div>
+					<!-- iterate layout control -->
+					<div class="layout horizontal development icons">
+						<iron-icon title="Switch to iterate the content over the found object or not (-)" id="iconLayoutIterate" icon="icons:autorenew" on-click="switchLayoutIterate"></iron-icon>
+					</div>
+                    <!-- code control -->
+					<div class="layout end-justified development icons">
+						<iron-icon title="Get the code of this element" id="iconLayoutCode" icon="icons:code" on-click="getCode"></iron-icon>
+					</div>
+					<!-- delete control -->
+					<div class="layout end-justified development icons">
+						<iron-icon title="Delete this component" id="iconLayoutDelete" icon="icons:delete" on-click="sendRemoveUIChildRequest"></iron-icon>
+					</div>
+					<!-- Iron signals -->
+					<!--<iron-signals on-iron-signal-update="oo"></iron-signals>-->
 				</div>
-				<!-- where objects are dropped -->
-				<div id="container" class="layout horizontal"></div>
-			</div>
+				
+				<div id="blockContainer" class="layout vertical flex development container">
+					<!-- icons for layout acceptance -->
+					<div class="layout horizontal">
+							<!-- check if no element is currently dragged -->
+							<template is="dom-if" if="[[_currentDragIsCompatible(0)]]">
+								<iron-icon icon="input"></iron-icon>
+							</template>
+							
+							<!-- check if currently dragged element is compatible -->
+							<template is="dom-if" if="[[_currentDragIsCompatible(1)]]">
+								<iron-icon icon="check-circle"></iron-icon>
+							</template>
+							
+							<!-- check if currently dragged element is not compatible -->
+							<template is="dom-if" if="[[_currentDragIsCompatible(2)]]">
+								<iron-icon icon="block"></iron-icon>
+							</template>
+					</div>
+					<!-- where objects are dropped -->
+					<div id="container" class="layout horizontal"></div>
+				</div>
+			</page-material>
 		</div>
 		
 		<!-- Operational -->
-		<div hidden$='[[!isMode("Operational", mode)]]'>
-			<div class="layout horizontal flex operational"></div>
+		<div draggable="false" hidden$='[[!isMode("Operational", mode)]]'>
+			<paper-material elevation="1">
+                <div id="operational" class="layout horizontal flex operational"><content></content></div>
+			</paper-material>
 		</div>
 		
 		<!-- Icon -->
-		<div hidden$='[[!isMode("Icon", mode)]]'>
-			<div draggable="false" is="layout-icon"></div>
+		<div draggable="false" hidden$='[[!isMode("Icon", mode)]]'>
+			<div is="cpt_icon-cpt" draggable="false" imgsrc="layout"></div>
 		</div>
 	</template>
 
@@ -149,47 +164,11 @@
 		Polymer({
 			is: 'layout-elt',
 			
-			behaviors: [DropBehavior, ModeChangedBehavior, ToasterTxBehavior, UtilitiesBehavior],
+			behaviors: [ToasterTxBehavior, DropBehavior, ModeChangedBehavior, UtilitiesBehavior],
 			
 			extends: 'div',
 			
 			properties: {
-				/* UI structure */
-				// UI children
-				structure:
-				{
-					type: Object,
-					notify: true,
-					value:{
-						"id": "",
-						"config": {
-							"computed_nested_filter": "",
-							"divUniqueId": 0,
-							"layoutHorizVert": false,
-							"layoutFlex": false,
-							"layoutIterate": false
-						},
-						"children": {}
-					},
-					readonly: true,
-					observer: 'updateJsonUIstructure'
-				},
-				
-				// Unique children Id reference
-				divUniqueId: 
-				{
-					type: Number,
-					value: 1
-				},
-				
-				/* UI configuration */
-				// id
-				id:
-				{
-					type: String,
-					value: 'no ID',
-					observer: 'updateJsonUIstructure'
-				},
 				
 				// accepts data type
 				accepts:
@@ -228,145 +207,137 @@
 				layoutHorizVert:
 				{
 					type: Boolean,
-					value: 0
+					value: 0,
+                    observer: 'setLayoutHorizVert'
 				},
 				
 				// 1: flex
 				layoutFlex:
 				{
 					type: Boolean,
-					value:false
+					value:false,
+                    observer: 'setLayoutFlex'
 				},
 				
 				// 1: iterate
 				layoutIterate:
 				{
 					type: Boolean,
-					value:false
-				}				
+					value:false,
+                    observer: 'setLayoutIterate'
+				}		
 				
-			},
-			
-			listeners: {
-				'UIchildrenUpdate': '_receiveChildrenUpdate'
-			},
-			
-			observers: ['updateJsonUIstructure(id, computed_nested_filter, divUniqueId, layoutFlex, layoutHorizVert, layoutIterate, structure)'],
-			
-			ready: function() { this.structure.id = this.id; },
-			
-			/* Structure management : this element and its config (layout + filter) + children */
-			//		
-			updateJsonUIstructure: function() {
-				console.log("updateJsonUIstructure");
-				console.log(this.structure);
-				/*var structure = {
-					"id": this.id,
-					"config": {
-						"computed_nested_filter": this.computed_nested_filter,
-						"divUniqueId": this.divUniqueId,
-						"layoutHorizVert": this.layoutHorizVert,
-						"layoutFlex": this.layoutFlex,
-						"layoutIterate": this.layoutIterate
-					},
-					"children": this.childrenStructure
-				};*/
-				this.fire('UIchildrenUpdate', { "id": this.id, "request": "update", "structure": this.structure  });
-			},
-			
-			_receiveChildrenUpdate: function(ev) {
-				console.log("_receiveChildrenUpdate");
-				console.log(ev);
-				var data = ev.detail,
-					id = data.id,
-					request = data.request;
-					
-				console.log(id);
-				console.log(this.id);
-					
-				if (id.split(this.id)[1]) {
-					console.log("received from children");
-					if( request == "update" )
-						this.structure.children[id] = data.structure;
-					if( request == "remove" )
-						this.structure.children[id].remove();
-						
-					console.log(data.structure);
-				}
-				console.log(this.structure);
 			},
 			
 			/* Layout config */
 			switchLayoutHorizVert: function(ev) {
+                console.log("/switchLayoutHorizVert");
+                
+                // Toggle value
 				this.layoutHorizVert = !this.layoutHorizVert;
-				
-				var sOld = (this.layoutHorizVert?"horizontal":"vertical"),
-					sNew = (this.layoutHorizVert?"vertical":"horizontal");
-					
-				this.sendToasterMsgDisplayRequest("Layout changed from " + sOld + " to " + sNew, "information");
-				
-				$(this.$.container).removeClass(sOld);
-				$(this.$.container).addClass(sNew);
+				                
+                // Change icon
 				this.$.iconLayoutHorizVert.icon = "icons:swap-" + (this.layoutHorizVert?"vert":"horiz");
 				
 				// update the structure to propagate the update to the parents
-				this.structure.config.layoutHorizVert = this.layoutHorizVert;
-				
+                this.set('structure.config.layoutHorizVert', this.layoutHorizVert);
 			},
 			
 			switchLayoutFlex: function(ev) {
-				this.layoutFlex = !this.layoutFlex;
-				this.toggleClass("flex", this.layoutFlex);
+				console.log("/switchLayoutFlex");
 				
-				this.sendToasterMsgDisplayRequest("Layout changed to " + (this.layoutFlex?"flex":"not flex", "information"));
-					
-				if (this.layoutFlex) {
-					$(this).addClass("flex");
+                // Toggle value
+                this.layoutFlex = !this.layoutFlex;
+				
+                // Change icon
+                if (this.layoutFlex)
 					this.$.iconLayoutFlex.icon = "icons:fullscreen";
-				} else {
-					$(this).removeClass("flex");
-					this.$.iconLayoutFlex.icon = "icons:fullscreen-exit";
-				}
-				
+				else
+                    this.$.iconLayoutFlex.icon = "icons:fullscreen-exit";
+                
 				// update the structure to propagate the update to the parents
-				this.structure.config.layoutFlex = this.layoutFlex;
+                this.set('structure.config.layoutFlex', this.layoutFlex);
 			},
 			
-			switchIterating: function(ev) {
+			switchLayoutIterate: function(ev) {
+				console.log("/switchLayoutIterate");
+                
+                // Toggle value
 				this.layoutIterate = !this.layoutIterate;
 				
-				this.sendToasterMsgDisplayRequest("Layout changed to " + (this.layoutIterate?"iterate":"not iterate"), "information");
+                // Change icon
 				this.$.iconLayoutIterate.icon = (this.layoutIterate?"icons:remove":"icons:autorenew");
 				
 				// update the structure to propagate the update to the parents
-				this.structure.config.layoutIterate = this.layoutIterate;
+                this.set('structure.config.layoutIterate', this.layoutIterate);
+			},
+            
+            // setLayoutHorizVert
+            setLayoutHorizVert: function() {
+				var sOld = (this.layoutHorizVert?"horizontal":"vertical"),
+					sNew = (this.layoutHorizVert?"vertical":"horizontal");
+				
+                // trigger toaster information
+				this.sendToasterMsgDisplayRequest("Layout changed from " + sOld + " to " + sNew, "information");
+				
+                // Set the layout effect
+				$(this.$.container).removeClass(sOld);
+				$(this.$.container).addClass(sNew);
+                $(this.$.operational).removeClass(sOld);
+				$(this.$.operational).addClass(sNew);
+			},
+            
+            // setLayoutFlex
+            setLayoutFlex: function() {
+                // trigger toaster information
+                this.sendToasterMsgDisplayRequest("Layout changed to " + (this.layoutFlex?"flex":"not flex", "information"));
+					
+                // Set the layout effect
+				if (this.layoutFlex)
+					$(this).addClass("flex");
+				else
+					$(this).removeClass("flex");
+			},
+            
+            // setLayoutFlex
+            setLayoutIterate: function() {
+                // trigger toaster information
+				this.sendToasterMsgDisplayRequest("Layout changed to " + (this.layoutIterate?"iterate":"not iterate"), "information");
+                
+                // Set the layout effect (..)
 			},
 			
 			/* sert a rien pour l'instant Non Op */
 			_currentDragIsCompatible: function(type) {
-				if (type == 0)	return 1;
+				if (type === 0)	return 1;
 				else return 0;
 			},
 			
 			/* Filtering */
 			sendPathJsonEditorRequest: function(ev) {
-				this.fire('pathJsonEditorRequest', { "current_filter": this.current_filter, "computed_nested_filter": this.computed_nested_filter});
+				this.fire('pathJsonEditorRequest', 
+                    {
+                        "current_filter": this.current_filter,
+                        "computed_nested_filter": this.computed_nested_filter
+                    }
+                );
 			},
 			
 			_getProvides: function() {
+                console.log("/_getprovides");
 				var sFilter = this.computed_nested_filter.split("/");
-				this.provides = sFilter[sFilter.length-1];
+				//this.provides = sFilter[sFilter.length-1];
 				
 				// update the structure to propagate the update to the parents
-				this.structure.config.provides = this.provides;
+                //this.set('structure.config.provides', this.provides);
 			},
 			
 			_resetFiltering: function(ev) {
-				console.log("_resetFiltering");
-				this.computed_nested_filter = "";
+				console.log("/_resetFiltering");
+				//this.computed_nested_filter = "";
 				
 				// update the structure to propagate the update to the parents
-				this.structure.config.provides = this.computed_nested_filter;
+                //this.set('structure.config.provides', this.computed_nested_filter);
 			}
 		});
 	</script>

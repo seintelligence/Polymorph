@@ -1,0 +1,32 @@
+<script>
+	TextCptBehavior = {
+		
+		properties: {
+            bindToContainer: 
+            {
+                type: Boolean,
+                value: false
+            },
+            
+            displayedText:
+            {
+                type: String,
+                value: "pp",
+                observer: 'displayedTextChanged'
+            }
+        },
+
+		connectCpt: function() {
+            this.bindToContainer = !this.bindToContainer;
+            
+            // update the structure to propagate the update to the parents
+            this.set("this.structure.config.bindToContainer", this.bindToContainer);
+        },
+          
+        displayedTextChanged: function(ev) {
+            console.log("/displayedTextChanged");
+            // update the structure to propagate the update to the parents
+            this.set("structure.config.displayedText", this.displayedText);
+        }
+    };
+</script>
