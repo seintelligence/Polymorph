@@ -1,7 +1,7 @@
 <script>
 	TextCptBehavior = {
 		
-		properties: {
+        properties: {
             bindToContainer: 
             {
                 type: Boolean,
@@ -11,22 +11,32 @@
             displayedText:
             {
                 type: String,
-                value: "pp",
+                value: "empty...",
                 observer: 'displayedTextChanged'
             }
+        },
+        
+        ready: function() {
+            if (this.id!= "h1-cpt" && this.id != "text-cpt")
+                this.structure.config.displayedText = "oo";
+            //this.set("structure.config.displayedText", "oo");
         },
 
 		connectCpt: function() {
             this.bindToContainer = !this.bindToContainer;
             
             // update the structure to propagate the update to the parents
-            this.set("this.structure.config.bindToContainer", this.bindToContainer);
+            this.set("structure.config.bindToContainer", this.bindToContainer);
         },
           
         displayedTextChanged: function(ev) {
             console.log("/displayedTextChanged");
+            var distxt = this.displayedText + '';
+            console.log(distxt);
+            console.log(this.copyJSONobj(this.structure));
+            console.log(this.host);
             // update the structure to propagate the update to the parents
-            this.set("structure.config.displayedText", this.displayedText);
+            //this.set("structure.config.displayedText", distxt);
         }
     };
 </script>

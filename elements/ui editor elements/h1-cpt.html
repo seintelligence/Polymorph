@@ -2,9 +2,10 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/iron-input/iron-input.html">
 
-<link rel="import" href="TextCptBehavior.html">
 <link rel="import" href="path_json_editor-cpt.html">
 <link rel="import" href="cpt_icon-cpt.html">
+
+<link rel="import" href="TextCptBehavior.html">
 
 <dom-module id='h1-cpt'>
 	<style>
@@ -61,7 +62,7 @@
 					<iron-icon title="Delete this component" id="iconLayoutDelete" icon="icons:delete" on-click="sendRemoveUIChildRequest"></iron-icon>
 				</div>
 			</div>
-			<input is="iron-input" id="h1_input" class="style-scope paper-input" required="" autocomplete="off" placeholder="h1" aria-describedby="" name="h1" aria-labelledby="paper-input-label-836">
+			<input is="iron-input" id="h1_input" class="style-scope paper-input" required="" autocomplete="off" placeholder="text" aria-describedby="" name="h1" aria-labelledby="paper-input-label-836" bind-value="{{displayedText}}">
 		</div>
 		
 		<!-- Operational -->
@@ -79,7 +80,7 @@
 	  Polymer({
 		is: 'h1-cpt',
 		
-		behaviors: [ToasterTxBehavior, DropBehavior, ModeChangedBehavior, TextCptBehavior, UtilitiesBehavior],
+		behaviors: [ToasterTxBehavior, DropBehavior, ModeChangedBehavior, UtilitiesBehavior, TextCptBehavior],
           
 		extends: 'div'
 		

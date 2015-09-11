@@ -30,6 +30,9 @@
 		
 		UIdragStart: function (ev) {
             console.log("/UIdragStart");
+            
+            this.$.contentDrawer.closeDrawer();
+            
 			$srcElement = $(ev.srcElement);
 			$srcElement.addClass("dragged");
             console.log($srcElement);

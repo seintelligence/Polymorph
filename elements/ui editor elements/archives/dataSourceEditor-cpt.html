@@ -1,0 +1,314 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="JSON_Filter-elt.html">
+
+<link rel="import" href="../UtilitiesBehavior.html">
+
+<script src="../../scripts/defiant-latest.min.js"></script>
+
+<dom-module id="dataSourceEditor-cpt">
+	  <style>
+		:host {
+		  @apply(--layout-horizontal);
+		};
+		
+		.Filter_panel {
+			@apply(--layout-vertical);
+		};
+		
+		.JSON_Filter_Buttons {
+			font-family: "Open Sans";
+			background: #4285f4;
+			color: white;
+		};
+	</style>
+	
+	<template>
+        
+		<!--<JSON_Filter-elt></JSON_Filter-elt>-->
+		<div class="Filter_panel" class="content layout vertical flex">
+			<template is="dom-repeat" items="[[ current_filter_elements ]]" as="current_filter_element" observe="isSelected">
+				<div style="margin-bottom:6px;" hidden="{{isNotSelected(current_filter_element.isSelected, current_filter_element.name)}}">
+					<paper-button title="[[current_filter_element.description]]" raised class="JSON_Filter_Buttons" on-click="getCurrent_filter">
+						<template is="dom-if" if="[[current_filter_element.isSelected]]">
+							<iron-icon icon="cancel"></iron-icon>
+						</template>
+						<span>[[current_filter_element.name]]</span>
+					</paper-button>
+				</div>
+			</template>
+            
+            <template is="dom-if" if="[[isCurrentFilterObject(current_filter)]]">
+                <div class="content layout horizontal flex">
+                    <div><img src="../../images/arrow_link.png"></div>
+                    <div class="content layout horizontal flex">
+                        <template is="dom-repeat" items="[[ current_links ]]" as="current_link">
+                            <div style="margin-bottom:6px;">
+                                <paper-button title="[[current_link.name]]" raised class="JSON_Filter_Buttons" on-click="getCurrent_Link">
+                                    <template is="dom-if" if="[[current_filter_element.isSelected]]">
+                                        <iron-icon icon="cancel"></iron-icon>
+                                    </template>
+                                    <span>[[current_link.name]]</span>
+                                </paper-button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            <template is="dom-if" if="[[isCurrentFilterObject(current_filter)]]">
+			     <dataSourceEditor-cpt initial_json="[[initial_json]]" parent_json="[[current_json]]" computed_nested_filter="{{sub_filter}}">    
+                </dataSourceEditor-cpt>
+		</template>
+		</div>
+		
+		
+	</template>
+	
+	<script>
+		 Polymer({
+			is: 'dataSourceEditor-cpt',
+			
+			behaviors: [UtilitiesBehavior],
+
+			properties: {
+				initial_json:
+				{
+					type: Array,
+					value: function() { return [];},
+					observer: "_observeParent_json"
+				},
+				parent_json:
+				{
+					type: Array,
+					value: function() { return [];},
+					observer: "_observeParent_json"
+				},
+				computed_nested_filter: {
+					type: String,
+					notify: true
+				},
+				current_filter_elements:
+				{
+					type: Array
+				},
+                current_links:
+                {
+                    type: Array
+                },
+				current_json: 
+				{
+					type: Array
+				},
+				current_filter: {
+					type: String,
+					observer: '_observeFiltersEvolution',
+					value: ""
+				},
+				sub_filter: {
+					type: String,
+					notify: true,
+					observer: '_observeFiltersEvolution',
+					value: ""
+				},
+				filters_struct:
+				{
+					value:
+					{
+						"position": 
+						{
+							"last()": "last()",
+							"first()": "first()",
+							"position()": 
+							{
+								"=": "=",
+								">": ">",
+								">=": ">=",
+								"<": "<",
+								"<=": "<=",
+								"<>": "<>"
+							}
+						},
+						"attributes":
+						{
+						
+						}						
+					}
+				}
+			},
+						
+			_observeFiltersEvolution: function(change) { this.computeComputed_nested_filter();},
+			
+			_observeParent_json: function(change) { this.updateCurrent_filter_elements();},
+			
+			updateCurrent_filter_elements: function()
+			{
+				var arrFilter = [];
+				var arrAttributes = [];
+				
+				var parent_json = this.parent_json;
+				
+				// resetCurrent_filter
+				this.resetCurrent_filter();
+				
+				// resetSub_filter
+				this.resetSub_filter();
+				
+				/*// add the basic xpath schema to the available filter elements
+				var wildcarFilter = {name: "*", isSelected: false, description: "selects all elements regardless of the element name"};
+				var childFilter = {name: "/", isSelected: false, description: "selects immediate children. When this operator appears at the start of the pattern, it indicates that children should be selected from root node."};
+				var recursiveChildFilter = {name: "//", isSelected: false, description: "search for the specified element at any depth. When this path operator appears at the start of the pattern, it indicates recursive descent from the root node."};
+				var currentFilter = {name: ".", isSelected: false, description: "Indicates the current context."};
+				var parentFilter = {name: "..", isSelected: false, description: "Indicates the parent of the current context."};
+				
+                // Add the JSON path 
+				arrFilter.push(
+					wildcarFilter,
+					childFilter,
+					recursiveChildFilter,
+					currentFilter,
+					parentFilter);*/
+				
+                console.log(parent_json);
+                if(parent_json)
+                arrFilter = this.getArrayEditor(parent_json);
+				
+				
+				this.current_filter_elements = arrFilter;
+				this.current_attribute_elements = arrAttributes;
+			},
+             
+             getArrayEditor(tmpJson)
+             {
+                var tmpArray = [];
+                 
+                 // add the available prop to the available filter elements
+				for (var key in tmpJson) {
+				   if (tmpJson.hasOwnProperty(key)) {
+					   var obj = tmpJson[key];
+						for (var prop in obj) {
+						  // important check that this is objects own property 
+						  // not from prototype prop inherited
+						  if(obj.hasOwnProperty(prop)){
+							var a = {name: prop, isSelected: false, description: prop};
+							tmpArray.push(a);
+						  }
+						  
+					   }
+					}
+				}
+                 return tmpArray;
+             },
+             
+             getArrayLinks(tmpJson)
+             {
+                var tmpArray = [];
+                 
+                // add the available prop to the available filter elements
+				for (var key in tmpJson) {
+				   if (tmpJson.hasOwnProperty(key)) {
+                        var parameters = this.initial_json.linkage_structure_schema[key]
+                        var a = {name: key, isSelected: false, parameters: parameters};
+                        tmpArray.push(a);
+					}
+				}
+                 return tmpArray;
+             },
+             
+             getCurrent_Link: function(e) 
+             {
+                 var model = e.model;
+				
+				// get current selection status
+				var isCurrentlySelected = this.get('current_links.' + model.__key__ + '.isSelected');
+				
+				// set all the filters to not selected
+				this.updateCurrent_links();
+				
+				// invert current selection status
+				this.set('current_links.' + model.__key__ + '.isSelected', !isCurrentlySelected);
+				
+				// get updated current selection status
+				var isCurrentlySelected = this.get('current_links.' + model.__key__ + '.isSelected');
+									
+				// updateCurrent_filter
+				var currentlySelected_link = "";
+				
+				if (isCurrentlySelected) currentlySelected_link = this.get('current_links.' + model.__key__ + '.name')
+				this.updateCurrent_Link(currentlySelected_link);
+				
+				// update the current json based on the filter
+				this.updateCurrent_json();
+             },
+			
+			getCurrent_filter: function(e)
+			{				
+				var model = e.model;
+				
+				// get current selection status
+				var isCurrentlySelected = this.get('current_filter_elements.' + model.__key__ + '.isSelected');
+				
+				// set all the filters to not selected
+				this.updateCurrent_filter_elements();
+				
+				// invert current selection status
+				this.set('current_filter_elements.' + model.__key__ + '.isSelected', !isCurrentlySelected);
+				
+				// get updated current selection status
+				var isCurrentlySelected = this.get('current_filter_elements.' + model.__key__ + '.isSelected');
+				
+				// reset sub_filter
+				//if (isCurrentlySelected)
+				//	this.resetSub_filter();
+					
+				// updateCurrent_filter
+				var currentlySelected_filter = "";
+				
+				if (isCurrentlySelected) currentlySelected_filter = this.get('current_filter_elements.' + model.__key__ + '.name')
+				this.updateCurrent_filter(currentlySelected_filter);
+				
+				// update the current json based on the filter
+				this.updateCurrent_json();
+			},
+			
+			computeComputed_nested_filter: function() {
+				if( this.current_filter !== "" || this.sub_filter !== "")
+					this.computed_nested_filter = "/" + this.current_filter + this.sub_filter;
+				else this.computed_nested_filter = "";
+			},
+			
+			updateCurrent_filter: function(current_filter) { this.current_filter = current_filter;},
+             
+			updateCurrent_link: function(current_link) { this.current_link = current_link;},
+			
+			updateCurrent_json: function() {
+				if ( this.current_filter.charAt(0) == "_" )
+				{
+					this.current_json = JSON.search(this.initial_json, "//" + this.current_filter.substring(1), false);
+					var subJSON = JSON.search(this.parent_json[0], "//" + this.current_filter, false);
+					this.updateCurrent_filter(subJSON[0]);
+				}
+				else if (this.current_filter)
+					this.current_json = JSON.search(this.parent_json[0], "//" + this.current_filter, false);
+				else
+					this.current_json = null;
+                
+                this.current_links = this.getArrayLinks(this.current_json[0].links);
+                console.log("/updateCurrent_json");
+                console.log(this.current_links);
+                console.log(this.current_json);
+			},
+			
+			isCurrentFilterObject: function( currentFilterObject ) { if (currentFilterObject && currentFilterObject.charAt(0) != "@") return true;},
+			
+			resetSub_filter: function() { this.sub_filter = ""; },
+			
+			resetCurrent_filter: function() { this.current_filter = ""; },
+			
+			isNotSelected: function(isSelected, name) { return !isSelected && this.current_filter != "";},
+			
+			// Not sure if needed
+			arrayItem: function(change, index, path){ return this.get(path, change.base[index]);}
+		});
+	</script>
+</dom-module>

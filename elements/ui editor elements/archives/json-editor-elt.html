@@ -1,0 +1,92 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-autogrow-textarea/iron-autogrow-textarea.html">
+ 
+<!--
+Simple textarea for editing JSON objects, with a few simple improvements.
+
+Adding whitespace (i.e. matching /\s+/ ) will not move cursor to end of input.
+
+Use the autofit attribute to have the textarea scale and fit as needed.
+
+##### Example
+
+    <json-editor rows="5" json="{{myJsonData}}" autofit></json-editor>
+
+@element json-editor
+@blurb Simple textarea for editing JSON objects
+@status alpha
+@homepage http://maxbates.github.io/json-editor
+-->
+<dom-module id='json-editor'>
+  <template>
+    <link rel="stylesheet" href="json-editor.css">
+    <div class="json-editor {{ {'has-focus': focused, 'has-error': errored} | tokenList }}">
+      <template if="{{errored}}">
+        <div class="help">{{errored}}</div>
+      </template>
+	  <iron-autogrow-textarea
+	    autofocus="true"
+		bindValue="{{text}}"
+		rows="{{rows}}"
+		placeholder="Enter JSON">
+	    <textarea id="t1"></textarea>
+	  </iron-autogrow-textarea>
+    </div>
+  </template>
+  <script>
+  var whitespaceResetRegex = /\s+/g;
+
+  Polymer({
+    is: 'json-editor',
+    properties: {
+        text : '',
+        focused : false,
+        errored : false,
+		json: {
+			value: "12",
+			plouf: "oo"	
+		},
+
+        //default values instead of using attributes attribute in element declaration
+        publish: {
+          rows: 1,
+          autofit: false
+        },
+ 
+        //declare in attributes at top so can set it with binding, hint it here
+        created : function () {
+          this.json = {};
+        },
+
+        //change watchers
+        jsonChanged : function (oldval, newval) {
+          this.text = JSON.stringify(newval, null, 2);
+        },
+        textChanged : function (oldval, newval) {
+          if (this.autofit) {
+            this.rows = newval.split('\n').length;
+         }
+
+         try {
+            //check to make sure we've added new characters, not just whitespace
+            //e.g. adding a space results in a valid json, and moves cursor to end of box
+            if (newval.replace(whitespaceResetRegex, '') !=  oldval.replace(whitespaceResetRegex, '')) {
+             this.json = JSON.parse(newval);
+             this.errored = false;
+           }
+         } catch(evt) {
+            this.errored = evt;
+          }
+        },
+
+        //event handlers
+        onFocus : function (evt) {
+          this.focused = true;
+        },
+        onBlur : function (evt) {
+          this.focused = false;
+        }
+      }
+	});
+  </script>
+</dom-module>

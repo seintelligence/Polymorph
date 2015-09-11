@@ -7,6 +7,7 @@
 
 <link rel="import" href="bower_components/polymer/polymer.html">
 
+<link rel="import" href="bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/iron-icons/editor-icons.html">
 
@@ -16,7 +17,7 @@
 <link rel="import" href="bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="bower_components/paper-progress/paper-progress.html">
-  
+    
 <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="bower_components/paper-toast/paper-toast.html">
@@ -39,8 +40,9 @@
 	  <link rel="import" href="elements/cockpit elements/Cockpit-connect.html">
 
 <link rel="import" href="elements/ui editor elements/path_json_editor-cpt.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-drawer-panel/paper-drawer-panel.html" >
+<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
 
 <!-- JSON tree -->
 <link href="scripts/JSON-tree/css/jsontree.css" rel="stylesheet">
@@ -107,96 +109,120 @@
 		.dragged {
 			opacity: 0.5;
 		}
+        
+        [drawer] {
+           position:relative;
+        }
+        
 	</style>
 	<template>
 	
 		<!-- get the Json Structure -->
-		<getJsonStructure-cpt json_schema="{{json_schema}}"></getJsonStructure-cpt>
+		<!--<getJsonStructure-cpt json_schema="{{json_schema}}"></getJsonStructure-cpt>-->
 		
 		<!-- Dialog box for JSON path filtering configuration in development mode -->
 		<paper-dialog id="modal" modal="" role="dialog" tabindex="-1" aria-modal="true" class="x-scope paper-dialog-0" style="outline: none; box-sizing: border-box; position: static; display: none;" aria-hidden="true">
 			<h2>Filtering</h2>
 			<paper-dialog-scrollable>
-				<path_json_editor-cpt
-					filter="[[current_filter]]"
-					computed_nested_filter="{{computed_nested_filter}}"
-				></path_json_editor-cpt>
+				<path_json_editor-cpt filter="[[current_filter]]" computed_nested_filter="{{computed_nested_filter}}">
+                </path_json_editor-cpt>
 			</paper-dialog-scrollable>
 			<div class="buttons">
 				<paper-button dialog-dismiss>Cancel</paper-button>
 				<paper-button dialog-confirm on-click="validateFiltering">Accept</paper-button>
 			</div>
 		</paper-dialog>
-		<div class="fullbleed layout vertical">
-			<!-- The application main toolbar -->
-			<paper-toolbar>
-			  <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button>
-				<div class="title">Polymorph by SEI</div>
-				<Cockpit-connect is-connected="{{isConnected}}"></Cockpit-connect>
-			  <paper-icon-button icon="more-vert" on-tap="moreAction"></paper-icon-button>
-			</paper-toolbar>
-			<!-- Progress bar -->
-			<div class="layout flex horizontal"><paper-progress value="90"></paper-progress></div>
-		
-			<div class="layout horizontal flex">
-				<!-- The catalog of UI elements to DnD -->
-				<div class="paper-header has-shadow header_panel" hidden$='[[!isMode("Development", mode)]]'>
-					<div class="content layout vertical flex" id="UIElementsCatalog">
-						
-						<paper-menu>
-							<paper-item id="stuctureMenuItem">Structural Elements</paper-item>
-							<paper-item id="catalogStructure">
-								<div is="layout-elt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="layout-elt"></div>
-							</paper-item>
-							<paper-item id="textMenuItem">Text Elements</paper-item>
-							<paper-item id="catalogText">
-								<div is="text-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="text-cpt"></div>
-								<div is="h1-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="h1-cpt"></div>
-							</paper-item>
-							<paper-item id="datavizMenuItem" onSelect="oo">Data Visualisation Elements</paper-item>
-							<paper-item id="catalogDataViz">
-								<div is="d3js-tree-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="d3js-tree-cpt"></div>
-							</paper-item>		
-						</paper-menu>
-                        
-                        
-						
-									
-					</div>
-				</div>
-				
-				<div class="layout vertical flex" style="padding: 20px;">
-					<!-- View Configuration toolbar -->
-					<div class="content layout horizontal">
-						
-						<!-- rights -->
-						<iron-icon title="Give rights for this view: Who can access this view and with which rights?" on-click='' icon="icons:supervisor-account"></iron-icon>
-						
-						<!-- classification -->
-						<iron-icon title="Classify this view to better find it back: Which tag attach to this view and in which folders to classify it?" on-click='' icon="icons:folder"></iron-icon>
-						
-						<!-- save the UI -->
-						<div class="layout flex">
-							<iron-icon title="Save this view" on-click='saveView' icon="icons:save">saved</iron-icon>
-						</div>
-							
-						<!-- In Development ==> Operational icon -->					
-						<div class="layout end-justified">
-							<div class="line">
-								<span id="modeToggleOperational">Operational</span>
-								<paper-toggle-button checked="true" id="modeToggle" class="blue" on-change="modeTogglechange" title="Switch the visual mode: Development or Operational mode"></paper-toggle-button>
-								<span id="modeToggleEdition">Edition</span>
-							</div>
-						</div>
-					</div>
-					
-					<!-- The container receiving the drag drop -->
-					<div id="UItopContainer" class="flex" is="layout-elt" mode="Development" structure="[[structure]]"></div>
-					<span id="JSONstructure"></span>
+            
+        <!-- content with drawer -->
+        <paper-drawer-panel id="contentDrawer" force-narrow="true" defaultSelected="drawer" peeking="true" dragging="true">
+            <paper-header-panel drawer >
+                <paper-toolbar>
+                  <div class="title">UI Components</div>
+                </paper-toolbar>
+                 <!-- The catalog of UI elements to DnD -->
+                <div hidden$='[[!isMode("Development", mode)]]'>
+                    <div class="content layout vertical flex" id="UIElementsCatalog">
+                        <paper-menu>
+                            
+                            <paper-item id="stuctureMenuItem" on-click="showStructureCatalog">
+                                Structural Elements
+                                &nbsp;
+                                <paper-fab icon="icons:view-quilt" class="UIcatalogIcons"></paper-fab>
+                            </paper-item>
+                            <iron-collapse id="structureCatalog">
+                                    <div is="layout-elt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="layout-elt"></div>
+                            </iron-collapse>
+                            
+                            <paper-item id="textMenuItem" on-click="showTextCatalog">
+                                Text Elements
+                                &nbsp;
+                                <paper-fab icon="icons:speaker-notes" class="UIcatalogIcons"></paper-fab>
+                            </paper-item>
+                            <iron-collapse id="textCatalog">
+                                <div is="text-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="text-cpt"></div>
+                                <div is="h1-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="h1-cpt"></div>
+                            </iron-collapse>
+                            
+                            <paper-item id="datavizMenuItem" onSelect="oo" on-click="showDataVizCatalog">
+                                Data Visualisation Elements
+                                &nbsp;
+                                <paper-fab icon="icons:trending-up" class="UIcatalogIcons"></paper-fab>
+                            </paper-item>
+                            <iron-collapse id="datavizCatalog">
+                                <div is="d3js-tree-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="d3js-tree-cpt"></div>
+                            </iron-collapse>
+                            
+                        </paper-menu>
+                    </div>
+                </div>
+            </paper-header-panel>
+
+            <paper-header-panel main>
+                <!-- The application main toolbar -->
+                <paper-toolbar>
+                    <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+                    <div class="title">Polymorph by SEI</div>
+                    <Cockpit-connect is-connected="{{isConnected}}"></Cockpit-connect>
+                    <paper-icon-button icon="more-vert" on-tap="moreAction"></paper-icon-button>
+                </paper-toolbar>
+
+                <!-- Progress bar -->
+                <div class="layout flex horizontal"><paper-progress value="90"></paper-progress></div>
+
+                <div>&nbsp;</div>
+                <!-- Main content -->
+                <div >
+                    <!-- View Configuration toolbar -->
+                    <div class="content layout horizontal">
+
+                        <!-- rights -->
+                        <iron-icon title="Give rights for this view: Who can access this view and with which rights?" on-click='' icon="icons:supervisor-account"></iron-icon>
+
+                        <!-- classification -->
+                        <iron-icon title="Classify this view to better find it back: Which tag attach to this view and in which folders to classify it?" on-click='' icon="icons:folder"></iron-icon>
+
+                        <!-- save the UI -->
+                        <div class="layout flex">
+                            <iron-icon title="Save this view" on-click='saveView' icon="icons:save">saved</iron-icon>
+                        </div>
+
+                        <!-- In Development ==> Operational icon -->					
+                        <div class="layout end-justified">
+                            <div class="line">
+                                <span id="modeToggleOperational">Operational</span>
+                                <paper-toggle-button checked="true" id="modeToggle" class="blue" on-change="modeTogglechange" title="Switch the visual mode: Development or Operational mode"></paper-toggle-button>
+                                <span id="modeToggleEdition">Edition</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- The container receiving the drag drop -->
+                    <div id="UItopContainer" class="flex" is="layout-elt" mode="Development" structure="{{structure}}"></div>
+                    <span id="JSONstructure"></span>
                     <span id="JSONhtml"></span>
-				</div>
-			</div>
-		</div>
+                </div>
+            </paper-header-panel>
+        </paper-drawer-panel>
 		
 		<!-- paper toasts - messages bubbling in the bottom of the window -->
 		<!-- information -->
@@ -215,7 +241,7 @@
 		Polymer({
 			is: 'visual-ui-editor-library-cpt',
 			
-			behaviors: [DragBehavior, ToasterTxBehavior, ToasterRxBehavior],
+			behaviors: [DragBehavior, ToasterTxBehavior, ToasterRxBehavior, UtilitiesBehavior],
 
 			extends: 'div',
 
@@ -268,15 +294,19 @@
             observer: ['observeJSONstructure(structure.*)'],
 			
 			listeners: {
-				'pathJsonEditorRequest': 'callPathJsonEditorModal',
-				//'childrenUpdate': 'observeJSONstructure'
+				'pathJsonEditorRequest': 'callPathJsonEditorModal'
 			},
             
             attached: function() {
                 var host = this;
                 this.$.UItopContainer.addEventListener("structure-changed", function(e){
                     console.log("/host structure changed");
-                    host.observeJSONstructure();
+                    console.log(e.target.__data__.id + " vs " + "UItopContainer");
+                    if ( e.target.__data__.id == "UItopContainer") {
+                        var structure = this.copyJSONobj(e.target.__data__.structure);
+                        host.observeJSONstructure({});
+                    }
+                    
                 });
                 
             },
@@ -318,60 +348,20 @@
 			
 			observeJSONstructure: function(ev) {
                 console.log('observeJSONstructure');
-                var structure = this.structure;
-                console.log(structure);
-                //if ( structure.id == "UItopContainer" ) {
+                var structure = this.copyJSONobj(this.structure);
+                
+                if ( structure.id == "UItopContainer" ) {
                     document.getElementById("JSONstructure").innerHTML = JSONTree.create(structure);
-                    var HTMLstructure = this.createHTMLstructure2( structure );
-                    document.getElementById("JSONhtml").innerHTML = HTMLstructure;
-                //}
+                    
+                    console.log("structure");
+                    console.log(structure);
+                   // var HTMLstructure = this.createHTMLstructure( structure );
+                   // document.getElementById("JSONhtml").innerHTML = HTMLstructure;
+                }
                 
 			},
             
             createHTMLstructure: function(structure) {
-                console.log("createHTMLstructure");
-                
-                var cpt = document.createElement('div');
-                
-                // id
-                cpt.setAttribute('id', structure.id);
-                
-                // is
-                cpt.setAttribute('is', structure.is);
-                
-                // config
-                var config = structure.config;
-                for (var key in config) {
-                   if (config.hasOwnProperty(key)) {
-                        var obj = config[key];
-                       // If this is a boolean
-                        if ( typeof obj === 'boolean' )
-                        {
-                            if ( obj ) cpt.setAttribute(key);
-                            else cpt.removeAttribute(key);
-                        }
-                        // else
-                        else
-                            cpt.setAttribute(key, obj);
-                    }
-                }
-                
-                // children
-                var children = structure.children;
-                console.log(children);
-                for (var child in children) {
-                    console.log("child found");
-                    console.log(children[child]);
-                    var childCpt = this.createHTMLstructure(children[child]);
-                    cpt.appendChild(childCpt);
-                }
-                
-                console.log(cpt);
-                // return the computed html structure
-                return cpt;
-            },
-            
-            createHTMLstructure2: function(structure) {
                 console.log("createHTMLstructure");
                 
                 var cpt = '<div ';
@@ -383,11 +373,21 @@
                 cpt = cpt + 'is="' + structure.is + '" ';
                 
                 // config
-                var config = structure.config;
+                var config = this.copyJSONobj(structure.config);
+                console.log("config");
+                console.log(config);
                 for (var key in config) {
-                   if (config.hasOwnProperty(key)) {
+                    console.log(key);
+                   if (config.hasOwnProperty(key))
+                   {
                         var obj = config[key];
-                       // If this is a boolean
+                        console.log(obj);
+                       
+                       // Function to make sure the format of polymer/js caps variable is converted to hmtl ones
+                        key = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+                        console.log(key);
+                       
+                        // If this is a boolean
                         if ( typeof obj === 'boolean' )
                         {
                             if ( obj ) cpt = cpt + key + ' ';
@@ -400,20 +400,42 @@
                 
                 cpt = cpt + '>';
                 
+                console.log(cpt);
+                
                 // children
-                var children = structure.children;
+                var children = this.copyJSONobj(structure.children);
                 for (var child in children) {
                     console.log("child found");
                     console.log(children[child]);
-                    var childCpt = this.createHTMLstructure2(children[child]);
-                    cpt + childCpt;
+                    var childCpt = this.createHTMLstructure(children[child]);
+                    cpt = cpt + childCpt;
                 }
                 
                 cpt = cpt + '</div>';
                 console.log(cpt);
                 // return the computed html structure
                 return cpt;
-            }
+            },
+            
+            
+            showStructureCatalog: function() { console.log("/showStructureCatalog");
+                this.$.structureCatalog.show();
+                this.$.textCatalog.hide();
+                this.$.datavizCatalog.hide();
+            },
+            showTextCatalog: function() { console.log("/showTextCatalog");
+                this.$.structureCatalog.hide();
+                this.$.textCatalog.show();
+                this.$.datavizCatalog.hide();
+            },
+            showDataVizCatalog: function() { console.log("/showDataVizCatalog");
+                this.$.structureCatalog.hide();
+                this.$.textCatalog.hide();
+                this.$.datavizCatalog.show();
+            },
+            
+            hideCatalogMenu: function() { this.$.collapseCatalogMenu.hide();},
+            showCatalogMenu: function() { this.$.collapseCatalogMenu.show();}
 		});
 	</script>
 </dom-module>

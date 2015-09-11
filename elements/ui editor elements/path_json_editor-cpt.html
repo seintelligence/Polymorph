@@ -2,7 +2,9 @@
 <script src="../../scripts/defiant-latest.min.js"></script>
 <script src="../../scripts/jquery.min.js"></script>
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="JSON-Editor.html">
+
+<!--<link rel="import" href="JSON-Editor.html">-->
+<link rel="import" href="select_Item_DataSource-cpt.html">
 
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
@@ -26,13 +28,15 @@
 	<template>
 		<iron-ajax 
 			auto
-			url="../../schema3.json"
+			url="../../schema4.json"
 			handle-as="text"
 			on-response="handleResponse"></iron-ajax>
 
 			<div>{{computesub_filter(current_filter, sub_filter)}}</div>
 			<div class="layout horizontal center">
-				<JSON-Editor parent_json="[[current_json]]" computed_nested_filter="{{sub_filter}}" initial_json="[[json_schema]]"></JSON-Editor>
+				<!--<dataSourceEditor-cpt parent_json="[[current_json]]" computed_nested_filter="{{sub_filter}}" initial_json="[[json_schema]]"></dataSourceEditor-cpt>-->
+                <select_Item_DataSource-cpt structure_schema='[[json_schema]]' current_link="[[current_link]]" computed_nested_item_datasource="{{computed_nested_data}}">
+                </select_Item_DataSource-cpt>
 			</div>
 	</template>
 	<script>
@@ -47,9 +51,14 @@
 				current_filter:
 				{
 					type: String,
-					value: "*",
+					value: "//items_structure_schema",
 					notify: true
 				},
+                current_link: 
+                {
+                    type: Object,
+                    value: function() { return { 'name': 'has_requirements'};}
+                },
 				computed_nested_filter:
 				{
 					type: String,
@@ -62,7 +71,16 @@
 					notify: true,
 					value: ""
 				},
-				json_schema: Object
+				json_schema:  
+				{
+					type: Object,
+					value: {}
+				},
+                computed_nested_data: 
+				{
+					type: Object,
+					value: function() { return {};}
+				},
 			},
 			
 			handleResponse: function(e, r) {

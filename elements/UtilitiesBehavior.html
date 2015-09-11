@@ -1,11 +1,15 @@
 <script>
 	UtilitiesBehavior = {
 			
-			arrayify: function(obj) { console.log("arrayify");console.log([obj]); return [obj]; },
+			arrayify: function(obj) { console.log(obj);console.log("arrayify");console.log(JSON.stringify([obj])); return [obj]; },
 			
-			echoP: function(v) {return v;},
+			echoP: function(v) {console.log(v); return v;},
         
-            echoObject: function(obj) { console.log(JSON.stringify(obj));}
+            echoObject: function(obj) { return obj;},
+        
+            echoArray: function(arr) { console.log(arr); return arr;},
+        
+            copyJSONobj: function(obj) { return JSON.parse( JSON.stringify( obj ) ); }
 			
 	};
 </script>

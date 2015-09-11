@@ -47,5 +47,71 @@
 				"_project": "projects"
 			}
 		}
+	},
+	"linkage_structure_schema":
+	{
+		"is_linked_to":
+        {
+			"from":
+			{
+				"*": true
+			},
+			"to":
+			{
+				"*": true
+			}
+		},        
+        "is_requirement_of": 
+		{
+			"from":
+			{
+				"requirements": true
+			},
+			"to":
+			{
+				"features": true,
+				"products": true
+			}
+		},
+		"has_requirements": 
+		{
+			"from":
+			{
+				"features": true,
+				"products": true
+			},
+			"to":
+			{
+				"requirements": true
+			}
+		}
+	},
+	"items_structure_schema":
+	{
+		"features":
+		{
+			"links":
+			{
+				"has_requirements": true,
+                "is_linked_to": true
+			},
+			"attributes":
+			{
+				"description": true,
+				"detailed_description": true
+			}			
+		},
+		"products":
+		{
+			"links":
+			{
+				"has_requirements": true
+			},
+			"attributes":
+			{
+				"description": true,
+				"detailed_description": true
+			}	
+		}
 	}
 }

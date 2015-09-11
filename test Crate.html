@@ -1,0 +1,7 @@
+<!--<script src="https://drone.io/github.com/megastef/node-crate/files/bundle.js"></script>-->
+<script>
+    var crate = require('node-crate');
+    
+crate.connect ('ext-1my7', 4200)
+  crate.execute ('select * from tweets limit 10').success (window.alert)
+</script>

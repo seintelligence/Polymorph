@@ -25,10 +25,11 @@
             {
                 type: Object,
                 notify: true,
+                //readOnly: true,
                 value:{
                     "id": "",
                     "is": "",
-                    "config": {},
+                    "config": { "displayedText": "ooo"},
                     "children": {}
                 }
             },
@@ -39,7 +40,9 @@
             {
                 type: String,
                 value: 'no ID',
-                reflectToAttribute: true
+                notify: true,
+                reflectToAttribute: true,
+                observer: 'oo'
             },
 		
             // Unique children Id reference
@@ -48,12 +51,8 @@
                 type: Number,
 				value: 0
 			},
-			
-			/*parentcontainer:
-			{
-				type: Object,
-				reflectToAttribute: true
-			}*/
+            
+            hostRef: ""
 			
 		},
 
@@ -62,10 +61,6 @@
 			dragleave: 'UIdragLeave',
 			drop: 'UIdrop'
 		},
-        
-        observers: [
-            //'updateJsonUIstructure2(structure.*)'
-        ],
 		
 		UIdragLeave: function (ev) {
 		
@@ -97,7 +92,7 @@
                 data = ev.dataTransfer.getData("text/html"),
 				newId = this.id + "_" + this.increaseUniqueID(); /* We cannot use the same ID */
 				
-			//this.structure.children[newId] = { 'id': newId};
+			//this.structure.children[newId] = {};
 			
 			// Remove the class "dragged" which makes the icon low opacity
 			$srcObject = document.getElementById(data);
@@ -107,18 +102,30 @@
 			this.toggleClass("refusingContainer", 0, this.$.blockContainer);
 			
 			var nodeCopy = document.createElement('div', data);
-				nodeCopy.id = newId;
-				nodeCopy.mode = "Development";
-				//nodeCopy.draggable = true;
-                // Not sure whether it is needed
-				//nodeCopy.parentcontainer = this.id;
-                // test related to add event listener to dynamically added cpt (https://stackoverflow.com/questions/30685452/bind-a-value-between-a-parent-and-a-child-element-where-child-element-is-created)
-				nodeCopy.addEventListener("structure-changed", function(e){
-                    console.log("/structure changed");
-                    host.set('structure.children.' + newId, this.structure);
-                    this.echoObject(host.structure);
-                    console.log(host);
-                });
+            console.log(newId);
+            
+            nodeCopy.id = newId;
+            nodeCopy.mode = "Development";
+            nodeCopy.hostRef = this;
+            //nodeCopy.draggable = true;
+            // Not sure whether it is needed
+            
+            console.log(this.copyJSONobj(nodeCopy.structure));
+
+            // test related to add event listener to dynamically added cpt (https://stackoverflow.com/questions/30685452/bind-a-value-between-a-parent-and-a-child-element-where-child-element-is-created)
+            /*nodeCopy.addEventListener("structure-changed", function(e) {
+                console.log("/structure-changed");
+                console.log(e.target);
+                console.log(this.copyJSONobj(this.structure));
+                console.log(e.target.__data__.id + " vs " + newId);
+                if ( e.target.__data__.id == newId) {
+                    //var structure = this.copyJSONobj(e.target.__data__.structure);
+                    var structure = this.copyJSONobj(this.structure);
+                    console.log(structure);
+                    console.log(host.structure);
+                    //host.set('structure.children.' + newId, structure);
+                }
+            });*/
 			
 			Polymer.dom(this.$.container).appendChild(nodeCopy);
 			this.sendToasterMsgDisplayRequest("dropped!", "information");
@@ -133,10 +140,17 @@
         
         attached: function() {
             console.log("/attached");
-            this.echoObject(this.structure);
-            this.structure.is = this.is;
+            console.log(this.hostRef);
+            //this.structure.is = this.is;
+            this.structure.id = this.id;
+            this.set('structure.is', this.is);
             // Use set to trigger the observer
-            this.set('structure.id', this.id);
+            //this.set('structure.id', this.id);
+        },
+        
+        oo: function() {
+                console.log("/oo");
+                console.log(this.id);
         }
     };
 </script>
