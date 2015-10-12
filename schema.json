@@ -1,0 +1,136 @@
+{
+	"links":
+	{
+		"is_linked_to":
+        {
+            "placeholder": "search for any item with a basic link to any other item",
+            "name": "is_linked_to",
+			"origin":
+			{
+				"*": true
+			},
+			"destination":
+			{
+				"*": true
+			}
+		},        
+        "is_requirement_of": 
+		{
+            "placeholder": "search for any element linked to a requirement",
+            "name": "is_requirement_of",
+			"origin":
+			{
+				"Requirement": true
+			},
+			"destination":
+			{
+				"Feature": true,
+				"Product": true
+			}
+		},
+        "is_sub_requirement_of":
+        {
+            "placeholder": "search for parent requirements of a requirement",
+            "name": "is_sub_requirement_of",
+			"origin":
+			{
+				"Requirement": true
+			},
+			"destination":
+			{
+				"Feature": true,
+				"Product": true
+			}
+		},
+        "is_parent_requirement_of":
+        {
+            "placeholder": "search for any element below a requirement",
+            "name": "is_parent_requirement_of",
+			"origin":
+			{
+				"Requirement": true
+			},
+			"destination":
+			{
+				"Feature": true,
+				"Product": true
+			}
+		},
+		"has_requirements": 
+		{
+            "placeholder": "search for any requirements",
+            "name": "has_requirements",
+			"origin":
+			{
+				"Feature": true,
+				"Product": true
+			},
+			"destination":
+			{
+				"Requirement": true
+			}
+		},
+        "has_parents":
+        {
+            "placeholder": "search for any parents",
+            "name": "has_parents",
+            "origin":
+			{
+				"Feature": true,
+				"Product": true
+			},
+			"destination":
+			{
+				"Requirement": true
+			}
+        
+        }
+	},
+	"items":
+	{
+		"Feature":
+		{
+            "placeholder": "is a feature",
+            "name": "Feature",
+			"links":
+			{
+				"has_requirements": true,
+                "is_linked_to": true
+			},
+			"attributes":
+			{
+				"description": true,
+				"detailed_description": true
+			}			
+		},
+		"Product":
+		{
+            "placeholder": "is a product",
+            "name": "Product",
+			"links":
+			{
+				"has_requirements": true
+			},
+			"attributes":
+			{
+				"description": true,
+				"detailed_description": true
+			}	
+		},
+		"Requirement":
+		{
+            "placeholder": "is a requirement",
+            "name": "Requirement",
+			"links":
+			{
+				"is_parent_requirement_of": true,
+                "is_sub_requirement_of": true
+            },
+			"attributes":
+			{
+				"description": true,
+				"detailed_description": true
+			}	
+		}
+	}
+}

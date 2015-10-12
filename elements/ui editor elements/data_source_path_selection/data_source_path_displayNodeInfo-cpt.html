@@ -1,0 +1,30 @@
+<dom-module id="data_source_path_displayNodeInfo-cpt">  <!-- Define your custom element -->
+  
+    <style>
+    </style>
+    
+    <template>
+        <div>[[currentlySelectedNode.name]]</div>
+        <div>[[currentlySelectedNode.placeholder]]</div>
+    </template>
+    
+    <script>
+        Polymer({
+
+            is: 'data_source_path_displayNodeInfo-cpt',
+
+            extends: 'div',
+
+            properties: {
+                currentlySelectedNode: {
+                    type: Object
+                }
+            },
+            
+            attached: function() {
+                console.log(this.currentlySelectedNode);
+            }
+            
+        });
+    </script>
+</dom-module>

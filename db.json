@@ -1,0 +1,103 @@
+{
+    "items": {
+        "ID1": {
+            "id": "ID1",
+            "name": "To Compute APS position",
+            "type": "Feature",
+            "description": "This feature aims at computing"
+        },
+
+        "ID2": {
+            "id": "ID2",
+            "name": "To Sense APS position",
+            "type": "Feature",
+            "description": "This feature aims at sensing"
+        },
+
+        "ID3": {
+            "id": "ID3",
+            "name": "System Drive By Wire",
+            "type": "Feature",
+            "description": "This system aims at providing the drive by wire capability"
+        },
+
+        "ID4": {
+            "id": "ID4",
+            "name": "System Fuel Information",
+            "type": "Feature",
+            "description": "This system aims at providing the fuel information"
+        },
+
+        "ID6": {
+            "id": "ID6",
+            "name": "To Sense Fuel Level",
+            "type": "Feature",
+            "description": "This functions aims at sensing the fuel level"
+        },
+
+        "ID7": {
+            "id": "ID7",
+            "name": "To Compute Fuel Level",
+            "type": "Feature",
+            "description": "This functions aims at computing the fuel level"
+        },
+        
+        "ID9": {
+            "id": "ID9",
+            "name": "Fuel level computation",
+            "type": "Requirement",
+            "description": "The function \"To Compute Fuel Level\" shall compute the fuel level based on TBD."
+        },
+        
+        "ID11": {
+            "id": "ID11",
+            "name": "Project ECU EPM44",
+            "type": "Project",
+            "description": "Project of BOSCH ECU EPM44"
+        }
+
+    },
+    "links": {
+        "ID5": {
+            "id": "ID5",
+            "type": "owns_function",
+            "origin": "ID3",
+            "destination": "ID1"
+        },
+        
+        "ID11": {
+            "id": "ID11",
+            "type": "owns_function",
+            "origin": "ID3",
+            "destination": "ID2"
+        },
+        
+        "ID8": {
+            "id": "ID8",
+            "type": "owns_function",
+            "origin": "ID4",
+            "destination": "ID6"
+        },
+        
+        "ID10": {
+            "id": "ID10",
+            "type": "owns_function",
+            "origin": "ID4",
+            "destination": "ID7"
+        },
+        
+        "ID12": {
+            "id": "ID12",
+            "type": "owns_function",
+            "origin": "ID11",
+            "destination": "ID3"
+        },
+        
+        "ID13": {
+            "id": "ID13",
+            "type": "owns_function",
+            "origin": "ID11",
+            "destination": "ID4"
+        }
+    }
+}

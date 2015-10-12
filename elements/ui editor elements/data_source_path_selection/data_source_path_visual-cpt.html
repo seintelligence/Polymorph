@@ -1,0 +1,599 @@
+<script type="text/javascript" src="../../../scripts/d3.min.js"></script> <!-- Import d3 js -->
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../UtilitiesBehavior.html">
+<script src="../../../scripts/alasql.min.js"></script>
+<script src="../../../scripts/defiant-latest.min.js"></script>
+
+<!-- JSON schema -->
+<link rel="import" href="../../../bower_components/iron-ajax/iron-ajax.html">
+
+<div is="data_source_path_visual-cpt"></div>
+
+<dom-module id="data_source_path_visual-cpt">  <!-- Define your custom element -->
+
+    <!-- Shadow CSS -->
+    <style type="text/css">
+        @font-face {
+            font-family: "Roboto Condensed";
+            font-style: normal;
+            src: local('Roboto Regular'), local('Roboto-Regular'), url('../../../styles/Roboto/Roboto-Regular.ttf') format('truetype');
+        }
+
+        html {
+          overflow-y:auto; 
+        }
+
+        div#body {
+            float:left;
+            vertical-align:middle;
+            overflow-y:auto;
+            overflow-x:auto;
+            /*border-style:solid;
+            //border-width:1px;*/
+            border-color:#FCFCFC;
+            /*width:100%;*/
+        }
+        
+            
+
+    </style>
+    
+	<template>
+        <style>
+        
+            div#body ::content svg {
+                /*float: left;*/
+                font-size: 1em;
+                font-family: "Roboto Condensed";
+            }
+            
+            div#body ::content g.node circle {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: rgb(217,217,217);
+              stroke-width: 1.5px;
+            }
+            
+            div#body ::content g.node path {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: rgb(217,217,217);
+              stroke-width: 1.5px;
+            }
+
+            div#body ::content g.node circle.selected {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: steelblue;
+              stroke-width: 1.5px;
+            }
+
+            div#body ::content g.node circle.selectedWarning {
+              cursor: pointer;
+              fill: #FF7788;
+              font: Calibri;
+              stroke: rgb(98,39,33);
+              stroke-width: 1.5px;
+            }
+
+            div#body ::content g.node path.selected {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: steelblue;
+              stroke-width: 1.5px;
+            }
+            
+            div#body ::content g.node path.selectedWarning {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: #FF7788;
+              stroke-width: 1.5px;
+            }
+
+            div#body ::content g.node text {
+              font-size: 0.8em;
+            }
+
+            div#body ::content g.node text.selected {
+              font-size: 0.8em;
+              fill: steelblue;
+            }
+
+            div#body ::content g.node text.selectedWarning {
+              font-size: 0.8em;
+              fill: #FF7788;
+            }
+
+            div#body ::content path.link {
+              fill: none;
+              stroke: #ccc;
+              stroke-width: 1.5px;
+            }
+        
+        </style>
+        
+		<iron-ajax
+            auto
+            url="../../../schema.json"
+            handle-as="json"
+            last-response="{{schema}}"></iron-ajax>
+        
+        <div class="body" id="body">
+            <content>
+            </content>
+        </div>
+    </template>
+        
+    <script>
+        
+        function D3JSTree(opts) {
+            opts = opts || {};
+            
+            opts
+            console.log(opts.schema);
+    
+            // THe link icon
+            var link_icon_str ="M00, 00L05, 03L10, 00L10, 06L05, 09L00, 06,L00, 00 Z M00, 10L05, 13L10, 10L10, 16L05, 19L00, 16,L00, 10 Z";
+
+           var margin = opts.margin || {top: 20, right: 120, bottom: 20, left: 120},
+                width = 800 - margin.right - margin.left,
+                height = 400 - margin.top - margin.bottom,
+                title = opts.title || 'Bar Chart';
+
+            var i = 0,
+                duration = 750;
+            
+            var schema = opts.schema;
+
+            function updateD3JSTree(selection) {
+                selection[0].schema = schema;
+                
+                selection.each(function(d, i) {
+                    
+                    var tree = d3.layout.tree()
+                        .size([height, width]);
+
+                    var diagonal = d3.svg.diagonal()
+                        .projection(function(d) { return [d.x, d.y]; });
+
+                    var groupNodes,
+                        root;
+
+                    var el = d3.select(this);
+
+                    // Initialize the display to show a few nodes.
+                    root = d[0];
+                    root.x0 = width / 2;
+                    root.y0 = 0;
+
+                    el.selectAll("svg").remove();
+                    
+                    var svg = el.append("svg") 
+                        .attr("id", "svg")
+                        .attr("width", width)
+                        .attr("height", height)
+                    var groupNodes = svg.append("g")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                            .attr("class", "nodeStart");      
+
+                    var node = groupNodes.data(d);
+
+                    function toggleAll(d, parent) {
+                        d.parent = parent;
+                        d.isSelected = false;
+                        if (d.children) {
+                          d.children.forEach(toggleAll, d);
+                          toggle(d);
+                        }
+                    }
+                    
+                    root.children.forEach(function(e) { toggleAll(e, root); });
+
+                    update(root);
+
+                    function update(source) {
+
+                        // Compute the new tree layout.
+                        var nodes = tree.nodes(root).reverse(),
+                            links = tree.links(nodes);
+
+                        // Normalize for fixed-depth.
+                        nodes.forEach(function(d) { d.y = d.depth * 50; });
+
+                        // Update the nodes…
+                        var node = groupNodes.selectAll("g.node")
+                            .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+                        // Enter any new nodes at the parent's previous position.
+                        var nodeEnter = node.enter().append("g")
+                            .attr("class", "node")
+                            .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
+                            .on("click", nodeClick)
+                            .on("mouseout", nodeOut)
+                            .on("mouseover", nodeOver);
+
+                        nodeEnter.filter(function(d) { return d.type == "item";}).append("circle")
+                            .attr("r", 1e-6)
+                            .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+
+                        nodeEnter.filter(function(d) { return d.type == "link";}).append("g")
+                            .attr("transform", "translate(-4, -10)")
+                            .append("path").attr("d", link_icon_str)
+                            .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+
+                        nodeEnter.append("text")
+                            .attr("x", "-5px")
+                            .attr("y", function(d) { return d.children || d._children ? -10 : 10; })
+                            .attr("dy", ".35em")
+                            .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+                            .text(function(d) { return d.name; })
+                            .style("fill-opacity", 1e-6);
+
+                        // Transition nodes to their new position.
+                        var nodeUpdate = node.transition()
+                            .duration(duration)
+                            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+                        nodeUpdate.select("circle")
+                            .attr("r", 4.5)
+                            .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+
+                        nodeUpdate.select("path")
+                            .attr("r", 4.5)
+                            .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+
+                        nodeUpdate.select("text")
+                            .style("fill-opacity", 1);
+
+                        // Transition exiting nodes to the parent's new position.
+                        var nodeExit = node.exit().transition()
+                            .duration(duration)
+                            .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
+                            .remove();
+
+                        nodeExit.select("circle")
+                            .attr("r", 1e-6);
+
+                        nodeExit.select("text")
+                            .style("fill-opacity", 1e-6);
+
+                        // Update the links…
+                        var link = groupNodes.selectAll("path.link")
+                            .data(links, function(d) { return d.target.id; });
+
+                        // Enter any new links at the parent's previous position.
+                        link.enter().insert("path", "g")
+                            .attr("class", "link")
+                            .attr("d", function(d) {
+                                var o = {x: source.x0, y: source.y0};
+                                return diagonal({source: o, target: o});
+                            });
+
+                        // Transition links to their new position.
+                        link.transition()
+                            .duration(duration)
+                            .attr("d", diagonal);
+
+                        // Transition exiting nodes to the parent's new position.
+                        link.exit().transition()
+                            .duration(duration)
+                            .attr("d", function(d) {
+                                var o = {x: source.x, y: source.y};
+                                return diagonal({source: o, target: o});
+                            })
+                            .remove();
+
+                        // Stash the old positions for transition.
+                        nodes.forEach(function(d) {
+                            d.x0 = d.x;
+                            d.y0 = d.y;
+                            });
+                    }
+
+                    // Highlight path on mouseover
+                    function nodeOver(d) {  highlightSelectedChildrenNodes(d);}
+
+                    // de-Highlight path on mouseover
+                    function nodeOut(d) {
+                        groupNodes.selectAll("g.node circle").attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+                    }
+
+                    // Highlight the selected children nodes
+                    function highlightSelectedChildrenNodes(d)
+                    {
+                        if (d.type == "item" && d.isSelected)
+                        groupNodes.selectAll("g.node circle").filter(function(_d) { return _d == d;}).attr("class", "selectedWarning");
+
+                        if (d.children)
+                            d.children.forEach(highlightSelectedChildrenNodes);
+                    }
+
+                    // Select or toggle children on click.
+                    function nodeClick(d) {
+                        console.log(this);
+                        console.log(schema);
+                        
+                        if (d.type == "link") {
+                            // search 
+                            console.log(d.destination);
+                            _.keys(d.destination).forEach(function(e) { console.log(e); getNextItems(e); });
+                            
+                        }
+                        
+                        // if the click node is an item and the ctrl key is pressed: Selection request
+                        if ( d3.event.ctrlKey && d.type == "item")
+                        {
+                            d.isSelected = !d.isSelected;
+                            node.selectAll("circle").attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+                        }       
+
+                        // Else toggle request
+                        else
+                        {
+                            if (d.children) {
+                                d._children = d.children;
+                                d.children = null;
+                            } else {
+                                d.children = d._children;
+                                d._children = null;
+                            }
+                            update(d);
+                        }
+                    }
+
+                    // Toggle children.
+                    function toggle(d) {
+                        if (d.children) {
+                            d._children = d.children;
+                            d.children = null;
+                        } else {
+                            d.children = d._children;
+                            d._children = null;
+                        }
+                    }
+                    
+                    function getNextItems(strItem) {
+                
+                        console.log(schema);
+                        // Get the items
+                        var items = alasql('SEARCH items/ FROM ?', [schema]);
+
+                        // Get the links
+                        var links = alasql('SEARCH links/ FROM ?', [schema]);
+
+                        console.log(strItem);
+                        // Get the matching items
+                        if (strItem == '*')
+                            strItem = '';
+                        else
+                            strItem = ' WHERE(name="' + strItem + '")';
+                        console.log(strItem);
+                        var item = alasql('SELECT *, "item" AS type FROM ?', [items]);
+console.log(item);
+                        // Select the first item
+                        item = item[0];
+
+                        // Get the found links ref and transform it for SQL Query
+                        var found_links = _reconstructSQLqueryArray(_.keys(item.links));
+
+                        // Get the found links
+                        var found_links = alasql('SELECT *, "link" AS type FROM ? WHERE(name IN ' + found_links + ')', [links]);
+
+                        // Attach the found links to the item
+                        item.children = found_links;
+
+                        console.log(item);
+                        // Return the item
+                        return item;
+                    }        
+                    
+                    // For SQL, Join the array to make it understandable for a SQL query
+                   function _reconstructSQLqueryArray(arr) { return '("' + arr.join('","' ) + '")'; }
+                    
+                });
+            }
+            
+            return updateD3JSTree;
+        }
+        
+    var JSONpolymorph = [	{
+		"name": "Features",
+        "type": "item",
+		"children": [
+			{
+				"name": "has_requirement",
+                "type": "link",
+				"children": [
+					{
+						"name": "Requirements",
+                        "type": "item",
+						"children": [
+							{
+								"name": "is_sub_requirement_of",
+                                "type": "link",
+								"children": [
+                                    {
+                                        "name": "Requirements",
+                                        "type": "item"
+                                    }
+                                ]
+							 },
+                             {
+								"name": "is_parent_requirement_of",
+                                "type": "link",
+								"children": [
+                                    {
+                                        "name": "Requirements",
+                                        "type": "item"
+                                    }
+                                ]
+							 },
+                             {
+								"name": "is_requirement_of",
+                                "type": "link",
+								"children": [
+                                    {
+                                        "name": "*",
+                                        "type": "item"
+                                    }
+                                ]
+							 }
+						]
+					 },
+					
+				]
+            },
+            {
+				"name": "is_sub_feature_of",
+                "type": "link",
+				"children": [
+					{
+                        "name": "Features",
+                        "type": "item"
+                    }
+                ]
+            }
+		]
+	 }];
+
+        Polymer({
+
+            is: 'data_source_path_visual-cpt',
+            
+            extends: 'div',
+
+            properties: {
+                
+                computedPath: {
+                    type: Array,
+                    notify: true
+                },
+                
+                width:
+                {
+                    value:400
+                },
+                
+                height: 
+                {
+                    value: 400
+                },
+                
+                pathData:
+                {
+                    type: Array,
+                    notify: true,
+                    observer: 'dataChanged',
+                    value: []
+                },
+                
+                currentlySelectedNode:
+                {
+                    type: Object,
+                    notify: true,
+                    value: {}
+                },
+                
+                schema: 
+                {
+                    type: Object
+                },
+                
+                receives:
+                {
+                    type: String,
+                    value: "Feature"
+                },
+                
+                data:
+                {
+                    type: Object
+                },
+                
+                slicedData: {
+                    computed: '_slice(data)'
+                }
+            },
+            
+            observers: [
+                'dataChanged(data.*)',
+                'schemaChanged(schema.*)'
+            ],
+			
+			behaviors: [UtilitiesBehavior],
+
+            created: function() {
+			},
+
+			dataChanged: function() { console.log("/data changed"); console.log(this.slicedData); this._draw();},
+            
+            schemaChanged: function() {
+                console.log("/schemaChanged");
+                
+                this.width = 400;
+                this.height = 400;
+				this.d3JSTree = new D3JSTree(this);
+                
+                this.data = this.getNextItems('Feature');
+            },
+            
+            getNextItems: function(strItem) {
+                
+                // Get the items
+                var items = alasql('SEARCH items/ FROM ?', [this.schema]);
+                
+                // Get the links
+                var links = alasql('SEARCH links/ FROM ?', [this.schema]);
+                
+                // Get the matching items 
+                var item = alasql('SELECT *, "item" AS type FROM ? WHERE(name="' + strItem + '")', [items]);
+                
+                // Select the first item
+                item = item[0];
+                
+                // Get the found links ref and transform it for SQL Query
+                var found_links = this._reconstructSQLqueryArray(_.keys(item.links));
+                
+                // Get the found links
+                var found_links = alasql('SELECT *, "link" AS type FROM ? WHERE(name IN ' + found_links + ')', [links]);
+                
+                // Attach the found links to the item
+                item.children = found_links;
+                
+                // Return the item
+                return item;
+            },
+
+			_draw: function() {
+				if (!this.data) { return; }
+				if (!this.elem) { return; }
+                
+                
+                /*var realWidth = function() { return window.innerWidth;},
+                    realHeight = function() { return window.innerHeight;};
+				
+                var body = d3.select("#body");
+                document.getElementById("body").style.width = 0.95 * realWidth();
+                document.getElementById("body").style.height = 0.95 * realHeight();*/
+				d3.select(this.elem)
+					.datum(this.slicedData).call(this.d3JSTree);
+			},
+
+			ready: function() {
+				this.elem = this.$.body;
+				this._draw();
+			},
+            
+            _slice: function(obj) {
+                var newObj = this._cloneObj(obj);
+                return [this._convertChildrenObjToArr(newObj)].slice();
+            }
+
+        });
+    </script>
+</dom-module>

@@ -1,34 +1,31 @@
 {
-  "name": "polymer",
-  "version": "1.1.1",
-  "main": [
-    "polymer.html"
-  ],
-  "license": "http://polymer.github.io/LICENSE.txt",
-  "ignore": [
-    "/.*",
-    "/test/",
-    "gen-changelog.sh"
-  ],
+  "name": "copy",
+  "version": "0.0.0",
   "authors": [
-    "The Polymer Authors (http://polymer.github.io/AUTHORS.txt)"
+    "aubronm <aubronm@gmail.com>"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Polymer/polymer.git"
-  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
   "dependencies": {
-    "gold-elements": "PolymerElements/gold-elements#~1.0.1",
-    "iron-elements": "PolymerElements/iron-elements#~1.0.3",
-    "paper-elements": "PolymerElements/paper-elements#~1.0.4",
-    "polymer": "Polymer/polymer#1.0.0",
-    "webcomponentsjs": "^0.7.2"
-  },
-  "devDependencies": {
-    "web-component-tester": "*"
-  },
-  "private": true,
-  "resolutions": {
-    "polymer": "^1.0.0"
+    "alasql": "~0.2.1",
+    "app-router": "~2.6.0",
+    "color": "~2.5.0",
+    "gold-elements": "PolymerElements/gold-elements#^1.0.0",
+    "google-web-components": "GoogleWebComponents/google-web-components#^1.0.0",
+    "hot-table": "~0.2.0",
+    "hydrolysis": "PolymerLabs/hydrolysis#^1.11.0",
+    "iron-elements": "PolymerElements/iron-elements#^1.0.0",
+    "molecules": "PolymerElements/molecules#^1.0.0",
+    "neon-elements": "PolymerElements/neon-elements#^1.0.0",
+    "paper-elements": "PolymerElements/paper-elements#^1.0.0",
+    "platinum-elements": "PolymerElements/platinum-elements#^1.0.0",
+    "polymer": "Polymer/polymer#^1.0.0",
+    "pushstate-anchor": "~0.3.0"
   }
 }

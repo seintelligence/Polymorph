@@ -1,15 +1,48 @@
+<script type="text/javascript" src="../scripts/underscore-min.js"></script> <!-- Import d3 js -->
+
 <script>
 	UtilitiesBehavior = {
 			
-			arrayify: function(obj) { console.log(obj);console.log("arrayify");console.log(JSON.stringify([obj])); return [obj]; },
-			
-			echoP: function(v) {console.log(v); return v;},
+			_arrayify: function(obj) { return [obj]; },
         
-            echoObject: function(obj) { return obj;},
+            _echoObject: function(obj) { console.log(obj); return obj;},
         
-            echoArray: function(arr) { console.log(arr); return arr;},
+            _echoArray: function(arr) { console.log(arr); return arr;},
         
-            copyJSONobj: function(obj) { return JSON.parse( JSON.stringify( obj ) ); }
+            /*
+				data: {
+					computed: '_parse(barData)'
+				}                                   */
+            _parse: JSON.parse,
+
+            _stringify: JSON.stringify,
+
+            _cloneObj: function(obj) { return this._parse( this._stringify( obj ) ); },
+        
+            // D3 method to convert obj children to array children
+            _convertChildrenObjToArr: function(obj)
+            {                    
+                var childrenArr = [];
+                var children = obj.children
+
+                for (var key in children)
+                {
+                   var child;
+                   if (children.hasOwnProperty(key))
+                   {
+                       child = children[key];
+                       if (child.children)
+                            child = this._convertChildrenObjToArr(child);
+                       childrenArr.push(child);
+                   }
+                }
+                obj.children = childrenArr;
+                return obj;
+            },
+        
+        
+            // For SQL, Join the array to make it understandable for a SQL query
+            _reconstructSQLqueryArray: function(arr) { return '("' + arr.join('","' ) + '")'; },
 			
 	};
 </script>

@@ -1,0 +1,140 @@
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">function typeContext(<span style="color: #007020">str</span>)
+        {
+            <span style="color: #333333">//</span> make conversation
+            <span style="color: #FF0000; background-color: #FFAAAA">$</span>(<span style="background-color: #fff0f0">&#39;#context&#39;</span>)<span style="color: #333333">.</span>typed({
+                strings: <span style="color: #007020">str</span>,
+                typeSpeed: <span style="color: #0000DD; font-weight: bold">5</span>,
+                backSpeed: <span style="color: #0000DD; font-weight: bold">0</span>,
+                backDelay: <span style="color: #0000DD; font-weight: bold">10</span>,
+                showCursor: true,
+                cursorChar: <span style="background-color: #fff0f0">&quot;|&quot;</span>
+            });
+        }
+        
+        function countContext(<span style="color: #007020">str</span>)
+        {
+            <span style="color: #008800; font-weight: bold">return</span> <span style="color: #007020">str</span><span style="color: #333333">.</span>length;
+        }
+        
+        function typeTalk(<span style="color: #007020">str</span>)
+        {
+            <span style="color: #333333">//</span> make conversation
+            <span style="color: #FF0000; background-color: #FFAAAA">$</span>(<span style="background-color: #fff0f0">&#39;#the_person_talks&#39;</span>)<span style="color: #333333">.</span>typed({
+                strings: <span style="color: #007020">str</span>,
+                typeSpeed: <span style="color: #0000DD; font-weight: bold">5</span>,
+                backSpeed: <span style="color: #0000DD; font-weight: bold">0</span>,
+                backDelay: <span style="color: #0000DD; font-weight: bold">10</span>,
+                showCursor: true,
+                cursorChar: <span style="background-color: #fff0f0">&quot;|&quot;</span>
+            });
+        }
+        
+        <span style="color: #333333">//</span>Programme <span style="background-color: #fff0f0">&quot;ça va?&quot;</span>
+        function ca_va_point_dinterrogation(context, example)
+        {
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Cette personne commence toujours la journée par </span><span style="color: #666666; font-weight: bold; background-color: #fff0f0">\&quot;</span><span style="background-color: #fff0f0">ça va?</span><span style="color: #666666; font-weight: bold; background-color: #fff0f0">\&quot;</span><span style="background-color: #fff0f0">^25000&lt;/b&gt;&quot;</span>);
+            
+            var talk <span style="color: #333333">=</span> <span style="background-color: #fff0f0">&quot;^3000- Salut Doudou, ça va?^500 Tu as bien dormi?^1000 Un peu de café?^500&lt;br&gt;&quot;</span>;
+            talk <span style="color: #333333">+=</span> <span style="background-color: #fff0f0">&quot;- Salut Valentine, ça va?^500 Tu vas mieux?^1000 Plus trop mal à la tête?^500&lt;br&gt;&quot;</span>;
+            talk <span style="color: #333333">+=</span> <span style="background-color: #fff0f0">&quot;- Salut Camille, ça va?^500 Le petit ventre aussi se porte bien?^500 Tu veux du café?^500&lt;br&gt;&quot;</span>;
+            talk <span style="color: #333333">+=</span> <span style="background-color: #fff0f0">&quot;- Salut Mat, ta jambe va bien?^500 Tu veux du café?^1000&quot;</span>;
+            
+            example<span style="color: #333333">.</span>push(talk);
+        }
+        
+        <span style="color: #333333">//</span>Programme <span style="color: #333333">&lt;</span>i<span style="color: #333333">&gt;</span>je suis trop gentil<span style="color: #333333">&lt;/</span>i<span style="color: #333333">&gt;</span>
+        function je_suis_trop_gentil(context, example)
+        {
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Cette personne est aussi très gentille^3000&lt;/b&gt;&quot;</span>);
+            
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;(Maintenant qu&#39;il a demandé à tout le monde si ça va et qu&#39;il a servi tout le monde en café)^10000&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^3000Bon je vais me faire un petit café...^8000Oh bah il n’y a plus de café!^2000&lt;br&gt;Ce n&#39;est pas grave je vais aller en chercher en ville pour que vous en ayez pour demain^1000&quot;</span>);
+            
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^2000&lt;b&gt;Les autres se disent que ce n&#39;est pas normal et veulent y aller^16000&lt;/b&gt;&quot;</span>);
+            
+            var talk <span style="color: #333333">=</span> <span style="background-color: #fff0f0">&quot;^3000- Non mais arrête Mat, tu ne vas pas y aller avec ta jambe^500&lt;br&gt;&quot;</span>;
+            talk <span style="color: #333333">+=</span> <span style="background-color: #fff0f0">&quot;- Non mais arrête Camille, tu ne vas pas y aller tu es enceinte^500&lt;br&gt;&quot;</span>;
+            talk <span style="color: #333333">+=</span> <span style="background-color: #fff0f0">&quot;- Non mais arrête Clémentine, tu ne vas pas y aller, tu as déjà été deux fois enceinte^500&lt;br&gt;&quot;</span>;
+            talk <span style="color: #333333">+=</span> <span style="background-color: #fff0f0">&quot;- Non mais arrête Doudou, tu en fais déjà trop^500&quot;</span>;
+            example<span style="color: #333333">.</span>push(talk);
+        } 
+        
+        <span style="color: #333333">//</span> Programme Machine Learning et curiosit<span style="color: #FF0000; background-color: #FFAAAA">é</span>
+        function machine_learning_and_curiosity(context, example)
+        {
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Cette personne a une soif d&#39;apprendre et une curiosité sans fin^1000&lt;/b&gt;&quot;</span>);
+            
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Cédric qui montre son pad musique...^3000(2h plus tard)^3000&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^4000Ah ouais vas-y montre ce que tu sais faire......^1000ah ouais mais en fait j&#39;ai tout compris !^500&quot;</span>);
+            
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Elisa qui parle d&#39;ustensiles de cuisine^3000&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^1000Mais il tiennent bien en machine?^500&quot;</span>);
+            
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Mat qui parle d&#39;hémorroides^3000&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^2500Ah ouais raconte c&#39;est trop intéressant comme science^500&quot;</span>);
+            
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Valentine qui parle de son tricot^3000&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^1000Punaise mais c&#39;est ouf que t&#39;arrives à faire une maille comme ça Val!^500&quot;</span>);
+            
+        }
+        
+        <span style="color: #333333">//</span> Programme humilit<span style="color: #FF0000; background-color: #FFAAAA">é</span>
+        function humility(context, example)
+        {
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Cette personne a une humilité qui se traduit en mettant les autres sur un pied d&#39;estale^1000&lt;/b&gt;&quot;</span>);
+            
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Mat et Clem prennent la voiture avec les enfants^4000&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^8000Olalala mais moi je pourrais jamais faire ca, je sais pas comment vous faites^500&quot;</span>);
+
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Romain coupe un citron en 3^3000&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^1000punaise Nan mais t&#39;es trop fort. C&#39;est ouf!^500&quot;</span>);
+
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Camille arrive à calmer Laurent^4000&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^1000Nan mais toi, mais t&#39;as une force mentale, franchement Camille, t&#39;es impressionnante^500&quot;</span>);
+
+        }
+        
+        <span style="color: #333333">//</span> Programme sensibilit<span style="color: #FF0000; background-color: #FFAAAA">é</span>
+        function sensibility(context, example)
+        {
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Cette personne a une sensibilité (mêlé d&#39;altruisme) au-dessus de la moyenne^1000&lt;/b&gt;&quot;</span>);
+            
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Doudou a pas tapé depuis 2 semaines^7000&lt;/b&gt;&quot;</span>)
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^7000oh mon doudou, ce doit être compliqué, franchement si tu as besoin d&#39;aide n&#39;hésite pas^500&quot;</span>);
+
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;A propos de sa boulangère qui se décrotte le nez tout les matins en lui donnant sa baguette^16000&lt;/b&gt;&quot;</span>)
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^5000Non mais il faut faire quelque chose, ce n&#39;est pas supportable cette situation, elle ne doit pas être bien. On voit bien que quelque chose la gêne. Sûrement que son air est trop sec, je pense qu&#39;on devrait lui acheter un humidificateur^500&quot;</span>);
+
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;Valentine ne s&#39;est pas faite tapée depuis 2 semaines^4000 [non ce n&#39;est pas ce que vous croyez, il a le programme fidélité aussi]^6000&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;^2000oh ma val, ce doit être compliqué, franchement si tu as besoin d&#39;aide n&#39;hésite pas^5000, j&#39;en connais un qui peut t&#39;aider^2000&quot;</span>);
+
+        }
+        
+        <span style="color: #FF0000; background-color: #FFAAAA">$</span>(document)<span style="color: #333333">.</span>ready(function() {
+            
+            var context <span style="color: #333333">=</span> [];
+            var example <span style="color: #333333">=</span> [];
+            
+            ca_va_point_dinterrogation(context, example);
+            
+            je_suis_trop_gentil(context, example);
+            
+            machine_learning_and_curiosity(context, example);
+            
+            humility(context, example);
+            
+            sensibility(context, example);
+            
+            context<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot;&lt;b&gt;End&lt;/b&gt;&quot;</span>);
+            example<span style="color: #333333">.</span>push(<span style="background-color: #fff0f0">&quot; &quot;</span>);
+                
+            typeContext(context);
+            typeTalk(example);
+            
+            
+          setTimeout(function() {
+            <span style="color: #333333">//</span> send <span style="background-color: #fff0f0">&#39;em packing </span>
+            <span style="color: #FF0000; background-color: #FFAAAA">$</span>(<span style="background-color: #fff0f0">&#39;#kick&#39;</span>)<span style="color: #333333">.</span>append(<span style="background-color: #fff0f0">&#39;As tu trouvé qui je suis?&#39;</span>);
+          }, <span style="color: #0000DD; font-weight: bold">202000</span>);
+        });
+</pre></div>

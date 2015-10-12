@@ -1,0 +1,98 @@
+{    
+    "UItopContainer": {
+      "id": "UItopContainer",
+      "is": "container-cpt",
+      "nodeChildren": {
+        "UItopContainer_1": {
+          "id": "UItopContainer_1",
+          "is": "h1-cpt",
+          "nodeChildren": {
+
+          },
+          "config": {
+            "displayedText": "{{contentData.name}}"
+          }
+        },
+        "UItopContainer_3": {
+              "id": "UItopContainer_3",
+              "is": "text-cpt",
+              "nodeChildren": {
+
+              },
+              "config": {
+                "displayedText": "{{contentData.description}}"
+              }
+        },
+        "UItopContainer_2": {
+          "id": "UItopContainer_2",
+          "is": "container-cpt",
+          "nodeChildren": {
+            "UItopContainer_2_1": {
+              "id": "UItopContainer_2_1",
+              "is": "h1-cpt",
+              "nodeChildren": {
+
+              },
+              "config": {
+                "displayedText": "{{contentData.name}}"
+              }
+            },
+            "UItopContainer_2_2": {
+              "id": "UItopContainer_2_2",
+              "is": "text-cpt",
+              "nodeChildren": {
+
+              },
+              "config": {
+                "displayedText": "{{contentData.description}}"
+              }
+            }
+          },
+          "config": {
+            "pathData":  [
+                {
+                    "path": "Feature",
+                    "filters": [],
+                    "subPathData": {
+                        "path": "owns_function",
+                        "filters": [],
+                        "subPathData": {
+                            "path": "Feature",
+                            "filters": [],
+                            "subPathData": {}
+                        }
+                    }
+                }
+            ],
+            "contentData": "{{contentData.nodeChildren.UItopContainer_2}}",
+            "structureData": "{{structureData.nodeChildren.UItopContainer_2}}",
+            "layoutIterate": true,
+            "layoutFlex": false,
+            "layoutHorizVert": true
+          }
+        }
+      },
+      "config": {
+        "pathData": [
+            {
+                "path": "Project",
+                "filters": [],
+                "subPathData": {
+                    "path": "owns_function",
+                    "filters": [],
+                    "subPathData": {
+                        "path": "Feature",
+                        "filters": [],
+                        "subPathData": {}
+                    }
+                }
+            }
+        ],
+        "contentData": "{{contentData.UItopContainer}}",
+        "structureData": "{{structureData.UItopContainer}}",
+        "layoutIterate": true,
+        "layoutFlex": false,
+        "layoutHorizVert": true
+      }
+    }
+}

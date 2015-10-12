@@ -6,6 +6,9 @@
 <script src="scripts/jquery.min.js"></script>
 
 <link rel="import" href="bower_components/polymer/polymer.html">
+    
+<link rel="import" href="bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="bower_components/neon-animation/animations/fade-out-animation.html">
 
 <link rel="import" href="bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
@@ -13,10 +16,12 @@
 
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
 
+<!-- Menu -->
 <link rel="import" href="bower_components/paper-item/paper-item.html">
 <link rel="import" href="bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="bower_components/paper-submenu/paper-submenu.html">
     
 <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="bower_components/paper-header-panel/paper-header-panel.html">
@@ -25,25 +30,42 @@
     
 <link rel="import" href="elements/UtilitiesBehavior.html">
 
-<link rel="import" href="elements/ui editor elements/layout-elt.html">
-<link rel="import" href="elements/ui editor elements/d3js-tree-cpt.html">
-<link rel="import" href="elements/ui editor elements/text-cpt.html">
-<link rel="import" href="elements/ui editor elements/h1-cpt.html">
-<!--<link rel="import" href="elements/ui editor elements/table-cpt.html">-->
+<link rel="import" href="elements/ui editor elements/components/d3js-tree-cpt.html">
+<link rel="import" href="elements/ui editor elements/components/text-cpt.html">
+<link rel="import" href="elements/ui editor elements/components/h1-cpt.html">
+<link rel="import" href="elements/ui editor elements/view_constructor/container-cpt.html">
 
-<link rel="import" href="elements/ui editor elements/DragBehavior.html">
-<link rel="import" href="elements/ui editor elements/ToasterRxBehavior.html">
+<link rel="import" href="elements/ui editor elements/behaviours/DragBehavior.html">
+<link rel="import" href="elements/ui editor elements/behaviours/ToasterRxBehavior.html">
+<link rel="import" href="elements/ui editor elements/behaviours/ToasterTxBehavior.html">
 
+<!-- Attributes selection -->
+<link rel="import" href="bower_components/paper-radio-button/paper-radio-button.html">
+    
 <!-- Connection toolbar -->
 <link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
-	  <link rel="import" href="elements/cockpit elements/Cockpit-connect.html">
+<link rel="import" href="elements/cockpit elements/Cockpit-connect.html">
 
-<link rel="import" href="elements/ui editor elements/path_json_editor-cpt.html">
+    
+<link rel="import" href="bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="elements/ui editor elements/data_source_path_selection/data_source_path_selection-cpt.html">
+    
 <link rel="import" href="bower_components/paper-drawer-panel/paper-drawer-panel.html" >
 <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 
+<link rel="import" href="bower_components/iron-image/iron-image.html">
+
+<!-- styles for icons -->
+<link rel="import" href="../../styles/cpt_icon-styles.html">
+ 
+<!-- JSON structre -->
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+    
+<!-- JSON dynamic HTML creation -->
+<link rel="import" href="elements/ui%20editor%20elements/view_constructor/create-HTML-cpt.html">
+    
 <!-- JSON tree -->
 <link href="scripts/JSON-tree/css/jsontree.css" rel="stylesheet">
 <script src="scripts/JSON-tree/src/jsontree.js"></script>
@@ -52,11 +74,13 @@
 
 <dom-module id="visual-ui-editor-library-cpt">
 	<style>
-		.header_panel {
-			font-family: "Open Sans";
-			color: white;
-			padding: 5px;
-		};
+        
+        * { font-family: RobotoDraft, Helvetica, Arial, sans-serif;}
+        
+        paper-toolbar {
+            --paper-toolbar-background: var(--paper-grey-400);
+        }
+        
 		#UIElementsCatalog div {
 			margin:4px;
 			width:75px;
@@ -66,27 +90,26 @@
 			list-style-type:none;
 		}
 		
-		.UIcatalogIcons {
-			 --paper-fab-background: var(--paper-light-blue-500);
-			--paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
-		}
-		
 		paper-progress {
 		  display: block;
 		  width: 100%;
 		   --paper-progress-active-color: var(--paper-light-blue-500);
 		}
 		
-      paper-toggle-button.blue {
-        --paper-toggle-button-checked-bar-color:  var(--paper-light-blue-500);
-        --paper-toggle-button-checked-button-color:  var(--paper-light-blue-500);
-        --paper-toggle-button-checked-ink-color: var(--paper-light-blue-500);
-        --paper-toggle-button-unchecked-bar-color:  var(--paper-light-blue-900);
-        --paper-toggle-button-unchecked-button-color:  var(--paper-light-blue-900);
-        --paper-toggle-button-unchecked-ink-color: var(--paper-light-blue-900);
-      }
+        paper-toggle-button.blue {
+            --paper-toggle-button-checked-bar-color:  var(--paper-light-blue-500);
+            --paper-toggle-button-checked-button-color:  var(--paper-light-blue-500);
+            --paper-toggle-button-checked-ink-color: var(--paper-light-blue-500);
+            --paper-toggle-button-unchecked-bar-color:  var(--paper-light-blue-900);
+            --paper-toggle-button-unchecked-button-color:  var(--paper-light-blue-900);
+            --paper-toggle-button-unchecked-ink-color: var(--paper-light-blue-900);
+        }
+        
+        paper-dialog {
+            --paper-dialog-background-color: #EEEEEE;
+        }
 	  
-	  toggleHelperBold { font-weight: 500;}
+	   toggleHelperBold { font-weight: 500;}
 	  
 		.container {
 			background-color:rgb(240, 240, 240);
@@ -114,112 +137,227 @@
            position:relative;
         }
         
+        paper-item.menu-trigger {
+            
+        }
+        
+        paper-menu.menu-content {
+            margin-left: 1em;
+        }
+        
+        paper-dialog.size-position {
+            position: fixed;
+            --paper-dialog-background-color: var(--paper-grey-3OO);
+            top: 16px;
+            right: 16px;
+        }
+        
+        paper-radio-button {
+          display: block;
+        }
+        
 	</style>
 	<template>
+        
+        <!-- include the styles for icons -->
+        <style include="cpt_icon-styles"></style>
 	
 		<!-- get the Json Structure -->
 		<!--<getJsonStructure-cpt json_schema="{{json_schema}}"></getJsonStructure-cpt>-->
-		
+		<iron-ajax
+            auto
+            url="schema.json"
+            handle-as="json"
+            on-response="schemaReceived"></iron-ajax>
+        
 		<!-- Dialog box for JSON path filtering configuration in development mode -->
-		<paper-dialog id="modal" modal="" role="dialog" tabindex="-1" aria-modal="true" class="x-scope paper-dialog-0" style="outline: none; box-sizing: border-box; position: static; display: none;" aria-hidden="true">
-			<h2>Filtering</h2>
-			<paper-dialog-scrollable>
-				<path_json_editor-cpt filter="[[current_filter]]" computed_nested_filter="{{computed_nested_filter}}">
-                </path_json_editor-cpt>
-			</paper-dialog-scrollable>
+		<paper-dialog id="modalDataSource" entry-animation="scale-up-animation" exit-animation="fade-out-animation" autoFitOnAttach modal>
+            <div id="data_source_path_selection" is="data_source_path_selection-cpt" path-data-initial="[[pathDataInitial]]" path-data-validated="{{pathDataValidated}}" tree-data="[[treeData]]" style="width:800px; min-height: 400px"></div>
+		</paper-dialog>
+        
+        <!-- Dialog box for JSON code display in development mode -->
+		<paper-dialog id="modalCode" modal="" role="dialog" tabindex="-1" aria-modal="true" style="outline: none; box-sizing: border-box; position: static; display: none; width: 500px;" aria-hidden="true">
+			<h2>code</h2>
+            <div id="current_code_content"></div>
 			<div class="buttons">
-				<paper-button dialog-dismiss>Cancel</paper-button>
-				<paper-button dialog-confirm on-click="validateFiltering">Accept</paper-button>
+				<paper-button dialog-dismiss>Close</paper-button>
 			</div>
 		</paper-dialog>
+        
+        <!-- window for the "attributes" selection -->
+        <paper-dialog id="modalAttributes" modal="" role="dialog" tabindex="-1" aria-modal="true">
+            <h2>Select the attribute to connect</h2>
+            <div class="layout vertical">
+                <paper-radio-group selected="1" on-change="txBindingAttributes">
+                    <template is="dom-repeat"  items="[[attributesToBeSelected]]">
+                        <paper-radio-button name="[[index]]">[[item]]</paper-radio-button>
+                    </template>
+                </paper-radio-group>
+            </div>
+            <div class="buttons">
+				<paper-button dialog-dismiss hidden$="[[isCurrentCallerBinded(callerAttributeSelector)]]">Deleted Binding</paper-button>
+				<paper-button dialog-dismiss>Cancel</paper-button>
+				<paper-button dialog-confirm>Validate</paper-button>
+			</div>
+        </paper-dialog>
+        
+        <!-- window for the "more" button -->
+        <paper-dialog id="modalMore" heading="Custom Size &amp; Position" class="size-position">
+            <paper-item>Exit the editor</paper-item>
+            <paper-item>Suggestions</paper-item>
+            <paper-item>Help</paper-item>
+            <paper-item>Sign Out</paper-item>
+        </paper-dialog>
             
         <!-- content with drawer -->
-        <paper-drawer-panel id="contentDrawer" force-narrow="true" defaultSelected="drawer" peeking="true" dragging="true">
+        <paper-drawer-panel id="contentDrawer" force-narrow="true" defaultSelected="drawer" >
             <paper-header-panel drawer >
                 <paper-toolbar>
-                  <div class="title">UI Components</div>
+                    <div class="title" style="margin-left:0px">UI configuration</div>
+                    <paper-fab mini icon="icons:close" class="UIcatalogIcons" title="Close the menu" on-click="hideCatalogMenu"></paper-fab>
                 </paper-toolbar>
                  <!-- The catalog of UI elements to DnD -->
-                <div hidden$='[[!isMode("Development", mode)]]'>
-                    <div class="content layout vertical flex" id="UIElementsCatalog">
-                        <paper-menu>
-                            
-                            <paper-item id="stuctureMenuItem" on-click="showStructureCatalog">
-                                Structural Elements
-                                &nbsp;
-                                <paper-fab icon="icons:view-quilt" class="UIcatalogIcons"></paper-fab>
-                            </paper-item>
-                            <iron-collapse id="structureCatalog">
-                                    <div is="layout-elt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="layout-elt"></div>
-                            </iron-collapse>
-                            
-                            <paper-item id="textMenuItem" on-click="showTextCatalog">
-                                Text Elements
-                                &nbsp;
-                                <paper-fab icon="icons:speaker-notes" class="UIcatalogIcons"></paper-fab>
-                            </paper-item>
-                            <iron-collapse id="textCatalog">
-                                <div is="text-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="text-cpt"></div>
-                                <div is="h1-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="h1-cpt"></div>
-                            </iron-collapse>
-                            
-                            <paper-item id="datavizMenuItem" onSelect="oo" on-click="showDataVizCatalog">
-                                Data Visualisation Elements
-                                &nbsp;
-                                <paper-fab icon="icons:trending-up" class="UIcatalogIcons"></paper-fab>
-                            </paper-item>
-                            <iron-collapse id="datavizCatalog">
-                                <div is="d3js-tree-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="d3js-tree-cpt"></div>
-                            </iron-collapse>
-                            
-                        </paper-menu>
+                <div>
+                    
+                    <div>&nbsp;</div>
+                    
+                    <!-- Switch In Development ==> Operational icon -->	
+                    <div style="text-align: center;">
+                            <span id="modeToggleOperational">Operational</span>
+                            <paper-toggle-button checked="true" id="modeToggle" class="blue" on-change="modeTogglechange" title="Switch the visual mode: Development or Operational mode"></paper-toggle-button>
+                            <span id="modeToggleEdition">Edition</span>
                     </div>
+                    <div>&nbsp;</div>
+                    
+                    <paper-menu>
+                        
+                         <!-- Save current view -->
+                        <paper-item class="menu-trigger">
+                            <paper-fab mini icon="icons:save" class="UIcatalogIcons" title="Save this view" item-icon></paper-fab>
+                             &nbsp;
+                            Save current view
+                        </paper-item>
+                        
+                        <!-- Configure current view -->
+                        <paper-submenu>
+                            <paper-item class="menu-trigger">
+                                <paper-fab mini icon="icons:settings" class="UIcatalogIcons" title="Configure the current view" item-icon></paper-fab>
+                                &nbsp;
+                                Configure current view
+                            </paper-item>
+                            <paper-menu class="menu-content">
+                                <paper-item>
+                                    <paper-fab mini icon="icons:folder" class="UIcatalogIcons" title="Classify this view to better find it back: Which tag attach to this view and in which folders to classify it?" item-icon>
+                                    </paper-fab>
+                                    &nbsp;
+                                    Link to an activity
+                                </paper-item>
+                                <paper-item>
+                                    <paper-fab mini icon="icons:supervisor-account" class="UIcatalogIcons" title="Give rights for this view: Who can access this view and with which rights?" item-icon></paper-fab>
+                                    &nbsp;
+                                    Link to a user
+                                </paper-item>
+                                <paper-item>
+                                    <paper-fab mini icon="editor:mode-edit" class="UIcatalogIcons" title="Rename the view" item-icon></paper-fab>
+                                    &nbsp;
+                                    Rename
+                                </paper-item>
+                                <paper-item>Set tags (for classification)</paper-item>
+                            </paper-menu>
+                        </paper-submenu>
+                        
+                         <!-- Access other views -->
+                        <paper-item class="menu-trigger">
+                            <paper-fab mini icon="icons:folder" class="UIcatalogIcons" item-icon></paper-fab>
+                            &nbsp;
+                            My views
+                        </paper-item>
+                        
+                        <!-- Catalog of structural elements -->
+                        <paper-submenu>
+                            <paper-item class="menu-trigger">
+                                <paper-fab mini icon="icons:view-quilt" class="UIcatalogIcons" item-icon></paper-fab>
+                                &nbsp;
+                                Structural Elements
+                            </paper-item>
+                            <paper-menu class="menu-content">
+                                
+                                <paper-item>
+                                    <div is="container-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="container-cpt"></div>
+                                </paper-item>
+                                
+                                <!--<paper-item>
+                                    <div is="table-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="table-cpt"></div>
+                                </paper-item>-->
+                                
+                            </paper-menu>
+                        </paper-submenu>
+                             
+                        <!-- Catalog of text elements -->
+                        <paper-submenu>
+                            <paper-item class="menu-trigger">
+                                <paper-fab mini icon="icons:speaker-notes" class="UIcatalogIcons" item-icon></paper-fab>
+                                &nbsp;
+                                Text Elements
+                            </paper-item>
+                            <paper-menu class="menu-content">
+                                <paper-item>
+                                    <div is="text-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="text-cpt"></div>
+                                </paper-item>
+                                <paper-item>
+                                    <div is="h1-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="h1-cpt"></div>
+                                </paper-item>
+                            </paper-menu>
+                        </paper-submenu>
+                        
+                        <!-- Catalog of dataviz elements -->
+                        <paper-submenu>
+                            <paper-item class="menu-trigger">
+                                <paper-fab mini icon="icons:trending-up" class="UIcatalogIcons" item-icon></paper-fab>
+                                &nbsp;
+                                DataViz Elements
+                            </paper-item>
+                            <paper-menu class="menu-content">
+                                <paper-item>
+                                    <div is="d3js-tree-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="d3js-tree-cpt"></div>
+                                </paper-item>
+                            </paper-menu>
+                            
+                        </paper-submenu>
+
+                    </paper-menu>
                 </div>
             </paper-header-panel>
 
             <paper-header-panel main>
                 <!-- The application main toolbar -->
                 <paper-toolbar>
-                    <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-                    <div class="title">Polymorph by SEI</div>
-                    <Cockpit-connect is-connected="{{isConnected}}"></Cockpit-connect>
-                    <paper-icon-button icon="more-vert" on-tap="moreAction"></paper-icon-button>
+                    <paper-icon-button icon="menu" on-tap="showCatalogMenu"></paper-icon-button>
+                    
+                    <div class="flex horizontal layout" >
+                            <span style="display: inline; vertical-align: bottom; float: left; "><iron-image position="bottom" style="width:35px; height:35px;" sizing="contain" preload fade src="images/SEI_final%20LinkedIn%20Square%20transp.png"></iron-image>
+                                </span>
+                            <span style="display: inline; vertical-align: bottom"><h3>&nbsp;Polymorph</h3></div>
+                    </span>
+                    <!--<Cockpit-connect is-connected="{{isConnected}}"></Cockpit-connect>-->
+                    
+                    <paper-icon-button icon="more-vert" on-tap="callMoreModal"></paper-icon-button>
                 </paper-toolbar>
 
-                <!-- Progress bar -->
-                <div class="layout flex horizontal"><paper-progress value="90"></paper-progress></div>
+                <!-- Progress bar
+                <div class="layout flex horizontal"><paper-progress value="90"></paper-progress></div> -->
 
                 <div>&nbsp;</div>
                 <!-- Main content -->
                 <div >
-                    <!-- View Configuration toolbar -->
-                    <div class="content layout horizontal">
-
-                        <!-- rights -->
-                        <iron-icon title="Give rights for this view: Who can access this view and with which rights?" on-click='' icon="icons:supervisor-account"></iron-icon>
-
-                        <!-- classification -->
-                        <iron-icon title="Classify this view to better find it back: Which tag attach to this view and in which folders to classify it?" on-click='' icon="icons:folder"></iron-icon>
-
-                        <!-- save the UI -->
-                        <div class="layout flex">
-                            <iron-icon title="Save this view" on-click='saveView' icon="icons:save">saved</iron-icon>
-                        </div>
-
-                        <!-- In Development ==> Operational icon -->					
-                        <div class="layout end-justified">
-                            <div class="line">
-                                <span id="modeToggleOperational">Operational</span>
-                                <paper-toggle-button checked="true" id="modeToggle" class="blue" on-change="modeTogglechange" title="Switch the visual mode: Development or Operational mode"></paper-toggle-button>
-                                <span id="modeToggleEdition">Edition</span>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- The container receiving the drag drop -->
-                    <div id="UItopContainer" class="flex" is="layout-elt" mode="Development" structure="{{structure}}"></div>
-                    <span id="JSONstructure"></span>
-                    <span id="JSONhtml"></span>
+                    <div id="UItopContainer" class="flex" is="container-cpt" mode="Development" nodeChildren="{{nodeChildren}}" hidden$='[[!isMode("Development", mode)]]'></div>
+                    
+                    <!-- the HTML dynamically created if in operational mode -->
+                    <template is="dom-if" if="[[isMode('Operational', mode)]]">
+                        <div is="create-HTML-cpt" node-children="[[nodeChildren]]"></div>
+                    </template>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -241,7 +379,7 @@
 		Polymer({
 			is: 'visual-ui-editor-library-cpt',
 			
-			behaviors: [DragBehavior, ToasterTxBehavior, ToasterRxBehavior, UtilitiesBehavior],
+			behaviors: [DragBehavior, ToasterTxBehavior, ToasterRxBehavior, UtilitiesBehavior, ModeChangedBehavior],
 
 			extends: 'div',
 
@@ -257,185 +395,233 @@
 				{
 					value: 0
 				},
+                
+                pathDataInitial: {
+                    type: Object,
+                    value: {}
+                },
 				
-				current_filter:
-				{
-					type: String,
-					value: "*"
-				},
-				
-				computed_nested_filter:
-				{
-					type: String,
-					value: "*",
-					notify: true
-				},
-				
-				structure: {
+				pathDataValidated: {
+                    type: Object,
+                    value: {}
+                },
+                
+                attributesToBeSelected: {
+                    type: Array,
+                    value: []
+                },
+                
+                callerDataSourceEditor: {},
+                
+                callerAttributeSelector: {},
+                
+                treeData2: {
+                    type: Object,
+                    value:	{
+                        "name": "Features",
+                        "type": "item",
+                        "children": {
+                            "has_requirement": {
+                                "name": "has_requirement",
+                                "type": "link",
+                                "children": {
+                                    "Requirements": {
+                                        "name": "Requirements",
+                                        "type": "item",
+                                        "children": {
+                                            "is_sub_requirement_of": {
+                                                "name": "is_sub_requirement_of",
+                                                "type": "link",
+                                                "children": {
+                                                    "Requirements": {
+                                                        "name": "Requirements",
+                                                        "type": "item"
+                                                    }
+                                                }
+                                            },
+                                            "is_parent_requirement_of": {
+                                                "name": "is_parent_requirement_of",
+                                                "type": "link",
+                                                "children": {
+                                                    "Requirements": {
+                                                        "name": "Requirements",
+                                                        "type": "item"
+                                                    }
+                                                }
+                                            },
+                                            "is_requirement_of": {
+                                                "name": "is_requirement_of",
+                                                "type": "link",
+                                                "children": {
+                                                    "*": {
+                                                        "name": "*",
+                                                        "type": "item"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            'is_sub_feature_of': {
+                                "name": "is_sub_feature_of",
+                                "type": "link",
+                                "children": {
+                                    'Features': {
+                                        "name": "Features",
+                                        "type": "item"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                
+                nodeChildren: {
 					type: Object,
-					value: {
-                        id: '',
-                        is: '',
-                        config: {
-                            computed_nested_filter: '',
-                            divUniqueId: 0,
-                            layoutHorizVert: false,
-                            layoutFlex: false,
-                            layoutIterate: false,
-                            provides: ''
-                        },
-                        children: {}
-                    },
-                    observer: 'observeJSONstructure'
-                    
-				}
+					value: function() { return {}; }
+                }
+                
 			},
             
-            observer: ['observeJSONstructure(structure.*)'],
+            observers: ['validateFiltering(pathDataValidated.*)'],
 			
 			listeners: {
-				'pathJsonEditorRequest': 'callPathJsonEditorModal'
+				'pathJsonEditorRequest': 'callPathJsonEditorModal',
+				'codeJsonRequest': 'callCodeJsonModal',
+                '_notifyResize': 'updatePathJsonEditorModal',
+                'attSelectionRequest': 'callModalAttributes'
 			},
             
             attached: function() {
-                var host = this;
-                this.$.UItopContainer.addEventListener("structure-changed", function(e){
-                    console.log("/host structure changed");
-                    console.log(e.target.__data__.id + " vs " + "UItopContainer");
-                    if ( e.target.__data__.id == "UItopContainer") {
-                        var structure = this.copyJSONobj(e.target.__data__.structure);
-                        host.observeJSONstructure({});
-                    }
+                
+                // Indicate the children node that we are his parent (not necessary w. Polymer except for dynamically added)
+                this.$.UItopContainer.set('hostRef', this);
+            },
+            
+            ready: function() {
+                this.async
+            },
+            
+            // schemaReceived
+            schemaReceived: function(ev) {
+                console.log("schemaReceived");
+                this.treeData = ev.detail.__data__.xhr.response;
+            },
+			
+			saveView: function() { this.sendToasterMsgDisplayRequest("UI view saved", "information");}, 
+			
+            /**************** Data Source Editor ****************/
+			callPathJsonEditorModal: function(ev) {
+                console.log("/callPathJsonEditorModal");
+                
+                // Data Source reset prior from opening
+                this.$.data_source_path_selection.set('tree-data', this.treeData);
+                this.$.data_source_path_selection.resetModalContent();
+                
+                // Get the data from the caller
+				var msg = ev.detail;
+				this.pathDataInitial = msg.pathData;
+                
+                // Get the caller
+				this.callerDataSourceEditor = ev.srcElement;
+                
+                // Open
+                this.$.modalDataSource.toggle();
+                this.async(function() {
+				    this.$.modalDataSource.open();  
+                    this.$.modalDataSource.center();
+                });           
+			},
+                
+            updatePathJsonEditorModal: function(ev) {
+                console.log("/updatePathJsonEditorModal");
+				this.$.modalDataSource.notifyResize();  
+            },
+            
+			validateFiltering: function(value) {
+                console.log("/validateFiltering");
+                console.log(this.pathDataValidated);
+                if (this.callerDataSourceEditor) {
+                    var caller = Polymer.dom(this.callerDataSourceEditor);
+                    console.log(JSON.stringify(this.pathDataValidated));
+                    caller.setAttribute("path-data-validated", JSON.stringify(this.pathDataValidated));
+                }
+                
+                this.pathDataInitial = {};
+			},
+            
+            /**************** More Modal Management ****************/
+            callMoreModal: function(ev) {
+                this.$.modalMore.open();  
+            },
+            
+            /**************** Attributes Modal Management ****************/
+            callModalAttributes: function(ev) {
+                
+                var msg = ev.detail;
+                this.attributesToBeSelected = msg.attributes;
+                
+                // Get the caller
+				this.callerAttributeSelector = ev.srcElement;
+                
+                // Open the modal window
+                this.$.modalAttributes.open();  
+            },
+            
+            txBindingAttributes: function(ev) {
+                console.log("/txBindingAttributes");
+                
+                if (this.callerAttributeSelector) {
+                    var caller = Polymer.dom(this.callerAttributeSelector);
                     
-                });
+                    var selectedAttr = "";
+
+                    caller.setAttribute('displayed-text', "[[contentData." + selectedAttr + "]]");
+                    caller.setAttribute('bind-to-container', true);
+                }
                 
             },
+                
+            isCurrentCallerBinded: function() {
+                if (this.callerAttributeSelector)
+                    return Polymer.dom(this.callerAttributeSelector).getAttribute('bind-to-container');
+                else
+                    return false;
+            },
+            
+            /**************** Get the JSON decorated string of the structure ****************/
+            callCodeJsonModal: function(ev) {
+                var msg = ev.detail;
+                //var HTMLstructure = JSON.stringify(msg.nodeChildren);
+                
+                console.log(HTMLstructure);
+                var HTMLstructure = JSONTree.create(msg.nodeChildren);
+                console.log(document.getElementById("current_code_content"));
+                document.getElementById("current_code_content").innerHTML = HTMLstructure;
+                this.$.modalCode.open();
+            },
+            
+            /**************** Mode Management ****************/
+			isMode: function(mode) { return this.mode == mode; },
 			
 			sendModeChangedRequest: function(mode) {
 				this.mode = mode; 
 				this.sendToasterMsgDisplayRequest("UI mode switched to " + mode, "information");
 				this.$.UItopContainer.fire('UImodeChangedRequest', { "mode": this.mode });
 			},
-			
-			saveView: function() { this.sendToasterMsgDisplayRequest("UI view saved", "information");}, 
-			
-			callPathJsonEditorModal: function(ev) {
-				var msg = ev.detail;
-				this.computed_nested_filter = msg.computed_nested_filter;
-				this.current_filter = msg.current_filter;
-				this.callerPathJsonEditor = ev.srcElement;
-				this.$.modal.open();
-			},
-			
-			isSelectedCatalog: function(catalog) {
-				console.log( this.querySelector( "#" + catalog ) );
-			},
-			
-			isMode: function(mode) { return this.mode == mode; },
-			
+            
 			modeTogglechange: function() {
 				if ( this.isMode('Development') )
 					this.sendModeChangedRequest('Operational');
 				else 
 					this.sendModeChangedRequest('Development');
 			},
-			
-			validateFiltering: function(ev) {
-				var caller = Polymer.dom(this.callerPathJsonEditor);
-				caller.setAttribute("computed_nested_filter", this.computed_nested_filter);
-				caller.setAttribute("current_filter", this.current_filter);
-			},
-			
-			observeJSONstructure: function(ev) {
-                console.log('observeJSONstructure');
-                var structure = this.copyJSONobj(this.structure);
-                
-                if ( structure.id == "UItopContainer" ) {
-                    document.getElementById("JSONstructure").innerHTML = JSONTree.create(structure);
-                    
-                    console.log("structure");
-                    console.log(structure);
-                   // var HTMLstructure = this.createHTMLstructure( structure );
-                   // document.getElementById("JSONhtml").innerHTML = HTMLstructure;
-                }
-                
-			},
             
-            createHTMLstructure: function(structure) {
-                console.log("createHTMLstructure");
-                
-                var cpt = '<div ';
-                
-                // id
-                cpt = cpt + 'id="' + structure.id + '" ';
-                
-                // is
-                cpt = cpt + 'is="' + structure.is + '" ';
-                
-                // config
-                var config = this.copyJSONobj(structure.config);
-                console.log("config");
-                console.log(config);
-                for (var key in config) {
-                    console.log(key);
-                   if (config.hasOwnProperty(key))
-                   {
-                        var obj = config[key];
-                        console.log(obj);
-                       
-                       // Function to make sure the format of polymer/js caps variable is converted to hmtl ones
-                        key = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-                        console.log(key);
-                       
-                        // If this is a boolean
-                        if ( typeof obj === 'boolean' )
-                        {
-                            if ( obj ) cpt = cpt + key + ' ';
-                        }
-                        // else
-                        else
-                            cpt = cpt + key + '="' + obj + '" ';
-                    }
-                }
-                
-                cpt = cpt + '>';
-                
-                console.log(cpt);
-                
-                // children
-                var children = this.copyJSONobj(structure.children);
-                for (var child in children) {
-                    console.log("child found");
-                    console.log(children[child]);
-                    var childCpt = this.createHTMLstructure(children[child]);
-                    cpt = cpt + childCpt;
-                }
-                
-                cpt = cpt + '</div>';
-                console.log(cpt);
-                // return the computed html structure
-                return cpt;
-            },
+            /****************** Menu Management ******************/
+            showCatalogMenu: function() { this.$.contentDrawer.openDrawer(); },
             
-            
-            showStructureCatalog: function() { console.log("/showStructureCatalog");
-                this.$.structureCatalog.show();
-                this.$.textCatalog.hide();
-                this.$.datavizCatalog.hide();
-            },
-            showTextCatalog: function() { console.log("/showTextCatalog");
-                this.$.structureCatalog.hide();
-                this.$.textCatalog.show();
-                this.$.datavizCatalog.hide();
-            },
-            showDataVizCatalog: function() { console.log("/showDataVizCatalog");
-                this.$.structureCatalog.hide();
-                this.$.textCatalog.hide();
-                this.$.datavizCatalog.show();
-            },
-            
-            hideCatalogMenu: function() { this.$.collapseCatalogMenu.hide();},
-            showCatalogMenu: function() { this.$.collapseCatalogMenu.show();}
+            hideCatalogMenu: function() { this.$.contentDrawer.closeDrawer(); }
 		});
 	</script>
 </dom-module>

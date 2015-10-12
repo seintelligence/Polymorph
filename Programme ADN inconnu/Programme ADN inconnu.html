@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" id="not-found">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>Qui suis-je?</title>
+    <link rel="stylesheet" type="text/css" href="main2.css">
+    <script src="js/jquery.min.js" type="text/javascript"></script>
+    <script src="js/typed.js" type="text/javascript"></script>
+    <script>
+        
+        function typeContext(str)
+        {
+            // make conversation
+            $('#context').typed({
+                strings: str,
+                typeSpeed: 5,
+                backSpeed: 0,
+                backDelay: 10,
+                showCursor: true,
+                cursorChar: "|"
+            });
+        }
+        
+        function countContext(str)
+        {
+            return str.length;
+        }
+        
+        function typeTalk(str)
+        {
+            // make conversation
+            $('#the_person_talks').typed({
+                strings: str,
+                typeSpeed: 5,
+                backSpeed: 0,
+                backDelay: 10,
+                showCursor: true,
+                cursorChar: "|"
+            });
+        }
+        
+        //Programme "ça va?"
+        function ca_va_point_dinterrogation(context, example)
+        {
+            context.push("<b>Cette personne commence toujours la journée par \"ça va?\"^25000</b>");
+            
+            var talk = "^3000- Salut Doudou, ça va?^500 Tu as bien dormi?^1000 Un peu de café?^500<br>";
+            talk += "- Salut Valentine, ça va?^500 Tu vas mieux?^1000 Plus trop mal à la tête?^500<br>";
+            talk += "- Salut Camille, ça va?^500 Le petit ventre aussi se porte bien?^500 Tu veux du café?^500<br>";
+            talk += "- Salut Mat, ta jambe va bien?^500 Tu veux du café?^1000";
+            
+            example.push(talk);
+        }
+        
+        //Programme <i>je suis trop gentil</i>
+        function je_suis_trop_gentil(context, example)
+        {
+            context.push("<b>Cette personne est aussi très gentille^3000</b>");
+            
+            context.push("<b>(Maintenant qu'il a demandé à tout le monde si ça va et qu'il a servi tout le monde en café)^10000</b>");
+            example.push("^3000Bon je vais me faire un petit café...^8000Oh bah il n’y a plus de café!^2000<br>Ce n'est pas grave je vais aller en chercher en ville pour que vous en ayez pour demain^1000");
+            
+            context.push("^2000<b>Les autres se disent que ce n'est pas normal et veulent y aller^16000</b>");
+            
+            var talk = "^3000- Non mais arrête Mat, tu ne vas pas y aller avec ta jambe^500<br>";
+            talk += "- Non mais arrête Camille, tu ne vas pas y aller tu es enceinte^500<br>";
+            talk += "- Non mais arrête Clémentine, tu ne vas pas y aller, tu as déjà été deux fois enceinte^500<br>";
+            talk += "- Non mais arrête Doudou, tu en fais déjà trop^500";
+            example.push(talk);
+        } 
+        
+        // Programme Machine Learning et curiosité
+        function machine_learning_and_curiosity(context, example)
+        {
+            context.push("<b>Cette personne a une soif d'apprendre et une curiosité sans fin^1000</b>");
+            
+            context.push("<b>Cédric qui montre son pad musique...^3000(2h plus tard)^3000</b>");
+            example.push("^4000Ah ouais vas-y montre ce que tu sais faire......^1000ah ouais mais en fait j'ai tout compris !^500");
+            
+            context.push("<b>Elisa qui parle d'ustensiles de cuisine^3000</b>");
+            example.push("^1000Mais il tiennent bien en machine?^500");
+            
+            context.push("<b>Mat qui parle d'hémorroides^3000</b>");
+            example.push("^2500Ah ouais raconte c'est trop intéressant comme science^500");
+            
+            context.push("<b>Valentine qui parle de son tricot^3000</b>");
+            example.push("^1000Punaise mais c'est ouf que t'arrives à faire une maille comme ça Val!^500");
+            
+        }
+        
+        // Programme humilité
+        function humility(context, example)
+        {
+            context.push("<b>Cette personne a une humilité qui se traduit en mettant les autres sur un pied d'estale^1000</b>");
+            
+            context.push("<b>Mat et Clem prennent la voiture avec les enfants^4000</b>");
+            example.push("^8000Olalala mais moi je pourrais jamais faire ca, je sais pas comment vous faites^500");
+
+            context.push("<b>Romain coupe un citron en 3^3000</b>");
+            example.push("^1000punaise Nan mais t'es trop fort. C'est ouf!^500");
+
+            context.push("<b>Camille arrive à calmer Laurent^4000</b>");
+            example.push("^1000Nan mais toi, mais t'as une force mentale, franchement Camille, t'es impressionnante^500");
+
+        }
+        
+        // Programme sensibilité
+        function sensibility(context, example)
+        {
+            context.push("<b>Cette personne a une sensibilité (mêlé d'altruisme) au-dessus de la moyenne^1000</b>");
+            
+            context.push("<b>Doudou a pas tapé depuis 2 semaines^7000</b>")
+            example.push("^7000oh mon doudou, ce doit être compliqué, franchement si tu as besoin d'aide n'hésite pas^500");
+
+            context.push("<b>A propos de sa boulangère qui se décrotte le nez tout les matins en lui donnant sa baguette^16000</b>")
+            example.push("^5000Non mais il faut faire quelque chose, ce n'est pas supportable cette situation, elle ne doit pas être bien. On voit bien que quelque chose la gêne. Sûrement que son air est trop sec, je pense qu'on devrait lui acheter un humidificateur^500");
+
+            context.push("<b>Valentine ne s'est pas faite tapée depuis 2 semaines^4000 [non ce n'est pas ce que vous croyez, il a le programme fidélité aussi]^6000</b>");
+            example.push("^2000oh ma val, ce doit être compliqué, franchement si tu as besoin d'aide n'hésite pas^5000, j'en connais un qui peut t'aider^2000");
+
+        }
+        
+        $(document).ready(function() {
+            
+            var context = [];
+            var example = [];
+            
+            ca_va_point_dinterrogation(context, example);
+            
+            je_suis_trop_gentil(context, example);
+            
+            machine_learning_and_curiosity(context, example);
+            
+            humility(context, example);
+            
+            sensibility(context, example);
+            
+            context.push("<b>End</b>");
+            example.push(" ");
+                
+            typeContext(context);
+            typeTalk(example);
+            
+            
+          setTimeout(function() {
+            // send 'em packing 
+            $('#kick').append('As tu trouvé qui je suis?');
+          }, 202000);
+        });
+        
+        
+    </script>
+    
+  </head>
+
+  <body>
+          <div><span><b>Commentaires: </b></span><span id="context"></span></div>
+          <div id="the_person_talks"></div>
+      <div></div>
+      <div id="holder">
+          <div id="kick"></div>
+      </div>
+      
+  </body>
+</html>

@@ -1,0 +1,229 @@
+<script src="../scripts/alasql.min.js"></script> 
+<script src="../scripts/underscore-min.js"></script>
+
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="UtilitiesBehavior.html">
+
+<dom-module id="content-data-request-cpt">
+	<style>
+        * { font-family: RobotoDraft, Helvetica, Arial, sans-serif;}
+	</style>
+	<template>
+        <iron-ajax
+            auto
+            url="../db.json"
+            handle-as="json"
+            last-response="{{db}}">
+        </iron-ajax>
+        
+        <iron-ajax
+            auto
+            url="../structureData.json"
+            handle-as="json"
+            last-response="{{structureData}}">
+        </iron-ajax>
+        
+        <div id="current_code_content"></div>
+    </template>
+    <script>
+        Polymer({
+			is: 'content-data-request-cpt',
+            
+            properties: {                
+                db: {
+                    observer: 'structureChanged'
+                },
+                
+                contentData: {
+                    type: Object,
+                    value: {},
+                    notify: true                   
+                },
+                
+                structureData: {
+                    type: Array,
+                    value: [],
+                    observer: 'structureChanged',
+                    notify: true  
+                }
+            },
+			
+			behaviors: [UtilitiesBehavior],
+            
+            structureChanged: function(ev) {
+                
+                // Check if we have received structure and the content
+                if ( _.isEmpty(this.structureData) || _.isEmpty(this.db) ) return;
+                
+                // Reduce the structure data
+                var structureData = JSON.parse(JSON.stringify(this.structureData.UItopContainer));
+                structureData.nodeChildren = this.getOnlyHasPathData(structureData.nodeChildren);
+                
+                // Get the uppermost object
+                var obj = structureData;
+                
+                var tmpContentData = {};
+                
+                // Iteratively get the content
+                tmpContentData["UItopContainer"] = this.getContainerData(obj);
+                this.set('contentData', tmpContentData);
+                
+                console.log(JSON.stringify(this.contentData));
+            },
+            
+            // Filter structure with only structure items with pathData
+            getOnlyHasPathData: function(nodeChildren) {
+                var tmpNodeChildren = nodeChildren;
+                nodeChildren = [];
+                
+                // Get the children node which are containers ==> nodes
+                for( key in tmpNodeChildren)
+                {
+                    if ( _.has(tmpNodeChildren[key].config, 'pathData' ) )
+                    {                        
+                        var tmp = tmpNodeChildren[key];
+                        tmp.nodeChildren = this.getOnlyHasPathData(tmpNodeChildren[key].nodeChildren);
+                        nodeChildren.push( tmp );
+                    }
+                }
+                return nodeChildren;
+            },
+            
+            // Run through the container structure and get its data
+            getContainerData: function() {
+                var foundItems = [];
+                var that = this;
+                var containerData = [];
+                var nodes = [];
+                
+                // get the function arguments
+                var arg = [].slice.call(arguments);
+                
+                // get the current object
+                var obj = arg.shift();
+                
+                var pathData = obj.config.pathData;
+                var nodeChildren = obj.nodeChildren;
+                
+                // Get the objects of the container
+                pathData.forEach(function(e) { foundItems = foundItems.concat.apply([], that.getItems(_.clone(e))); });
+                
+                // Get the unique list of objects + 
+                // For each found item, iterate and search for the children item
+                foundItems.forEach(function(foundItem) {
+                    
+                    // if similar, then skip else:
+                    if (_.findWhere(containerData, foundItem) == null) {
+                        
+                        foundItem.nodeChildren = {};
+                        
+                        // Get the node children
+                        nodeChildren.forEach( function(nodeChild) {
+                            
+                            var tmpNode = JSON.parse(JSON.stringify(nodeChild));
+                            var nodeChildPathData = tmpNode.config.pathData;
+                            
+                            tmpNode.config.pathData = [];
+                            
+                            // Introduce in the pathData the current found item to start the sql query from here
+                            nodeChildPathData.forEach(function(path) {
+                                path.filters.push('id = "' + foundItem.id + '"');
+                                tmpNode.config.pathData.push(path);
+                            });
+                            
+                            foundItem.nodeChildren[nodeChild.id] = that.getContainerData(tmpNode);
+                        });
+                        containerData.push( foundItem );
+                    }
+                    
+                });
+                    
+                // Return the unique list of objects
+                return containerData;
+            },
+                        
+            contentDataReceived: function(ev) {
+                console.log("/contentDataReceived");
+                
+                this.db = ev.detail.__data__.xhr.response;
+                
+            },
+            
+            // generic function
+            getObjects: function() {
+                var filters = "";
+                var db = this.db;
+                
+                // get the function arguments
+                var arg = [].slice.call(arguments);
+                
+                // get the type of searched objects
+                var strObjects = arg.shift();
+                
+                // get the column name and sub query column name according to the type of searched objects
+                var column_name = 'destination', sub_column_name = 'id';
+                if (strObjects == 'items') { column_name = 'id'; sub_column_name = 'origin';}
+                
+                // get the path Data
+                var pathData = arg.shift();
+                
+                // get the upper element of the sub query which is the type of the search item and remove it from the sub query
+                filters = 'type="' + pathData.path + '"';
+            
+                // construct the filter string for the sql query
+                pathData.filters.forEach( function(e) { filters += " AND " + e; } );
+                
+                // add the WHERE command for SQL query
+                filters = 'WHERE (' + filters + ')';
+                
+                // Get the objects
+                var objects = alasql('SEARCH ' + strObjects + '/ FROM ?', [db]);
+                
+                // If a sub query does exist, then continue to the getLinks()
+                if ( !_.isEmpty(pathData.subPathData) ){
+                    
+                    var subPathData = _.clone(pathData.subPathData);
+                    
+                    // Get the searched items
+                    var found_objects_id = alasql('SELECT COLUMN ' + column_name + ' FROM ? ' + filters, [objects]);
+
+                    // Flatten found linked items
+                    //found_objects_id = _.flatten(found_objects_id, true);
+                    
+                    if (_.isEmpty(found_objects_id)) return [];
+                    
+                    
+                    // Reconstruct the found items array
+                    var newFilter = sub_column_name + ' IN ' + this._reconstructSQLqueryArray(found_objects_id);
+                    subPathData.filters.push(newFilter);;
+                    
+                    // return the searched linked items
+                    if (strObjects == 'items')  return this.getLinks(subPathData);
+                    else                        return this.getItems(subPathData);
+                }
+                
+                // Else return the current items
+                return alasql('SELECT * FROM ? ' + filters, [objects]);   
+            },
+            
+            // Get the items
+            getItems: function() {
+                
+                var arg = [].slice.call(arguments);
+                arg.unshift('items');
+                
+                return this.getObjects.apply(this, arg);
+            },
+            
+            // Get the links
+            getLinks: function() {
+                
+                var arg = [].slice.call(arguments);
+                arg.unshift('links');
+                
+                return this.getObjects.apply(this, arg);
+                
+            }
+        });
+    </script>
+</dom-module>

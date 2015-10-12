@@ -1,0 +1,31 @@
+{
+    "UItopContainer": [
+        {
+            "name": "System Drive By Wire1",
+            "type": "Feature",
+            "description": "This system aims at...",
+            "nodeChildren": {
+                "UItopContainer_2": [
+                    {
+                        "name": "To Compute APS position",
+                        "type": "Feature",
+                        "description": "This feature aims at..."			
+                    },
+                    {
+                        "name": "To Sense APS position",
+                        "type": "Feature",
+                        "description": "This feature aims at sensing"			
+                    }
+                ]
+            }
+        },
+        {
+            "name": "System Drive By Wire2",
+            "type": "Feature",
+            "description": "This system aims at...",
+            "nodeChildren": {
+                "UItopContainer_2": []
+            }
+        }
+    ]
+}

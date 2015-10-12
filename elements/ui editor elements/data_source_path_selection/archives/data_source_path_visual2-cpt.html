@@ -1,0 +1,604 @@
+<script type="text/javascript" src="../../../scripts/d3.min.js"></script> <!-- Import d3 js -->
+
+<dom-module id="data_source_path_visual-cpt">  <!-- Define your custom element -->
+
+    <!-- Shadow CSS -->
+    <style type="text/css">
+        @font-face {
+            font-family: "Roboto Condensed";
+            font-style: normal;
+            src: local('Roboto Regular'), local('Roboto-Regular'), url('Roboto-Regular.ttf') format('truetype');
+        }
+
+        html {
+          overflow-y:auto; 
+        }
+
+        div#body {
+            float:left;
+            vertical-align:middle;
+            overflow-y:auto;
+            overflow-x:auto;
+            /*border-style:solid;
+            //border-width:1px;*/
+            border-color:#FCFCFC;
+            /*width:100%;*/
+        }
+        
+            
+
+    </style>
+    
+	<template>
+        <style>
+        
+            div#body ::content svg {
+                /*float: left;*/
+                font-size: 1em;
+                font-family: "Roboto Condensed";
+            }
+            
+            div#body ::content g.node circle {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: rgb(217,217,217);
+              stroke-width: 1.5px;
+            }
+            
+            div#body ::content g.node path {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: rgb(217,217,217);
+              stroke-width: 1.5px;
+            }
+
+            div#body ::content g.node circle.selected {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: steelblue;
+              stroke-width: 1.5px;
+            }
+
+            div#body ::content g.node circle.selectedWarning {
+              cursor: pointer;
+              fill: #FF7788;
+              font: Calibri;
+              stroke: rgb(98,39,33);
+              stroke-width: 1.5px;
+            }
+
+            div#body ::content g.node path.selected {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: steelblue;
+              stroke-width: 1.5px;
+            }
+            
+            div#body ::content g.node path.selectedWarning {
+              cursor: pointer;
+              fill: white;
+              font: Calibri;
+              stroke: #FF7788;
+              stroke-width: 1.5px;
+            }
+
+            div#body ::content g.node text {
+              font-size: 0.8em;
+            }
+
+            div#body ::content g.node text.selected {
+              font-size: 0.8em;
+              fill: steelblue;
+            }
+
+            div#body ::content g.node text.selectedWarning {
+              font-size: 0.8em;
+              fill: #FF7788;
+            }
+
+            div#body ::content path.link {
+              fill: none;
+              stroke: #ccc;
+              stroke-width: 1.5px;
+            }
+        
+        </style>
+        <div class="layout vertical">
+            <div class="body" id="body">
+                <content><svg id="svg"></svg></content>
+            </div>
+            <div>
+                <u>Tip:</u> Click a node with [CTRL] to select a node as data source
+            </div>
+        </div>
+    </template>
+        
+    <script>
+
+        Polymer({
+
+            is: 'data_source_path_visual-cpt',
+            
+            extends: 'div',
+
+            properties: {
+                
+                computedPath: {
+                    type: Array,
+                    notify: true
+                },
+                
+                width:
+                {
+                    value:400
+                },
+                
+                height: 
+                {
+                    value: 400
+                },
+                
+                pathData:
+                {
+                    type: Array,
+                    notify: true,
+                    observer: 'updateDataSource',
+                    value: []
+                },
+                
+                currentlySelectedNode:
+                {
+                    type: Object,
+                    notify: true,
+                    value: {}
+                },
+                
+                treeData:
+                {
+                    type: Object,
+                    value: {
+                        "name": "Features",
+                        "type": "item",
+                        "children": {
+                            "has_requirement": {
+                                "name": "has_requirement",
+                                "type": "link",
+                                "children": {
+                                    "Requirements": {
+                                        "name": "Requirements",
+                                        "type": "item",
+                                        "children": {
+                                            "is_sub_requirement_of": {
+                                                "name": "is_sub_requirement_of",
+                                                "type": "link",
+                                                "children": {
+                                                    "Requirements": {
+                                                        "name": "Requirements",
+                                                        "type": "item"
+                                                    }
+                                                }
+                                            },
+                                            "is_parent_requirement_of": {
+                                                "name": "is_parent_requirement_of",
+                                                "type": "link",
+                                                "children": {
+                                                    "Requirements": {
+                                                        "name": "Requirements",
+                                                        "type": "item"
+                                                    }
+                                                }
+                                            },
+                                            "is_requirement_of": {
+                                                "name": "is_requirement_of",
+                                                "type": "link",
+                                                "children": {
+                                                    "*": {
+                                                        "name": "*",
+                                                        "type": "item"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            'is_sub_feature_of': {
+                                "name": "is_sub_feature_of",
+                                "type": "link",
+                                "children": {
+                                    'Features': {
+                                        "name": "Features",
+                                        "type": "item"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                
+                slicedData: {}
+            },
+			
+			behaviors: [UtilitiesBehavior],
+
+            //observers: ['updateD3JS(treeData.splices)'],
+            
+            attached: function()
+            {
+                this.updateD3JS();                
+            },
+            
+            updateDataSource: function() {
+                /*this.async(function() {
+				    this.updateD3JS();  
+                });*/
+            },
+            
+            updateD3JS: function()
+            {
+                console.log("/updateD3JS");
+                
+                
+                console.log(this.treeData);
+                var treeDataArr = [convertChildrenObjToArr(this.treeData)];
+                console.log(treeDataArr);
+                var SlicedData = treeDataArr.slice();
+                console.log(SlicedData);
+                
+                d3.select(this).select('svg').selectAll('g').remove();
+                
+                d3.select("#body");
+    
+                // THe link icon
+                var link_icon_str ="M00, 00L05, 03L10, 00L10, 06L05, 09L00, 06,L00, 00 Z\
+                                    M00, 06L05, 09L10, 06L10, 12L05, 15L00, 12,L00, 06 Z\
+                                    M00, 12L05, 15L10, 12L10, 18L05, 21L00, 18,L00, 12 Z";
+
+                var margin = {top: 20, right: 20, bottom: 20, left: 20},
+                    width = this.width - margin.right - margin.left,
+                    height = this.height - margin.top - margin.bottom;
+
+                var realWidth = this.width,
+                    realHeight = this.height;
+
+                var i = 0,
+                    duration = 750,
+                    root;
+
+                var tree = d3.layout.tree()
+                    .size([height, width]);
+
+                var diagonal = d3.svg.diagonal()
+                    .projection(function(d) { return [d.x, d.y]; });
+
+                var body = d3.select("#body");
+                document.getElementById("body").style.width = realWidth;
+                document.getElementById("body").style.height = realHeight;
+
+                var svg = body.select("svg") 
+                    .attr("id", "svg")
+                    .attr("width", 0.95 * realWidth)
+                    .attr("height", 0.95 * realHeight);
+                
+                var groupNodes = svg.append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                        .attr("class", "nodeStart");      
+
+                var node = groupNodes.data(SlicedData);
+
+                // Initialize the display to show a few nodes.
+                root = SlicedData[0];
+                root.x0 = width / 2;
+                root.y0 = 0;
+                
+                console.log(root);
+                // If it has children, then toggle it
+                if (root.children)
+                    root.children.forEach(function(e) { console.log(e); toggleAll(e, root); });
+
+                //d3.select(self.frameElement).style("height", "800px");
+
+                var that = this;
+                update(root, that);
+
+                function update(source, that) {
+
+                    // Compute the new tree layout.
+                    var nodes = tree.nodes(root).reverse(),
+                        links = tree.links(nodes);
+
+                    // Normalize for fixed-depth.
+                    nodes.forEach(function(d) { d.y = d.depth * 50; });
+
+                    // Update the nodes…
+                    var node = groupNodes.selectAll("g.node")
+                        .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+                    // Enter any new nodes at the parent's previous position.
+                    var nodeEnter = node.enter().append("g")
+                        .attr("class", "node")
+                        .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
+                        .on("click", nodeClick)
+                        .on("mouseout", nodeOut)
+                        .on("mouseover", nodeOver);
+
+                    nodeEnter.filter(function(d) { return d.type == "item";}).append("circle")
+                        .attr("r", 1e-6)
+                        .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+
+                    nodeEnter.filter(function(d) { return d.type == "link";}).append("g")
+                        .attr("transform", "translate(-4, -10)")
+                        .append("path").attr("d", link_icon_str)
+                        .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+
+                    nodeEnter.append("text")
+                        .attr("x", "-5px")
+                        .attr("y", function(d) { return d.children || d._children ? -10 : 10; })
+                        .attr("dy", ".35em")
+                        .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+                        .text(function(d) { return d.name; })
+                        .style("fill-opacity", 1e-6);
+
+                    // Transition nodes to their new position.
+                    var nodeUpdate = node.transition()
+                        .duration(duration)
+                        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+                    nodeUpdate.select("circle")
+                        .attr("r", 4.5)
+                        .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+
+                    nodeUpdate.select("path")
+                        .attr("r", 4.5)
+                        .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+
+                    nodeUpdate.select("text")
+                        .style("fill-opacity", 1);
+
+                    // Transition exiting nodes to the parent's new position.
+                    var nodeExit = node.exit().transition()
+                        .duration(duration)
+                        .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
+                        .remove();
+
+                    nodeExit.select("circle")
+                        .attr("r", 1e-6);
+
+                    nodeExit.select("text")
+                        .style("fill-opacity", 1e-6);
+
+                    // Update the links…
+                    var link = groupNodes.selectAll("path.link")
+                        .data(links, function(d) { return d.target.id; });
+
+                    // Enter any new links at the parent's previous position.
+                    link.enter().insert("path", "g")
+                        .attr("class", "link")
+                        .attr("d", function(d) {
+                            var o = {x: source.x0, y: source.y0};
+                            return diagonal({source: o, target: o});
+                        });
+
+                    // Transition links to their new position.
+                    link.transition()
+                        .duration(duration)
+                        .attr("d", diagonal);
+
+                    // Transition exiting nodes to the parent's new position.
+                    link.exit().transition()
+                        .duration(duration)
+                        .attr("d", function(d) {
+                            var o = {x: source.x, y: source.y};
+                            return diagonal({source: o, target: o});
+                        })
+                        .remove(); 
+
+                    // Stash the old positions for transition.
+                    nodes.forEach(function(d) {
+                        d.x0 = d.x;
+                        d.y0 = d.y;
+                    });
+                }
+                
+                // Create the node info for display
+                function updateCurrentSelectedNode(d)
+                {
+                    if (d)
+                        that.currentlySelectedNode = {
+                            'name': d.name,
+                            'description': 'same'
+                        };  
+                    else 
+                        that.currentlySelectedNode = {};
+                }  
+                
+                function getParentNodePath(d, subPathData)
+                {
+                    console.log("/getParentNodePath");
+                    console.log(d);
+                    var oNode = { 'path': d.name, 'filters': [], 'type': d.type };
+                    
+                    // the path in string
+                    oNode.str = d.name + "/";
+                    
+                    if (subPathData) {
+                        console.log("child found");
+                        oNode.subPathData = that.copyJSONobj( subPathData );
+                        oNode.str += subPathData.str;
+                    }
+                    
+                    if (d.parent) {
+                        var oParent = getParentNodePath(d.parent, oNode);
+                        return oParent;
+                    }
+                    
+                    return oNode;
+                }
+                
+                // Create the path for display
+                function addCurrentNodePath(d)
+                {
+                    console.log("/addCurrentNodePath");
+                    
+                    // Highlight the selected children nodes
+                    var oPath = getParentNodePath(d);
+                    
+                    oPath.provides = d.name;
+                    
+                    console.log("/addCurrentNodePath");
+                    console.log(oPath);
+                    
+                    //pathData[oPath.str] = oPath;
+                    
+                    that.push('pathData', oPath);
+                    
+                    console.log(that.pathData);
+                }
+
+                // Highlight path on mouseover
+                function nodeOver(d) {
+                    console.log("nodeOver");
+                    if ( d3.event.ctrlKey && d.type == "item" && !d.isSelected )
+                    {
+                        var currentNode = groupNodes.selectAll("g.node").filter(function(_d) { return d == _d});
+                        currentNode.select("circle")
+                            .attr("class", "selected");
+                        currentNode.select("text")
+                            .attr("class", "selected");
+                        
+
+                        // Highlight the selected children nodes
+                        if (d.children)
+                            d.children.forEach(highlightSelectedChildrenNodes);
+                    }
+                    
+                    // DIsplay the node info
+                    updateCurrentSelectedNode(d);
+
+                }
+
+                // de-Highlight path on mouseover
+                function nodeOut(d) {
+                    console.log("nodeOut");
+                    
+                    var currentNode = groupNodes.selectAll("g.node").filter(function(_d) { return _d == d;});
+                    currentNode.select("circle")
+                        .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+                    currentNode.select("text")
+                        .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+                    currentNode.select("path")
+                        .attr("class", function(d) { return d.isSelected ? "selected" : "NotSelected"; });
+                    computePath();
+                    
+                    // Create the node info for display
+                    updateCurrentSelectedNode();
+                }
+
+                // Highlight the selected children nodes
+                function highlightSelectedChildrenNodes(d)
+                {
+                    if (d.type == "item" && d.isSelected)
+                    {
+                        var currentNode = groupNodes.selectAll("g.node").filter(function(_d) { return _d == d;});
+                        currentNode.select("circle")
+                            .attr("class", "selectedWarning");
+                        currentNode.select("path")
+                            .attr("class", "selectedWarning");
+                        currentNode.select("text")
+                            .attr("class", "selectedWarning");
+
+                        if (d.children)
+                            d.children.forEach(highlightSelectedChildrenNodes);
+                    }
+                    computePath();
+                }
+
+                // Select or toggle children on click.
+                function nodeClick(d, that) {
+                    console.log("nodeClick");
+                    console.log(this.treeDate);
+                    
+                    
+                    // if the click node is an item and the ctrl key is pressed: Selection request
+                    if ( d3.event.ctrlKey && d.type == "item")
+                    {
+                        console.log("clicked");
+                        d.isSelected = !d.isSelected;
+                        
+                        var strClass = (d.isSelected) ? "selected" : "NotSelected";
+                        
+                        // if selected
+                        if (d.isSelected)
+                        {
+                            // Create the node info for display
+                            updateCurrentSelectedNode(d);
+                        
+                            // Create the path for display
+                            addCurrentNodePath(d);
+                            
+                        }
+                        
+                        var currentNode = groupNodes.selectAll("g.node").filter(function(_d) { return d == _d});
+                        currentNode.select("circle")
+                            .attr("class", strClass);
+                        currentNode.select("text")
+                            .attr("class", strClass);
+                    }       
+
+                    // Else toggle request
+                    else
+                    {
+                        if (d.children) {
+                            d._children = d.children;
+                            d.children = null;
+                        } else {
+                            d.children = d._children;
+                            d._children = null;
+                        }
+                        update(d, that);
+                    }
+                    
+                    
+                    computePath();
+                }
+
+                function toggleAll(d, parent) {
+                    //d.parent = parent;
+                    d.isSelected = false;
+                    if (d.children) {
+                      d.children.forEach(toggleAll, d);
+                      toggle(d);
+                    }
+                    
+                    computePath();
+                    
+                }
+
+                // Toggle children.
+                function toggle(d) {
+                    if (d.children) {
+                        d._children = d.children;
+                        d.children = null;
+                    } else {
+                        d.children = d._children;
+                        d._children = null;
+                    }
+                    
+                    computePath();
+                }
+                
+                function computePath() {
+                    
+                    
+                    return 0;
+                }
+                
+            }
+
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,29 @@
+{
+  "name": "color",
+  "main": "one-color.js",
+  "licence": "2-clause BSD",
+  "ignore": [
+    "bin",
+    "demo",
+    "lib",
+    "slides",
+    "test",
+    ".gitignore",
+    ".gitmodules",
+    "LICENSE",
+    "Makefile",
+    "component.json",
+    "package.json"
+  ],
+  "homepage": "https://github.com/One-com/one-color",
+  "version": "2.5.0",
+  "_release": "2.5.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v2.5.0",
+    "commit": "8d09dfeee4e17cb2aff7752cf4d66bcb6a2658d5"
+  },
+  "_source": "git://github.com/One-com/one-color.git",
+  "_target": "~2.5.0",
+  "_originalSource": "color"
+}

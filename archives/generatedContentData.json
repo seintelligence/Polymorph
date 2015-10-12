@@ -1,0 +1,104 @@
+{
+   "UItopContainer":[
+      {
+         "id":"ID1",
+         "name":"To Compute APS position",
+         "type":"Feature",
+         "description":"This feature aims at computing",
+         "nodeChildren":{
+            "UItopContainer_2":[
+
+            ]
+         }
+      },
+      {
+         "id":"ID2",
+         "name":"To Sense APS position",
+         "type":"Feature",
+         "description":"This feature aims at sensing",
+         "nodeChildren":{
+            "UItopContainer_2":[
+
+            ]
+         }
+      },
+      {
+         "id":"ID3",
+         "name":"System Drive By Wire",
+         "type":"Feature",
+         "description":"This system aims at providing the drive by wire capability",
+         "nodeChildren":{
+            "UItopContainer_2":[
+               {
+                  "id":"ID1",
+                  "name":"To Compute APS position",
+                  "type":"Feature",
+                  "description":"This feature aims at computing",
+                  "nodeChildren":{
+
+                  }
+               },
+               {
+                  "id":"ID2",
+                  "name":"To Sense APS position",
+                  "type":"Feature",
+                  "description":"This feature aims at sensing",
+                  "nodeChildren":{
+
+                  }
+               }
+            ]
+         }
+      },
+      {
+         "id":"ID4",
+         "name":"System Fuel Information",
+         "type":"Feature",
+         "description":"This system aims at providing the fuel information",
+         "nodeChildren":{
+            "UItopContainer_2":[
+               {
+                  "id":"ID6",
+                  "name":"To Sense Fuel Level",
+                  "type":"Feature",
+                  "description":"This functions aims at sensing the fuel level",
+                  "nodeChildren":{
+
+                  }
+               },
+               {
+                  "id":"ID7",
+                  "name":"To Compute Fuel Level",
+                  "type":"Feature",
+                  "description":"This functions aims at computing the fuel level",
+                  "nodeChildren":{
+
+                  }
+               }
+            ]
+         }
+      },
+      {
+         "id":"ID6",
+         "name":"To Sense Fuel Level",
+         "type":"Feature",
+         "description":"This functions aims at sensing the fuel level",
+         "nodeChildren":{
+            "UItopContainer_2":[
+
+            ]
+         }
+      },
+      {
+         "id":"ID7",
+         "name":"To Compute Fuel Level",
+         "type":"Feature",
+         "description":"This functions aims at computing the fuel level",
+         "nodeChildren":{
+            "UItopContainer_2":[
+
+            ]
+         }
+      }
+   ]
+}

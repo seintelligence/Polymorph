@@ -1,0 +1,191 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="select_Item_DataSource-cpt.html">
+
+<link rel="import" href="../UtilitiesBehavior.html">
+
+<dom-module id="select_Link_DataSource-cpt">
+     <style>
+		:host {
+		  @apply(--layout-horizontal);
+		};
+		
+		.Filter_panel {
+			@apply(--layout-vertical);
+		};
+		
+		.JSON_Filter_Buttons {
+			font-family: "Open Sans";
+			background: #4285f4;
+			color: white;
+		};
+	</style>
+    
+    <template> 
+        <!-- Test -->
+        <iron-ajax 
+			auto
+			url="../../schema4.json"
+			handle-as="text"
+			on-response="handleResponse"></iron-ajax>
+        
+        <!-- The selection of the items -->
+        <template is="dom-repeat" items="[[ computed_nested_link_datasource ]]" as="link" observe="*">            
+            <div class="layout vertical center">
+                <div style="margin-bottom:6px;">
+                    <paper-button title="[[link.name]]" class="JSON_Filter_Buttons" on-click="setSelected_link">
+                        <template is="dom-if" if="[[link.isSelected]]">
+                            <iron-icon icon="cancel"></iron-icon>
+                        </template>
+                        <span>[[link.name]]</span>
+                    </paper-button>
+                </div>
+                
+                <!-- Filters and links -->
+                <template is="dom-if" if="[[link.isSelected]]">
+
+                    <!-- The selection of the items
+                    <select_Item_DataSource-cpt structure_schema='[[structure_schema]]' current_link="[[link]]" computed_nested_item_datasource="{{link.to}}">
+                    </select_Item_DataSource-cpt> -->
+                    <select_Item_DataSource-cpt structure_schema='[[structure_schema]]' current_link="[[link]]" computed_nested_item_datasource="{{computed_nested_data}}">
+
+                </template>
+            </div>
+        </template>
+    </template>
+    
+    <script>
+		 Polymer({
+			is: 'select_Link_DataSource-cpt',
+			
+			behaviors: [UtilitiesBehavior],
+
+			properties: {
+				current_item:
+                {
+                    type: Object,
+					value: function() { return [];},
+					observer: "_observe_structure_schema"
+                },
+                structure_schema:
+				{
+					type: Object,
+                    value: function() { return {};},
+					observer: "_observe_structure_schema"
+				},
+                computed_nested_link_datasource: {
+					type: Array,
+                    notify: true,
+                    observer: '_observe_computed_nested_link_datasource'
+				},
+                current_links:
+                {
+                    type: Array
+                },
+                
+                // Pour test
+                 current_link: 
+                {
+                    type: Object,
+                    value: function() { return { 'name': 'is_sub_requirement_of'};}
+                },
+                computed_nested_data: 
+				{
+					type: Object
+				}
+			},
+             
+             _observe_structure_schema: function()
+             {
+                console.log("/_observe_link_structure_schema.................;;;");
+                var structure_schema = this.structure_schema;
+                 console.log(structure_schema);
+                 
+                 var current_item = this.current_item;
+                 
+                if (structure_schema === undefined)
+                    return 0;
+
+                if (typeof structure_schema === 'string') 
+                    var structure_schema = JSON.parse(structure_schema);
+
+                if ( !structure_schema.hasOwnProperty('linkage_structure_schema') )
+                    return 0;
+                 
+                 if (typeof current_item === 'string') 
+                    var current_item = JSON.parse(current_item);
+                
+                var links = structure_schema.items_structure_schema[this.current_item.name].links;
+                 
+                 
+                 var tmpArr = [];
+                 
+                 for (var key in links) {
+                     var name = key;
+                     var item = {
+                        'isSelected': false,
+                        'name': name,
+                        'to': []
+                     };
+                     
+                     tmpArr.push(item);
+                 };
+                 
+                 this.set('computed_nested_link_datasource', tmpArr);
+                 console.log(this.computed_nested_link_datasource);
+                 
+             },
+             
+             _observe_computed_nested_link_datasource: function() {
+                 console.log("_observe_computed_nested_link_datasource");
+                 console.log(this.computed_nested_link_datasource);
+             },
+             
+             ready: function(){
+                 //console.log("/ready select link");
+             },
+             
+             setSelected_link: function(e)
+			{				
+				var model = e.model;
+				
+				// get current selection status
+				var isCurrentlySelected = this.get('computed_nested_link_datasource.' + model.__key__ + '.isSelected');
+				
+                
+				// set all the filters to not selected
+				//this.updateComputed_nested_item_datasource();
+				
+				// invert current selection status
+				this.set('computed_nested_link_datasource.' + model.__key__ + '.isSelected', !isCurrentlySelected);
+				
+				// get updated current selection status
+				var isCurrentlySelected = this.get('computed_nested_link_datasource.' + model.__key__ + '.isSelected');
+				
+				// reset sub_filter
+				//if (isCurrentlySelected)
+				//	this.resetSub_filter();
+					
+				// updateCurrent_filter
+				var currentlySelected_item = "";
+				
+				if (isCurrentlySelected) currentlySelected_item = this.get('computed_nested_link_datasource.' + model.__key__ + '.name')
+				//this.updateCurrent_filter(currentlySelected_item);
+				
+				// update the current json based on the filter
+				//this.updateCurrent_json();
+			},
+             
+             isNotSelected: function(isSelected) { return !isSelected && this.current_filter != "";},
+             
+             handleResponse: function(e, r) {
+				this.json_schema = String(r.xhr.responseText);
+				this.json_schema = JSON.parse(this.json_schema);
+				//this.current_json = JSON.search(this.json_schema, this.current_filter, false);
+			}
+             
+         });
+    </script>
+</dom-module>

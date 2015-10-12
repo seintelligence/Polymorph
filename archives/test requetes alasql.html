@@ -1,0 +1,137 @@
+<script src="scripts/alasql.min.js"></script> 
+<script src="scripts/underscore-min.js"></script>
+
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="test-alasql">
+	<style>
+        * { font-family: RobotoDraft, Helvetica, Arial, sans-serif;}
+	</style>
+	<template>
+        <iron-ajax
+            auto
+            url="db.json"
+            handle-as="json"
+            on-response="contentDataReceived"></iron-ajax>
+    </template>
+    <script>
+        Polymer({
+			is: 'test-alasql',
+            
+            properties: {                
+                db: {},
+                
+                pathData: {
+                    type: Array,
+                    value: ['Feature/is_sub_function_of/Feature']
+                },
+                
+                contentData: {
+                    type: Array,
+                    value: [],
+                    notify: true                   
+                }
+            },
+            
+            contentDataReceived: function(ev) {
+                console.log("/contentDataReceived");
+                
+                this.db = ev.detail.__data__.xhr.response;
+                
+                var foundItems = [];
+                var that = this;
+                
+                this.pathData.forEach(function(e) {
+                    foundItems = foundItems.concat.apply([], that.getItems(e));
+                });
+                
+                var newFoundItems = [];
+                foundItems.forEach(function(e) {
+                    if (_.findWhere(newFoundItems, e) == null) {
+                        newFoundItems.push(e);
+                    }
+                });
+                
+                this.contentData = newFoundItems;
+            },
+            
+            // generic function
+            getObjects: function() {
+                var filters = "";
+                var db = this.db;
+                
+                // get the function arguments
+                var arg = [].slice.call(arguments);
+                
+                // get the type of searched objects
+                var strObjects = arg.shift();
+                
+                // get the column name and sub query column name according to the type of searched objects
+                var column_name = 'destination', sub_column_name = 'id';
+                if (strObjects == 'items') { column_name = 'id'; sub_column_name = 'origin';}
+                
+                // get the sub query
+                var sub_query = arg.shift().split("/");
+                
+                // get the upper element of the sub query which is the type of the search item and remove it from the sub query
+                filters = 'type="' + sub_query.shift() + '"';
+                
+                // reconstruct the sub query with the other elements
+                sub_query = sub_query.join('/');
+            
+                // construct the filter string for the sql query
+                for (i = 2; i < arguments.length; i++) { filters += " AND " + arguments[i]; }
+                
+                // if filters exists, then add the WHERE command for SQL query
+                if (filters) filters = 'WHERE (' + filters + ')';
+                
+                // Get the objects
+                var objects = alasql('SEARCH ' + strObjects + '/ FROM ?', [db]);
+                
+                // If a sub query does exist, then continue to the getLinks()
+                if (sub_query){
+                    
+                    // Get the searched items
+                    var found_objects_id = alasql('SELECT COLUMN ' + column_name + ' FROM ? ' + filters, [objects]);
+
+                    // Flatten found linked items
+                    found_objects_id = _.flatten(found_objects_id, true);
+                    
+                    // Reconstruct the found items array
+                    var filterSubQuery = sub_column_name + ' IN ' + this.reconstructSQLqueryArray(found_objects_id);
+                    
+                    // return the searched linked items
+                    if (strObjects == 'items')  return this.getLinks(sub_query, filterSubQuery);
+                    else                        return this.getItems(sub_query, filterSubQuery);
+                }
+                
+                // Else return the current items
+                return alasql('SELECT * FROM ? ' + filters, [objects]);   
+            },
+            
+            // Get the items
+            getItems: function() {
+                
+                var arg = [].slice.call(arguments);
+                arg.unshift('items');
+                
+                return this.getObjects.apply(this, arg);
+            },
+            
+            // Get the links
+            getLinks: function() {
+                
+                var arg = [].slice.call(arguments);
+                arg.unshift('links');
+                
+                return this.getObjects.apply(this, arg);
+                
+            },
+            
+            // Join the array to make it understandable for a SQL query
+            reconstructSQLqueryArray: function(arr) { return '("' + arr.join('","' ) + '")'; },
+        });
+    </script>
+</dom-module>
+
+<test-alasql></test-alasql>

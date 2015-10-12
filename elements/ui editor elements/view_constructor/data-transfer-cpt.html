@@ -1,0 +1,27 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<dom-module id="data-transfer-cpt">
+    <script>
+		Polymer({
+			is: 'data-transfer-cpt',
+            
+            properties: {
+                initialData: {
+                    observer: 'transferData',
+                    type: Object
+                },
+                        
+                transferedData: {
+                    notify: true,
+                    type: Object
+                }
+            },
+            
+            transferData: function() {
+                if (typeof this.initialData === Object)
+                this.initialData = JSON.parse(this.initialData);
+                this.set('transferedData', this.initialData);
+            }
+        });
+    </script>
+</dom-module>

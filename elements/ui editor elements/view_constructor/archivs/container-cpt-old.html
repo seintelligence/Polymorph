@@ -1,0 +1,168 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+
+<link rel="import" href="../components/h1-cpt.html">
+<link rel="import" href="../components/text-cpt.html">
+<link rel="import" href="data-transfer-cpt.html">
+
+
+<dom-module id="container-cpt">
+    <template>
+        <content></content>
+    </template>
+    <script>
+		Polymer({
+			is: 'container-cpt',
+            
+            properties: {
+                contentData: {
+                    type: Array,
+                    value: [],
+                    observer: 'writeDynContent'
+                },
+                
+                structureData: {
+                   type: Object,
+                    value: {},
+                    observer: 'writeDynContent'
+                }
+            },
+            
+            writeDynContent: function() {
+                console.log("/writeDynContent");
+                
+                Polymer.dom(this).innerHTML = "";
+                
+                // data json
+                var strContentData = JSON.stringify(this.contentData);
+                
+                // structure json
+                //var strStructureData = JSON.stringify(this.structureData);
+                var strStructureData = this.structureData;
+                
+                if ( strContentData === undefined || strContentData == null || strStructureData === undefined || strStructureData == null ) return;
+                console.log(this.contentData);
+                console.log(this.structureData);
+                
+                console.log(strStructureData);
+                /*strStructureData = {
+                    "id": "UItopContainer",
+                    "is": "layout-cpt",
+                    "nodeChildren": {
+                        
+                            "UItopContainer_1": {
+                              "id": "UItopContainer_1",
+                              "is": "h1-cpt",
+                              "nodeChildren": {
+
+                              },
+                              "config": {
+                                "displayedText": "{{contentData.name}}",
+                              }
+                            },
+                        
+                            "UItopContainer_2": {
+                              "id": "UItopContainer_2",
+                              "is": "text-cpt",
+                              "nodeChildren": {
+
+                              },
+                              "config": {
+                                "displayedText": "{{contentData.description}}"
+                              }
+                            },
+                        
+                            "UItopContainer_3": {
+                              "id": "UItopContainer_3",
+                              "is": "layout-cpt",
+                              "nodeChildren": {
+                                "UItopContainer_1_1": {
+                                  "id": "UItopContainer_1_1",
+                                  "is": "h1-cpt",
+                                  "nodeChildren": {
+
+                                  },
+                                  "config": {
+                                    "displayedText": "{{contentData.name}}",
+                                  }
+                                },
+                                "UItopContainer_1_2": {
+                                  "id": "UItopContainer_1_2",
+                                  "is": "text-cpt",
+                                  "nodeChildren": {
+
+                                  },
+                                  "config": {
+                                    "displayedText": "{{contentData.description}}"
+                                  }
+                                }
+                              },
+                              "config": {
+                                "layoutHorizVert": true,
+                                "contentData": "{{contentData}}",
+                                "filteredContentData": "{{filteredContentData}}"
+                              }
+                            }
+                    },
+                  "config": {
+                    "layoutHorizVert": true,
+                    "contentData": "{{contentData}}",
+                    "filteredContentData": "{{filteredContentData}}"
+                  }
+                };*/
+                
+                // domBind
+                var domBind = document.createElement('template', 'dom-bind');
+                var doc = domBind.content.ownerDocument;
+                
+                // Element layout
+                var layout = this.createJSONelements(doc, strStructureData);
+                console.log(strStructureData);
+                
+                // Sub elements
+                var nodeChildren = strStructureData.nodeChildren;
+                console.log(nodeChildren);
+                for (var key in nodeChildren)
+                {
+                    if (nodeChildren.hasOwnProperty(key))
+                    {
+                        var elt = this.createJSONelements(doc, nodeChildren[key]);
+                        layout.appendChild(elt);
+                    }
+                }
+                         
+                // Element transfer data               
+                var transferData = doc.createElement('data-transfer-cpt');
+                transferData.setAttribute('initial-data', strContentData);
+                transferData.setAttribute('content-data', '{{contentData}}');
+                
+                domBind.content.appendChild(layout);
+                domBind.content.appendChild(transferData);
+                
+                Polymer.dom(this).appendChild(domBind);
+            },
+            
+            createJSONelements: function(doc, JSONelt) {
+                var elt = doc.createElement('div', JSONelt.is);
+                console.log(JSON.is);
+                var config = JSONelt.config;
+                for (var key in config)
+                {
+                    if (config.hasOwnProperty(key))
+                    {
+                        var obj = config[key];
+
+                        // Function to make sure the format of polymer/js caps variable is converted to hmtl ones
+                        key = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+
+                        elt.setAttribute(key, obj);
+                    }
+                }
+                
+                return elt;
+            }
+            
+            
+        });
+    </script>
+</dom-module>

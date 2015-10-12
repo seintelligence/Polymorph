@@ -1,0 +1,19 @@
+    <script src="http://alasql.org/console/alasql.min.js"></script>
+    <script src="http://alasql.org/console/xlsx.core.min.js"></script>
+    <button onclick="window.exportExcel()">Export table to Excel</button>
+    <p>Source table</p>
+    <table id="MyInquires">
+    	<thead><tr><th>#<th>Inquiry<th>Topic</thead>
+    	<tbody>
+    		<tr><td>1<td>WinPhone<td>Screen
+    		<tr><td>2<td>iPhone<td>Keyboard
+    		<tr><td>3<td>Android<td>Memory
+    	</tbody>
+    </table>
+	
+	<script>
+	window.exportExcel =     function exportExcel() {
+        alasql('SELECT * INTO XLSX("myinquires.xlsx",{headers:true}) \
+                    FROM HTML("#MyInquires",{headers:true})');
+    }
+	</script>
