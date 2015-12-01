@@ -1,0 +1,57 @@
+<dom-module id="data_source_path_displayPath-cpt">  <!-- Define your custom element -->
+  
+    <style>
+        paper-item-body{
+            font-size: 11px;
+        }
+    </style>
+    
+    <template>
+                <template is="dom-repeat" items="[[pathDataArr]]">
+                    <span>[[item.path]]</span><span>/</span>
+                </template>
+        
+    </template>
+    
+    <script>
+        Polymer({
+
+            is: 'data_source_path_displayPath-cpt',
+
+            extends: 'div',
+
+            properties: {
+                
+                pathData: {
+                    type: Object,
+                    value: {},
+                    observer: 'convertObjToArray'
+                },
+                
+                pathDataArr: {
+                    type: Array,
+                    value: []
+                }
+            },
+            
+            attached: function() {
+                console.log("//data_source_path_displayPath");
+            },
+            
+            convertObjToArray: function() {
+                console.log(this.pathData);
+                this.pathDataArr = [];
+                this.runThroughObj( this.pathData );
+            
+            },
+            
+            runThroughObj: function(node) {
+                this.push('pathDataArr', {'path': node.path});
+                
+                if ( node.subPathData )
+                    this.runThroughObj(node.subPathData);
+            }
+            
+        });
+    </script>
+</dom-module>

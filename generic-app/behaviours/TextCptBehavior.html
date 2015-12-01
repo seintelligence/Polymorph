@@ -1,0 +1,154 @@
+<style>
+</style>
+<script>
+	TextCptBehavior = {
+		
+        properties: {
+            bindToContainer: 
+            {
+                type: Boolean,
+                value: false
+            },
+            
+            displayedText:
+            {
+                type: String,
+                value: "empty...",
+                observer: 'displayedTextChanged'
+            },
+            
+            originalDisplayedText:
+            {
+                type: String
+            },
+                
+            exportRequest: {
+                type: Boolean,
+                value: false,
+                notify: true,
+                reflectToAttribute: true,
+                observer: 'getCleanHtml'
+            },
+            
+            bindAttribute: {
+                type: String,
+                observer: 'bindAttributes'
+            },
+              
+            activeChangeRequest: {
+                observer: 'setActiveCR'
+            },
+            
+            bOver: {
+                type: Boolean,
+                value: false
+            },
+            bHasActiveCR: {
+                type: Boolean,
+                value: false
+            },
+              
+            bInEditMode: {
+                type: Boolean,
+                value: false
+            },
+              
+            originalTextField: {
+                
+            }
+        },
+        
+        bindAttributes: function() {
+            console.log("/bindAttribute")
+            console.log(this.bindAttribute)
+        },
+        
+        ready: function() {
+            if (this.id!= "h1-cpt" && this.id != "text-cpt")
+                this.config.displayedText = "oo";
+        },
+
+		connectCpt: function() {
+            this.bindToContainer = !this.bindToContainer;
+            
+            // update the structure to propagate the update to the parents
+            this.set("config.bindToContainer", this.bindToContainer);
+            
+            this.txAttributesSelectionRequest();
+            
+            // trigger toaster information
+            this.sendToasterMsgDisplayRequest("Text value " + (this.bindToContainer? "": "dis") + "connected to the data source");
+        },
+        
+        txAttributesSelectionRequest: function (ev) { this.fire('attSelectionRequest', { "attributes": [ "name", "description" ] } );},
+          
+        displayedTextChanged: function(ev) {
+            // update the structure to propagate the update to the parents
+            this.set("config.displayedText", this.$.dev_input.value);
+        },
+        
+        getCleanHtml: function(ev) {
+                if ( !this.exportRequest ) return;
+            
+                this.cleanHTML = Polymer.dom(this.$.Operational).innerHTML;
+                console.log(this.cleanHTML);
+                this.exportRequest = false;
+                this.hostRef.fire('readyExport', { host: this.hostRef.id });
+        },
+        
+        /********************* changeRequest ************************/
+        setActiveCR: function(ev) {
+            console.log("/setActiveCR");
+              console.log(this.activeChangeRequest)
+              console.log(this.is)
+        },
+          
+        overTextField: function() {
+            console.log("/overTextField");
+            if (this.activeChangeRequest)
+                this.bHasActiveCR = true;
+            else
+                this.bHasActiveCR = false;
+            
+            if(this.bInEditMode)
+                this.$.FieldText.focus();
+            
+            this.bOver = true;
+        },
+
+        outTextField: function() {
+            console.log("/outTextField");
+            this.bOver = false;
+        },
+
+        dblclickTextField: function() {
+            console.log("/dblclickTextField");
+            if (!this.originalDisplayedText) this.originalDisplayedText = this.displayedText;
+            if (!this.activeChangeRequest) {this.sendToasterMsgDisplayRequest('You cannot modify it. No Active CR', 'warning');return;}
+            this.bInEditMode = true;
+            this.$.FieldText.focus();
+        },
+          
+        validateTextFieldChange: function() {
+            console.log("/validateTextFieldChange");
+            console.log(this.nodeOwner);
+            console.log(this.bindAttribute);
+            
+            var changeElement = {};
+            changeElement.request_change_to = this.nodeOwner;
+            changeElement.part_of_CR = this.activeChangeRequest
+            changeElement.is = {
+                'type': "changeElement",
+                'attribute': this.bindAttribute,
+                'change': this.$.FieldText.value
+            };
+            this.fire('changeElement', changeElement);
+            this.bInEditMode = false;
+        },
+          
+        cancelTextFieldChange: function() {
+            this.$.FieldText.value = this.originalDisplayedText;
+            this.bInEditMode = false;
+        }
+    };
+</script>

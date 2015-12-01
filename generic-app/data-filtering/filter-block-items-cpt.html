@@ -1,0 +1,93 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-icon-item.html">
+
+<link rel="import" href="../data-filtering/filter-data-cpt.html">
+<link rel="import" href="../data-exchanges/get-db-items-cpt.html">
+<link rel="import" href="../data-filtering/filter-block2-cpt.html">
+
+<dom-module id="filter-block-items-cpt">
+   
+    <style>
+        :host {
+            margin: 20px;
+        }
+    </style>
+    
+    <template>
+        <get-db-items-cpt db="[[db]]"
+                          filters="[[filterGetItems]]"
+                          data="{{items}}"
+                          type="[[type]]">
+        </get-db-items-cpt>
+        
+        <div is="filter-block2-cpt"
+             heading="[[heading]]"
+             description="[[description]]"
+             width="[[width]]"
+             searchBarLabel="[[searchBarLabel]]"
+             wide-filter="{{wideFilter}}"
+             items="[[items]]"
+             s-items="[[sItems]]"
+             filter="{{filter}}">
+        </div>
+        
+    </template>
+    
+    <script>
+		Polymer({
+			is: 'filter-block-items-cpt',
+            
+            extends: 'div',
+            
+            properties: {
+                
+                db: {},
+                
+                type: {
+                    type: String,
+                    value: 'items'
+                },
+                
+                heading: {
+                    type: String,
+                    value: ""
+                },
+                
+                width: {
+                    type: Number,
+                    value: 275
+                },
+                
+                sItems: {
+                    type: String,
+                    value: ""
+                },
+                
+                items: {
+                    type: Array
+                },
+                
+                description: {
+                    type: String,
+                    value: ""
+                },
+                
+                filterGetItems:  {
+                    type: Array,
+                    value: []
+                },
+                
+                filter: {
+                    type: Array,
+                    value: ["*"],
+                    notify: true
+                }
+                
+            }
+        });
+    </script>
+    
+</dom-module>

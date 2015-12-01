@@ -1,0 +1,62 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
+
+<link rel="import" href="../../../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="cpt_icon-cpt.html">
+<link rel="import" href="basic-txt-cpt.html">
+
+<link rel="import" href="../../../generic-app/behaviours/TextCptBehavior.html">
+<link rel="import" href="../../../generic-app/basic-cpt/icon-with-tooltip-cpt.html">
+
+<dom-module id='h1-cpt'>
+	<style>
+        
+        :host {
+            --my-text-theme: {
+                h1;
+                border-width: 0px;
+                font-size: 36px;
+                font-family: 'Open Sans';
+                font-weight: 500;
+                background-color:rgb(250,250,250);
+                rgb(51, 51, 51);
+            };
+        }
+        
+	</style> 
+	<template>
+        <basic-txt-cpt icon_src="title_h1"
+                       icon_caption="title <h1>"
+                       displayed-text="[[displayedText]]"
+                       mode="[[mode]]"
+                       node-owner="[[nodeOwner]]"
+                       active-change-request="[[activeChangeRequest]]">
+        </basic-txt-cpt>
+	</template>
+
+	<script>
+	  Polymer({
+        is: 'h1-cpt',
+
+        extends: 'div',
+          
+        behaviors: [DropBehavior, ModeChangedBehavior],
+          
+        properties: {
+            activeChangeRequest: {
+                type: String,
+                value: ''
+            },
+            
+            nodeOwner: {
+            }
+        }
+		
+	  });
+	</script>
+</dom-module>

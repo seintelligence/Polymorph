@@ -1,0 +1,36 @@
+{
+  "name": "xp-shared-behavior",
+  "license": "BSD-3-Clause",
+  "version": "0.9.10",
+  "main": "xp-shared-behavior.html",
+  "description": "A custom element used to share data across an application",
+  "homepage": "http://expandjs.com/elements/xp-shared-behavior",
+  "authors": [
+    "Giuliano Rullo <g.rullo@expandjs.com>",
+    "Maurizio Stefàno <m.stefano@expandjs.com>",
+    "Robert Manolea <r.manolea@expandjs.com>"
+  ],
+  "keywords": [
+    "web app",
+    "html5",
+    "expandjs",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*"
+  ],
+  "dependencies": {
+    "expandjs": "ExpandJS/expandjs#0.9.10",
+    "xp-object-behavior": "ExpandJS/xp-object-behavior#0.9.10",
+    "polymer": "Polymer/polymer#^1.1.0"
+  },
+  "_release": "0.9.10",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.9.10",
+    "commit": "88e00317bf794ac2aa665bfe7fefa49aa7f6ae36"
+  },
+  "_source": "git://github.com/ExpandJS/xp-shared-behavior.git",
+  "_target": "0.9.10",
+  "_originalSource": "ExpandJS/xp-shared-behavior"
+}

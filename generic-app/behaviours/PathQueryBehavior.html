@@ -1,0 +1,158 @@
+<script type="text/javascript" src="../../scripts/alasql.min.js"></script>
+<script type="text/javascript" src="../../scripts/underscore-min.js"></script>
+<script>
+	PathQueryBehavior = {
+	
+		properties: {
+				db: {
+                    type: Object,
+                    value: {},
+                    observer: 'hey'
+                }
+		},
+        
+        behaviours: 'UtilitiesBehavior',
+        
+		listeners: {
+			'toasterMessageRequest': 'displayToasterMessage'
+		},
+        
+        hey: function() {
+            console.log('/hey', this.db);
+        },
+        
+		// generic function
+        getObjects: function() {
+            var filters = "";
+            var db = this.db;
+
+            // get the function arguments
+            var arg = [].slice.call(arguments);
+
+            // get the type of searched objects
+            var strObjects = arg.shift();
+            
+            // get the path Data
+            var pathData = arg.shift();
+            
+            // get the upper element of the sub query which type is of the search item and remove it from the sub query
+            if (pathData.path != "*" )
+                filters = 'type="' + pathData.path + '"';
+console.log(pathData.filters)
+            // construct the filter string for the sql query
+            pathData.filters.forEach( function(e) { filters += (filters?" AND ": "") + e; } );
+            
+            // add the WHERE command for SQL query
+            filters = (filters)?'WHERE (' + filters + ')':'';
+
+            // Get the objects
+            var objects = alasql('SEARCH ' + strObjects + '/ FROM ?', [db]);
+            console.log(filters, objects, db);
+
+            // If a sub query does exist, then continue to the getLinks()
+            if ( !_.isEmpty(pathData.subPathData) ) {
+            
+                var subPathData = _.clone(pathData.subPathData);
+                
+                // get the column name and sub query column name according to the type of searched objects            
+                var column_name = "destination", sub_column_name = 'id';
+                if (strObjects == 'items' || strObjects == 'nodesSchema') { column_name = 'id'; sub_column_name = "origin";}
+                
+                // invert the column name if this is a link with attribute inverted
+                if (pathData.inverted && (strObjects == 'links' || strObjects == 'linksSchema'))
+                    column_name = "origin";
+                   
+                // invert the subcolumn name if the sub path is a link with attribute inverted
+                if( subPathData.inverted && (strObjects == 'items' || strObjects == 'nodesSchema'))
+                    sub_column_name = "destination";
+            
+                
+                // Get the searched items
+                request = 'SELECT COLUMN ' + column_name + ' FROM ? AS items ' + filters;
+                var found_objects_id = alasql(request, [objects]);
+                if (_.isEmpty(found_objects_id)) return [];
+                
+                console.log(found_objects_id, strObjects)
+                
+                var operator,
+                    newFilter;   
+                
+                
+                operator = "IN";
+                // Reconstruct the found items array
+                newFilter = sub_column_name + ' ' + operator + ' ' +
+                    this._reconstructSQLqueryArray(found_objects_id);
+                subPathData.filters.push(newFilter);
+
+                // return the searched linked items
+                if (strObjects == 'items')              return this.getLinks(subPathData);
+                else if (strObjects == 'links')         return this.getItems(subPathData);
+                else if (strObjects == 'nodesSchema')   return this.getLinksSchema(subPathData);
+                else if (strObjects == 'linksSchema')   return this.getNodesSchema(subPathData);
+                
+            }
+            
+            // Else return the current items
+            if (strObjects == 'linksSchema') {
+                var subStr = filters.substring(filters.indexOf(' IN (') + 5);
+                t = JSON.parse('[' + subStr.substring(0, subStr.length - 2) + ']')
+                
+                var a, b = [];
+                a = alasql('SELECT * FROM ?', [objects]);
+                
+                a.forEach(function(l) {
+                    if(l['origin'])
+                        if(_.intersection(l['origin'], t).length > 0)
+                            b.push(l);
+                });
+            
+                return b;
+            }
+            else
+                return alasql('SELECT * FROM ? ' + filters, [objects]);   
+        },
+
+        // Get the items
+        getItems: function() {
+
+            var arg = [].slice.call(arguments);
+            arg.unshift('items');
+
+            return this.getObjects.apply(this, arg);
+        },
+
+        // Get the links
+        getLinks: function() {
+            var arg = [].slice.call(arguments);
+            arg.unshift('links');
+
+            return this.getObjects.apply(this, arg);
+        },
+        
+        // Get the nodes schema
+        getNodesSchema: function() {
+            console.log("/getNodesSchema")
+            var arg = [].slice.call(arguments);
+            arg.unshift('nodesSchema');
+
+            return this.getObjects.apply(this, arg);
+        },
+        
+        // Get the links schema
+        getLinksSchema: function() {
+            console.log("/getLinksSchema")
+            var arg = [].slice.call(arguments);
+            arg.unshift('linksSchema');
+
+            return this.getObjects.apply(this, arg);
+        },
+        
+        // Get the path result
+        getPath: function(pathData) {
+            foundItems = [];
+            var that = this;
+            pathData.forEach(function(e) { foundItems = foundItems.concat.apply([], that.getItems(_.clone(e))); });
+            return foundItems;
+        }
+    };
+</script>

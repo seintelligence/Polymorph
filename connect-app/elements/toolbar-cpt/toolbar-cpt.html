@@ -1,0 +1,131 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<dom-module is="toolbar-design-cpt">
+    <style>
+		#UIElementsCatalog div {
+			margin:4px;
+			width:75px;
+			cursor: move;
+			text-align:center;
+			padding:2px;
+			list-style-type:none;
+		}
+    </style>
+    <template>
+
+        <!-- include the styles for icons -->
+        <style include="cpt_icon-styles"></style>
+                    
+        <!-- Switch In Development ==> Operational icon -->	
+        <div style="text-align: center;">
+                <span id="modeToggleOperational">Operational</span>
+                <paper-toggle-button checked="true" id="modeToggle" class="blue" on-change="modeTogglechange" title="Switch the visual mode: Development or Operational mode"></paper-toggle-button>
+                <span id="modeToggleEdition">Edition</span>
+        </div>
+        <div>&nbsp;</div>
+
+        <paper-menu>
+
+             <!-- Save current view -->
+            <paper-item class="menu-trigger">
+                <paper-fab mini icon="icons:save" class="UIcatalogIcons" title="Save this view" item-icon></paper-fab>
+                 &nbsp;
+                Save current view
+            </paper-item>
+
+            <!-- Configure current view -->
+            <paper-submenu>
+                <paper-item class="menu-trigger">
+                    <paper-fab mini icon="icons:settings" title="Configure the current view" item-icon></paper-fab>
+                    &nbsp;
+                    Configure current view
+                </paper-item>
+                <paper-menu class="menu-content">
+                    <paper-item>
+                        <paper-fab mini icon="icons:folder" class="UIcatalogIcons" title="Classify this view to better find it back: Which tag attach to this view and in which folders to classify it?" item-icon>
+                        </paper-fab>
+                        &nbsp;
+                        Link to an activity
+                    </paper-item>
+                    <paper-item>
+                        <paper-fab mini icon="icons:supervisor-account" class="UIcatalogIcons" title="Give rights for this view: Who can access this view and with which rights?" item-icon></paper-fab>
+                        &nbsp;
+                        Link to a user
+                    </paper-item>
+                    <paper-item>
+                        <paper-fab mini icon="editor:mode-edit" class="UIcatalogIcons" title="Rename the view" item-icon></paper-fab>
+                        &nbsp;
+                        Rename
+                    </paper-item>
+                    <paper-item>Set tags (for classification)</paper-item>
+                </paper-menu>
+            </paper-submenu>
+
+             <!-- Access other views -->
+            <paper-item class="menu-trigger">
+                <paper-fab mini icon="icons:folder" class="UIcatalogIcons" item-icon></paper-fab>
+                &nbsp;
+                My views
+            </paper-item>
+
+            <!-- Catalog of structural elements -->
+            <paper-submenu>
+                <paper-item class="menu-trigger">
+                    <paper-fab mini icon="icons:view-quilt" class="UIcatalogIcons" item-icon></paper-fab>
+                    &nbsp;
+                    Structural Elements
+                </paper-item>
+                <paper-menu class="menu-content">
+
+                    <paper-item>
+                        <div is="container-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="container-cpt"></div>
+                    </paper-item>
+
+                    <!--<paper-item>
+                        <div is="table-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="table-cpt"></div>
+                    </paper-item>-->
+
+                </paper-menu>
+            </paper-submenu>
+
+            <!-- Catalog of text elements -->
+            <paper-submenu>
+                <paper-item class="menu-trigger">
+                    <paper-fab mini icon="icons:speaker-notes" class="UIcatalogIcons" item-icon></paper-fab>
+                    &nbsp;
+                    Text Elements
+                </paper-item>
+                <paper-menu class="menu-content">
+                    <paper-item>
+                        <div is="text-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="text-cpt"></div>
+                    </paper-item>
+                    <paper-item>
+                        <div is="h1-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="h1-cpt"></div>
+                    </paper-item>
+                </paper-menu>
+            </paper-submenu>
+
+            <!-- Catalog of dataviz elements -->
+            <paper-submenu>
+                <paper-item class="menu-trigger">
+                    <paper-fab mini icon="icons:trending-up" class="UIcatalogIcons" item-icon></paper-fab>
+                    &nbsp;
+                    DataViz Elements
+                </paper-item>
+                <paper-menu class="menu-content">
+                    <paper-item>
+                        <div is="d3js-tree-cpt" mode="Icon" draggable="true" on-dragstart="UIdragStart" on-dragenter="UIdragEnter" on-dragend="UIdragEnd" id="d3js-tree-cpt"></div>
+                    </paper-item>
+                </paper-menu>
+
+            </paper-submenu>
+
+        </paper-menu>
+    </template>
+    <script>
+		Polymer({
+			is: 'toolbar-design-cpt'
+            
+        });    
+    </script>
+</dom-module>

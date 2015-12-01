@@ -1,0 +1,48 @@
+{
+  "name": "mat-icon-button",
+  "license": "BSD-3-Clause",
+  "version": "0.9.10",
+  "main": "mat-icon-button.html",
+  "description": "A custom element used to display a Material Design icon button",
+  "homepage": "http://expandjs.com/elements/mat-icon-button",
+  "authors": [
+    "Giuliano Rullo <g.rullo@expandjs.com>",
+    "Maurizio Stefàno <m.stefano@expandjs.com>",
+    "Robert Manolea <r.manolea@expandjs.com>"
+  ],
+  "keywords": [
+    "material design",
+    "material icon button",
+    "material button",
+    "web app",
+    "html5",
+    "expandjs",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*"
+  ],
+  "dependencies": {
+    "expandjs": "ExpandJS/expandjs#0.9.10",
+    "mat-icon": "ExpandJS/mat-icon#0.9.10",
+    "mat-ripple": "ExpandJS/mat-ripple#0.9.10",
+    "xp-anchor-behavior": "ExpandJS/xp-anchor-behavior#0.9.10",
+    "xp-pressed-behavior": "ExpandJS/xp-pressed-behavior#0.9.10",
+    "xp-referral-behavior": "ExpandJS/xp-referral-behavior#0.9.10",
+    "polymer": "Polymer/polymer#^1.1.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0"
+  },
+  "devDependencies": {
+    "mat-demo": "ExpandJS/mat-demo#0.9.10",
+    "mat-icons": "ExpandJS/mat-icons#0.9.10"
+  },
+  "_release": "0.9.10",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.9.10",
+    "commit": "2830a79e86f59829df1d88ac1cec67ecc1646388"
+  },
+  "_source": "git://github.com/ExpandJS/mat-icon-button.git",
+  "_target": "~0.9.5",
+  "_originalSource": "ExpandJS/mat-icon-button"
+}

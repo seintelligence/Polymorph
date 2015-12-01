@@ -1,0 +1,378 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html"> <!-- Import Polymer element -->
+<script type="text/javascript" src="../../../scripts/d3.min.js"></script> <!-- Import d3 js -->
+<script type="text/javascript" src="../../../scripts/jquery.min.js"></script> <!-- Import Jquery js -->
+
+<link rel="import" href="cpt_icon-cpt.html">
+
+<link rel="import" href="../behaviours/DropBehavior.html">
+<link rel="import" href="../behaviours/ModeChangedBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/ToasterTxBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/UtilitiesBehavior.html">
+
+<dom-module id="d3js-tree-cpt">  <!-- Define your custom element -->
+	<!-- Shadow CSS -->
+	<style>
+
+		<!-- html {
+		  overflow-y:auto; 
+		}
+
+		div#holderDev {
+			float:left;
+			vertical-align:middle;
+			overflow-y:auto;
+			overflow-x:auto;
+			border-style:solid;
+			border-width:1px;
+			border-color:#E2E2E2;
+		} -->
+
+	</style>
+		
+	<template>
+		<style>
+		
+			@font-face {
+				font-family: "Roboto Condensed";
+				font-style: normal;
+				src: local('Roboto Regular'), local('Roboto-Regular'), url('Roboto-Regular.ttf') format('truetype');
+			}
+			
+			svg#svg {
+				float: left;
+				font-size: 1em;
+				font-family: "Roboto Condensed";
+			}
+
+			.node circle {
+			  cursor: pointer;
+			  fill: #fff;
+			  font: Calibri;
+			  stroke: steelblue;
+			  stroke-width: 1.5px;
+			}
+
+			.node text {
+			  font-size: 0.7em;
+			}
+
+			path.link {
+			  fill: none;
+			  stroke: #ccc;
+			  stroke-width: 1.5px;
+			}
+			
+		</style>
+		
+		<!-- Development -->
+		<div id="development" class="layout auto-vertical flex development" hidden$='[[!isMode("Development", mode)]]'>
+			<div id="holderDev"></div>
+		</div>
+	
+		<!-- Operational -->
+		<div id="operational" hidden$='[[!isMode("Operational", mode)]]'>
+			<template is="dom-repeat" items="[[data]]" as="dataElt">
+				<h4>[[dataElt.__firebaseKey__]]</h4>
+				<span>{{dataElt.text}}</span>
+			</template>
+			<div id="holderOp"></div>
+		</div>
+		
+		<!-- Icon -->
+		<div hidden$='[[!isMode("Icon", mode)]]'>
+			<div is="cpt_icon-cpt" draggable="false" imgsrc="d3js"></div>
+		</div>
+	</template>
+
+	<script>
+
+	  Polymer({
+		is: 'd3js-tree-cpt',
+		
+		behaviors: [ToasterTxBehavior, DropBehavior, ModeChangedBehavior, UtilitiesBehavior],
+		
+		extends: 'div',
+		
+		properties: {
+			accepts:
+			{
+				type: String,
+				value: "*",
+				notify: true
+			},
+			data: {
+				type: Array,
+				notify: true,
+				value:	[	{
+						"Name": "Services",
+						"sRef": "d|0x00000016|2276|0|208bc|10000",
+						"children": [
+							{ "Name": "Service TIC" },
+							{ "Name": "Service TIC" },
+							{ "Name": "Service TIC" } ]
+						}]
+			}
+		},
+		
+		observers: ['updateD3JS(data.splices)'],
+  
+		margin : { "top": "20", "right": "120", "bottom": "20", "left": "120" },
+		
+		width: function() {return this.realWidth() - this.margin.right - this.margin.left;},
+		
+		height: function() { return this.realHeight() - this.margin.top - this.margin.bottom;},
+		
+		duration: 750,
+		
+		realWidth: function() {
+			return window.innerWidth;
+		},
+		
+		realHeight: function() {
+			return window.innerHeight;
+		},
+		
+		getHolderContainer: function() {			
+			if ( this.isMode("Development", this.mode) )
+				return this.$.holderDev;
+			else
+				return this.$.holderOp;
+		},
+		
+		ready: function() {
+		},
+		
+			
+		attached: function() { 
+			//d3 chart rendering code
+			var divHolder = this.getHolderContainer();
+			var body = d3.select(divHolder);
+			var svg = body.append("svg") 
+				.attr("id", "svg")
+				.attr("width", this.width())
+				.attr("height", this.height())
+			
+			this.groupNodes = svg.append("g")
+					.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
+					.attr("id", "gHolder")
+					.attr("class", "nodeStart");   	
+
+			this.updateD3JS();
+		},
+		
+		updateD3JS: function( data ) {
+			
+			var holder = this.getHolderContainer();
+				
+			holder.style.width = this.width();
+			holder.style.height = this.height();
+			var that = this;
+			
+			var i = 0,
+				root;
+            
+			var newDataSet = this.data;
+			
+			newDataSet = convObjToArrObj(newDataSet);
+			
+			var SlicedData = [{
+				"Name": "Start Node",
+				"children": newDataSet
+			}];
+			
+			if ( SlicedData.length > 0 && this.groupNodes ) {
+				//["10","11"].map(function(d) {return {text: d, size: 10 + Math.random() * 90};} )
+				var nodeEnter = this.groupNodes.data(SlicedData).enter().append("g")
+					  .attr("class", "node")
+					  .on("click", click);
+
+				nodeEnter.append("circle")
+					  .attr("r", 1e-6)
+					  .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+				nodeEnter.append("text")
+					  .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+					  .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+					  .attr("dy", ".35em")
+					  .text(function(d) { return d.Name; })
+					  .style("fill-opacity", 1e-6);
+
+				// Initialize the display to show a few nodes.
+				root = SlicedData[0];
+				root.x0 = that.height() / 2;
+				root.y0 = 0;
+				
+				root.x = root.x0;
+				root.y = root.y0;	
+				
+				for(key in root.children){
+					var obj = root.children[key];
+					toggleAll(obj);
+				}
+				toggle(root);
+
+				d3.select(self.frameElement).style("height", "800px");
+
+				this.root = root;
+				update(root, that);
+		
+			}
+
+			function update(source, that) {
+				var tree = d3.layout.tree()
+					.size([that.height(), that.width()]);
+
+				var diagonal = d3.svg.diagonal()
+					.projection(function(d) { return [d.y, d.x]; });
+
+				// Compute the new tree layout.
+				var nodes = tree.nodes(that.root).reverse(),
+					links = tree.links(nodes);
+
+				// Normalize for fixed-depth.
+				nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+				// Update the nodes…
+				var node = that.groupNodes.selectAll("g.node")
+					.data(nodes, function(d) { return d.id || (d.id = ++i); });
+			
+				// Enter any new nodes at the parent's previous position.
+				var nodeEnter = node.enter().append("g")
+					.attr("class", "node")
+					.attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+					.on("click", click);
+
+			
+				nodeEnter.append("circle")
+					.attr("r", 1e-6)
+					.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+				nodeEnter.append("text")
+					.attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+					.attr("y", "-5px")
+					.attr("dy", ".35em")
+					.attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+					.text(function(d) { return d.Name; })
+					.style("fill-opacity", 1e-6);
+					
+				// Transition nodes to their new position.
+				
+				var nodeUpdate = node.transition()
+					.duration(that.duration)
+					.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+				nodeUpdate.select("circle")
+					.attr("r", 4.5)
+					.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+				nodeUpdate.select("text")
+					.style("fill-opacity", 1);
+
+				// Transition exiting nodes to the parent's new position.
+				var nodeExit = node.exit().transition()
+					.duration(that.duration)
+					.attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+					.remove();
+
+				nodeExit.select("circle")
+					.attr("r", 1e-6);
+
+				nodeExit.select("text")
+					.style("fill-opacity", 1e-6);
+
+				// Update the links…
+				var link = that.groupNodes.selectAll("path.link")
+					.data(links, function(d) { return d.target.id; });
+
+				// Enter any new links at the parent's previous position.
+				link.enter().insert("path", "g")
+					.attr("class", "link")
+					.attr("d", function(d) {
+						var o = {x: source.x0, y: source.y0};
+						return diagonal({source: o, target: o});
+					});
+
+				// Transition links to their new position.
+				link.transition()
+					.duration(that.duration)
+					.attr("d", diagonal);
+
+				// Transition exiting nodes to the parent's new position.
+				link.exit().transition()
+					.duration(that.duration)
+					.attr("d", function(d) {
+						var o = {x: source.x, y: source.y};
+						return diagonal({source: o, target: o});
+					})
+					.remove();
+
+					// Stash the old positions for transition.
+					nodes.forEach(function(d) {
+						d.x0 = d.x;
+						d.y0 = d.y;
+					});
+				
+				}
+				
+				// Toggle children on click.
+				function click(d) {
+					if (d.children) {
+						d._children = d.children;
+						d.children = null;
+					} else {
+						d.children = d._children;
+						d._children = null;
+					}
+					var that = document.querySelector("div", "d3js-tree-cpt");
+					that = Polymer.dom(that);
+					update(d, that);
+				}
+				
+				
+				// Toggle children.
+				function toggle(d) {
+					if (d.children) {
+						d._children = d.children;
+						d.children = null;
+					} else {
+						d.children = d._children;
+						d._children = null;
+					}
+				}
+				
+				function toggleAll(d) {
+					if (d.children) {
+						for(key in d.children){
+							var obj = d.children[key];
+							toggleAll(obj);
+						}
+					  toggle(d);
+					}
+				}
+				
+				function convObjToArrObj( obj ) {
+					// If it is an object we convert it to an array
+					if ( obj.constructor === Object )
+						var obj = $.map(obj, function(value, index) { return [value];});
+					
+					// Then if it is an array, we will run through the children to convert it if needed to array
+					for (var i = 0; i < obj.length; i++) {
+						if( obj[i].children )
+							obj[i].children = convObjToArrObj( obj[i].children );
+					}
+					return obj;
+				}
+				
+				function clone(obj) {
+					if (null == obj || "object" != typeof obj) return obj;
+					var copy = obj.constructor();
+					for (var attr in obj) {
+						if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+					}
+					return copy;
+				}
+		}
+	  });
+	</script>
+	
+</dom-module>

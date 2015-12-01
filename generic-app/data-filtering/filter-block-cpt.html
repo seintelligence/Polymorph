@@ -1,0 +1,136 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-icon-item.html">
+
+<link rel="import" href="../data-filtering/filter-data-cpt.html">
+<link rel="import" href="../data-exchanges/get-db-items-cpt.html">
+
+<script src="../../scripts/alasql.min.js"></script>
+
+<dom-module id="filter-block-cpt">
+   
+    <style>
+        :host {
+            margin: 20px;
+        }
+    </style>
+    
+    <template>
+        <get-db-items-cpt db="[[db]]" filters="[[filterGetItems]]" data="{{items}}"></get-db-items-cpt>
+        <paper-card heading="[[heading]]">
+            <div class="card-content">[[description]]</div>
+            <div class="card-actions">
+                <paper-icon-item>
+                    <paper-checkbox name="*" item-icon on-change="filterChanged" checked="{{all_checked}}"></paper-checkbox>
+                    <div class="flex" style="[[computedWidth]]">All <span>[[sItems]]</span></div>
+                </paper-icon-item>
+            </div>
+            <div class="card-actions" hidden$="[[all_checked]]">
+                <filter-data-cpt width="15" label="[[searchBarLabel]]" wide-filter="{{wideFilter}}"></filter-data-cpt>
+            </div>
+            <div id="filters" class="card-actions" hidden$="[[all_checked]]">
+                <template is="dom-repeat" items="[[items]]" as="item">
+                    <paper-icon-item >
+                        <paper-checkbox name="[[item.id]]" item-icon on-change="filterChanged"></paper-checkbox>
+                        <div class="flex">[[item.name]]</div>
+                    </paper-icon-item>
+                </template>
+            </div>
+        </paper-card>
+    </template>
+    
+    <script>
+		Polymer({
+			is: 'filter-block-cpt',
+            
+            extends: 'div',
+            
+            properties: {
+                
+                db: {},
+                
+                heading: {
+                    type: String,
+                    value: ""
+                },
+                
+                width: {
+                    type: Number,
+                    value: 150
+                },
+                
+                computedWidth: {
+                    type: String,
+                    computed: 'getComputedWidth(width)'                    
+                },
+                
+                sItems: {
+                    type: String,
+                    value: ""
+                },
+                
+                description: {
+                    type: String,
+                    value: ""
+                },
+                
+                all_checked:{
+                    type: Boolean,
+                    value: true,
+                    notify: true                    
+                },
+                
+                searchBarLabel: {
+                    type: String,
+                    computed: 'getLabel(sItems)'
+                },
+                
+                filterGetItems:  {
+                    type: Array,
+                    value: []
+                },
+                
+                filter: {
+                    type: Array,
+                    value: ["*"],
+                    notify: true,
+                    readOnly: true
+                }
+                
+            },
+                
+            getComputedWidth: function(width) { return "width: " + width + "px;"},
+            
+            filterChanged: function(ev) {
+                var changedElt = ev.srcElement.name,
+                    status = ev.srcElement.checked,
+                    filter = [];
+                
+                if (changedElt == "*" && status)
+                    filter = ["*"];
+                
+                else
+                    filter = this.getAllFiltersCheckboxes();
+                
+                this._setFilter(filter);
+            },
+            
+            getAllFiltersCheckboxes: function() {
+                var filter = [],
+                    checkboxes = this.$.filters.querySelectorAll('paper-checkbox');
+                
+                for(prop in checkboxes) {
+                    var cb = checkboxes[prop];
+                    if (cb.checked)
+                        filter.push(cb.name)
+                }
+                return filter;
+            },
+            
+            getLabel: function(sItems) { return "filter on " + sItems;}
+        });
+    </script>
+    
+</dom-module>

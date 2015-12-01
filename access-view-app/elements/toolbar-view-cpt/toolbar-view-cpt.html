@@ -1,0 +1,29 @@
+<dom-module is="toolbar-view-cpt">
+    <style>
+        paper-toolbar {
+            --paper-toolbar-background: var(--paper-grey-400);
+        }
+    </style>
+    <template>
+        
+        <!-- content of the toolbar -->
+        <h2>Main</h2>
+        <div><a href="/access-view-app">Back to views selection</a></div>
+        <h2>Your favorites</h2>
+        none
+        
+    </template>
+    <script>
+		Polymer({
+			is: 'toolbar-view-cpt',
+            
+            properties: {
+                title: {
+                    type: String,
+                    value: "header"
+                }
+                
+            }
+        });    
+    </script>
+</dom-module>

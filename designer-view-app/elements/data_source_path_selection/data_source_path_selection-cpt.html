@@ -1,0 +1,246 @@
+<link rel="import" href="data_source_path_visual-cpt.html">
+<link rel="import" href="data_source_path_displayNodeInfo-cpt.html">
+<link rel="import" href="data_source_path_displayPath-cpt.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="data_source_path_selection-cpt">
+	
+    <style>
+        div.visualFrame {
+            margin-right: 20px;
+        };
+        
+        div.selectedPath {
+            margin-bottom: 20px;
+        };
+        
+        div.infoNode {
+            margin-right: 20px;
+        };
+        
+        div.frame {
+            padding: 10px;
+            border: 1px #FAFAFA;
+        };
+        
+        div.content {
+            background-color: #FCFCFC;
+        };
+    </style>
+    
+    <template>
+        
+        <paper-dialog-scrollable>
+            <iron-pages id="pages_content" selected="0">
+
+                <!-- Main tree page -->
+                <div class="layout horizontal">
+
+                    
+                    <div class="layout vertical">
+                        <h2>Selection of the data source(s)</h2>
+                        <div>Select one or more data source(s) for your container:</div>
+                        <!-- display the tree node -->
+                        <div id="visualTree" is="data_source_path_visual-cpt" style="width:600px; height:300px" height='300' width='500' schema="{{schema}}" currently-Selected-Node="{{currentlySelectedNode}}" path-data="{{pathData}}" tree-data="{{treeData}}" class="content visualFrame frame"></div>
+                        <div>
+                            <u>Tip:</u> Click a node with [CTRL] to select a node as data source
+                        </div>
+                    </div>
+                    <div class="layout vertical">
+
+                        <h2>Selected path(es):</h2>
+                        <div>for this container</div>
+                        <div class="content selectedPath frame">
+                            <!-- display the paths -->
+                            <template is="dom-repeat" items="[[pathData]]">
+                                <paper-icon-button icon="clear" alt="clear" title="clear"></paper-icon-button>
+                                <div is="data_source_path_displayPath-cpt" path-data-str="{{pathData.path}}" path-data="[[item]]"></div>
+                            </template>
+                        </div>
+
+                        <!-- display the node info -->
+                        <h2>Selected node:</h2>
+                        <div>current node information</div>
+                        <div class="content frame">
+                            <div is="data_source_path_displayNodeInfo-cpt" currently-Selected-Node="[[currentlySelectedNode]]"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Specific node(s) tree page -->
+                <template is="dom-repeat" items="[[pathData]]">
+                    <div>
+                        <h2>Configuration of the data source:</h2>
+                        <h3>[[item.name]]</h3>
+                        <div is="data_source_path_displayPath-cpt" path-data="[[item]]"></div>
+                        <div>Feature in progress...</div>
+                    </div>
+                </template>
+
+                <!-- Synthesis -->
+                <div>
+                    <h2>Synthesis</h2>
+                    <div>The configured data source:</div>
+                    <template is="dom-repeat" items="[[pathData]]">
+                            <paper-checkbox checked></paper-checkbox>
+                            <div is="data_source_path_displayPath-cpt" path-data="[[item]]"></div>
+                    </template>
+                </div>
+            </div>
+
+            </iron-pages>
+        </paper-dialog-scrollable>
+
+        <div class="buttons">
+            <iron-pages id="pages_navigation" selected="0">
+                <div id="menu_main_tree">
+                    <!-- Check if any pathData is available prior from displaying the next button -->
+                    <template is="dom-if" if="{{hasPathData(pathData.*)}}">
+                        <paper-button on-click="nextPage">Next</paper-button>
+                    </template>
+                    <paper-button dialog-dismiss>Cancel</paper-button>
+                    <paper-button dialog-confirm on-click="validateFiltering">Validate</paper-button>
+                </div>
+                <template is="dom-repeat" items="[[pathData]]">
+                    <div id="menu_specific_node_tree">
+                        <paper-button on-click="previousPage">Previous</paper-button>
+                        <paper-button on-click="nextPage">Next</paper-button>
+                        <paper-button dialog-dismiss>Cancel</paper-button>
+                    </div>
+                </template>
+                <div id="menu_synthesis">
+                    <paper-button on-click="previousPage">Previous</paper-button>
+                    <paper-button dialog-dismiss on-click="cancelFiltering">Cancel</paper-button>
+                    <paper-button dialog-confirm on-click="validateFiltering">Validate</paper-button>
+                </div>
+            </iron-pages>
+        </div>
+        
+    </template>
+
+    <script>
+		Polymer({
+			is: 'data_source_path_selection-cpt',
+            
+            extends: 'div',
+            
+            properties: {
+                
+                currentlySelectedNode:
+                {
+                    type: Object,
+                    value: {}
+                },
+                
+                pathData: 
+                {
+                    type: Array,
+                    value: []
+                },
+                
+                pathDataInitial:
+                {
+                    type: Object,
+                    value: {},
+                    observer: 'updatePathData'
+                },
+                
+                pathDataValidated: 
+                {
+                    type: Object,
+                    value: {},
+                    notify: true
+                },
+                
+                pathDataStr:
+                {
+                    type: String,
+                    value: ""
+                },
+                
+                schema: {
+                    type: Object,
+                    value: {},
+                },
+                
+                receives:
+                {
+                    type: String,
+                    value: ""
+                },
+                
+                treeData: {
+                    type: Object,
+                    value: {},
+                    notify: true
+                }
+            },
+            
+            attached: function() { this.updateContentModal(); },
+            
+            previousPage: function() {
+                var pages_content = document.querySelector('#pages_content');
+                var pages_navigation = document.querySelector('#pages_navigation');
+                pages_content.selectPrevious();
+                pages_navigation.selectPrevious();
+            },
+            
+            nextPage: function() {
+                var pages_content = document.querySelector('#pages_content');
+                var pages_navigation = document.querySelector('#pages_navigation');
+                pages_content.selectNext();
+                pages_navigation.selectNext();
+            },     
+            
+            selectPage: function(numPage) {
+                var pages_content = document.querySelector('#pages_content');
+                var pages_navigation = document.querySelector('#pages_navigation');
+                pages_content.select(numPage);
+                pages_navigation.select(numPage);
+            },     
+            
+            updateContentModal: function() {
+                this.fire('_notifyResize', {});
+            },
+                
+            updatePathData: function() {
+                this.pathData = [];
+                var pathDataInitial = this.pathDataInitial;
+                for (var key in pathDataInitial) {
+                   if (pathDataInitial.hasOwnProperty(key))
+                   {
+                       console.log(pathDataInitial[key]);
+                       this.push('pathData', pathDataInitial[key]);
+                   }
+                }
+                
+                //if (pathDataInitial) this.selectPage(this.pathData.length + 1);
+            },
+            
+            validateFiltering(ev) {
+                console.log("/validateFiltering visual");
+                var that = this;
+                var obj = {};
+                this.pathData.forEach(function(e) { obj[e.str] = e;});
+                this.pathDataValidated = obj;
+                console.log(this.pathDataValidated);
+            },
+            
+            // Reset
+            resetModalContent: function() {
+                console.log("/resetModalContent");
+                this.selectPage(0);
+                var schema = this.schema;
+                this.set('schema', null);
+                this.set('schema', schema);
+                this.updateContentModal();
+            },
+            
+            // Check if any pathData is available
+            hasPathData: function(pathData) { console.log(this.pathData); return (this.pathData.length > 0) ? true:false;}
+        });
+    </script>
+    
+</dom-module>

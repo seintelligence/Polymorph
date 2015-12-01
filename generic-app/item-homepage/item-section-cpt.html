@@ -1,0 +1,29 @@
+<script src="../../scripts/jquery.min.js"></script>
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="stylesheet" href="../../bower_components/open-sans-fontface/open-sans.css">
+<dom-module is="item-section-cpt">
+    
+    <style>
+        *{font-family: "Open Sans", sans-serif;}
+        .section {
+            position: relative;
+            padding: 8px;
+            border: 1px solid;
+            border-color: #e0e0e0;
+            border-top: 0
+        }
+    </style>
+    
+    <template>
+        <div class="section layout horizontal flex end">
+            <content></content>
+        </div>
+    </template>
+    
+    <script>
+		Polymer({
+			is: 'item-section-cpt',
+        });
+    </script>
+    
+</dom-module>

@@ -1,0 +1,66 @@
+<link href="../../../bower_components/jsoneditor/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
+<script src="../../../bower_components/jsoneditor/dist/jsoneditor.min.js"></script>
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+ 
+<dom-module id="add-json-entries-cpt">
+    <template>
+        <div id="jsoneditor" style="width: 400px; height: 400px;"></div>
+    </template>
+
+    <script>
+        
+		Polymer({
+			is: 'add-json-entries-cpt',
+            
+            extends: 'div',
+            
+            properties: {
+                json: {
+                    type: Object,
+                    value: {
+                        "Array": [1, 2, 3],
+                        "Boolean": true,
+                        "Null": null,
+                        "Number": 123,
+                        "Object": {"a": "b", "c": "d"},
+                        "String": "Hello World"
+                    },
+                    observer: 'updateEditor'
+                }
+                
+            },
+            
+            oo: function(ev) {
+                console.log(ev);
+            },
+            
+            ready: function() {
+                // create the editor
+                var container = this.$.jsoneditor;
+                var options = {
+                    "mode": "tree",
+                    "change": this.oo(),
+                    "modes": ["tree", "view", "form", "code"],
+                    "search": true
+                };
+                
+                this.editor = new JSONEditor(container, options);
+                
+                this.updateEditor();
+            },
+            
+            updateEditor: function() {
+                console.log("/updateEditor");
+                console.log(JSON.stringify(this.json))
+                
+                if (!this.editor) return;
+
+                this.editor.set(this.json);
+
+                // get json
+                var json = this.editor.get();
+                
+            }
+        });
+    </script>
+<dom-module>

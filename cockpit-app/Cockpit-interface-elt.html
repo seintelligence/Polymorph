@@ -1,0 +1,145 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../TopAjax-elt.html">
+
+<link rel="import" href="../generic-app/behaviours/UtilitiesBehavior.html">
+<script type="text/javascript" src="../../scripts/x2js/xml2json.min.js"></script>
+
+<dom-module id="Cockpit-interface-elt">
+	<template>
+		<TopAjax-elt
+			id="ajaxGET"
+			s-Url-Ajax="{{sUrlAjax}}"
+			s-Params='{}'
+			contentType="application/xml"
+			handleAs="text"
+			verbose="true"
+			withCredentials="true"
+			method="GET"
+			data="{{AjaxData}}"
+			debounceDuration="300">
+		</TopAjax-elt>
+		
+		<TopAjax-elt
+			id="ajaxPOST"
+			s-Url-Ajax="{{sUrlAjax}}"
+			s-Params='{}'
+			contentType="application/xml"
+			handleAs="text"
+			verbose="true"
+			withCredentials="true"
+			method="GET"
+			data="{{AjaxData}}"
+			debounceDuration="300">
+		</TopAjax-elt>
+		
+		<TopAjax-elt
+			id="ajaxDELETE"
+			s-Url-Ajax="{{sUrlAjax}}"
+			s-Params='{}'
+			contentType="application/xml"
+			handleAs="text"
+			verbose="true"
+			withCredentials="true"
+			method="GET"
+			data="{{AjaxData}}"
+			debounceDuration="300">
+		</TopAjax-elt>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'Cockpit-interface-elt',
+			
+			behaviors: [UtilitiesBehavior],
+			
+			sASP_Adress: "req test asp CORS.asp",
+			
+			sAPI_Adress: "cockpitapiv2.ase",
+			
+			sProjectDescription: "FULL-LED-93X-MY17",
+			
+			ProjectList: ["BAJAJ EE System 90X (RC MY15 / Duke MY16)",
+						"BAJAJ EE System 93X (RC MY16 / Duke MY17)",
+						"FULL-LED-93X-MY17",
+						"ECU EPM44 MY16",
+						"ECU EPM44 MY17",
+						"FULL-LED-93X-MY17"],
+						
+			sThisFileName: "Req%20Management%20View%20v5.html",
+			
+			sHost: "EXT-1MY7",
+			
+			sDomain: "Cognition Cockpit",
+			
+			sServer: "Production Server 1",
+			
+			sPortal: "http://EXT-1MY7:81/cockpit/",
+			
+			properties: {
+				data: {
+					type: Array,
+					notify: true,
+					value: function() { return [];}
+				},
+				
+				AjaxData: {
+					type: Array,
+					notify: true,
+					observer: 'handleResponse'
+				},
+				
+				sUrlAjax: {
+					type: String,
+					value: "http://ext-1my7:81/cockpit/req test asp CORS.asp"
+				},
+				
+				attrRequest: {
+					type: String,
+					notify: true
+				},
+				
+				customRequest: {
+					type: String,
+					notify: true
+				}
+			},
+			
+			generateRequest: function() {
+				this.$.ajaxGET.sUrlAjax = this.getURLapi( this.customRequest , this.attrRequest );
+				this.$.ajaxGET.generateRequest();
+			},
+			
+			insertEntry: function(entry) {
+				this.$.ajaxPost.body = JSON.stringify(entry);
+				this.$.ajaxPost.generateRequest();
+			},
+			
+			handleResponse: function() {
+				var x2js = new X2JS();
+				// Remove 2 characters from the XML string sent by CC
+				if (this.AjaxData) {
+					var d = this.AjaxData.substring(2);
+					d = x2js.xml_str2json(d);
+					this.data = this.arrayify(d["cockpitapi"]["project"]["object"]);
+				}
+			},
+			
+			getURLapi: function(customRequest, attrRequest)
+			{
+				// Cockpit adress + api script
+				var urlAPI = this.sPortal + this.sASP_Adress;
+				// Project
+				urlAPI += "?sKeyType=Search&sThisKey=PROJECT|sDescription|" + this.ProjectList[0];
+				// Custom project
+				urlAPI += "&sCustomRequests=" + customRequest + "&sGetAs=[xml|json]";
+				//Attributes to retrieve
+				urlAPI += "&sFields=" + attrRequest;
+				// Max objects to retrieve
+				urlAPI += "&iStart=0&iMax=1000";
+				// Return the url GET API
+				return urlAPI;
+			}
+			
+		});
+	</script>
+</dom-module>

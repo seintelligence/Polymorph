@@ -1,0 +1,105 @@
+<!--
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/shadow.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../bower_components/more-routing/more-route.html">
+
+<!--
+A page of Polyfora, describing all available forums.
+-->
+<dom-module id="polyfora-forum-index">
+
+  <style>
+
+    :host {
+      display: block;
+      padding: 16px;
+    }
+
+    header {
+      @apply(--paper-font-caption);
+    }
+
+    .forum {
+      @apply(--shadow-elevation-2dp);
+      @apply(--paper-font-body1);
+      margin: 8px 0;
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .forum .title {
+      @apply(--paper-font-title);
+    }
+
+    .description {
+      margin-top: 8px;
+    }
+
+  </style>
+
+  <template>
+    <more-route context name="root"></more-route>
+
+    <header>Forums</header>
+
+    <template is="dom-repeat" items="[[_forumList]]" as="forum">
+      <section class="forum" on-tap="_onForumTapped" forum-id$="[[forum.id]]">
+        <header class="title">[[forum.title]]</header>
+        <div class="description">[[forum.desc]]</div>
+      </section>
+    </template>
+
+    <!--
+    One way to interact routes is to declare references to them. In this case,
+    we want to navigate to individual forums (in response to user action).
+    -->
+    <more-route id="forumRoute" name="forum"></more-route>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'polyfora-forum-index',
+
+      properties: {
+
+        data: {
+          type:     Object,
+          observer: '_dataChanged',
+        },
+
+      },
+
+      _dataChanged: function() {
+        this._forumList = Object.keys(this.data.forums).map(function(id) {
+          return this.data.forums[id];
+        }.bind(this));
+      },
+
+      _onForumTapped: function(event) {
+        var forumId = event.currentTarget.getAttribute('forum-id');
+        // One way to navigate to a route is to call the `navigateTo` helper on
+        // a `more-route` element that references it:
+        this.$.forumRoute.navigateTo({forumId: forumId});
+        event.stopPropagation();
+        // Another way is by calling `MoreRouting.navigateTo` with the name or
+        // path of the route and its params. You can see an example of this in
+        // `polyfora-forum.html`.
+      },
+
+    });
+
+  </script>
+
+</dom-module>

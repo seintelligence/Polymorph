@@ -1,0 +1,91 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../generic-app/behaviours/UtilitiesBehavior.html">
+
+<dom-module id="create-HTML-cpt">
+	<style>
+	</style>
+	<template>
+        <content></content>
+    </template>
+    <script>
+		Polymer({
+			is: 'create-HTML-cpt',
+            
+            extends: 'div',
+			
+			behaviors: [UtilitiesBehavior],
+            
+            properties: {
+                
+                nodeChildren: {
+					type: Object,
+					value: function() { return {}; }
+                }
+                
+            },
+            
+            observers: ['observeJSONstructure(nodeChildren.*)'],
+                
+            observeJSONstructure: function(ev) {
+                console.log("/observeJSONstructure");
+                console.log(this.nodeChildren);
+                // If a node has been attached
+                if (this.nodeChildren.UItopContainer)
+                {
+                    // Get the HTML structure (string)
+                    var HTMLstructure = this.createHTMLstructure( this.nodeChildren.UItopContainer );
+                    console.log(HTMLstructure);
+                    console.log(Polymer.dom(this).querySelector('content'));
+                    // Insert the HTML structure in the DOM
+                    Polymer.dom(this).innerHTML = HTMLstructure;
+                }
+                
+			},
+            
+            createHTMLstructure: function( structure ) {
+                console.log("/createHTMLstructure");
+                var cpt = '<div ';
+                
+                // id
+                cpt = cpt + 'id="' + structure.id + '" ';
+                
+                // is
+                cpt = cpt + 'is="' + structure.is + '" ';
+                
+                // config
+                var config = this.copyJSONobj(structure.config);
+                for (var key in config) {
+                   if (config.hasOwnProperty(key))
+                   {
+                        var obj = config[key];
+                       
+                       // Function to make sure the format of polymer/js caps variable is converted to hmtl ones
+                        key = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+                       
+                        // If this is a boolean
+                        if ( typeof obj === 'boolean' )
+                        {
+                            if ( obj ) cpt = cpt + key + ' ';
+                        }
+                        // else
+                        else
+                            cpt = cpt + key + '="' + obj + '" ';
+                    }
+                }
+                
+                cpt = cpt + '>';
+                
+                // nodeChildren
+                var nodeChildren = this.copyJSONobj(structure.nodeChildren);
+                for (var child in nodeChildren) {
+                    var childCpt = this.createHTMLstructure(nodeChildren[child]);
+                    cpt = cpt + childCpt;
+                }
+                
+                cpt = cpt + '</div>';
+                // return the computed html structure
+                return cpt;
+            }
+        });
+    </script>
+</dom-module>

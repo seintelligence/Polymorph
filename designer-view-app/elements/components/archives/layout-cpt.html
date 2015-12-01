@@ -1,0 +1,364 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="cpt_icon-cpt.html">
+<link rel="import" href="../../../generic/data-filtering/filter-data-cpt.html">
+
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-signals/iron-signals.html">
+
+<link rel="import" href="../behaviours/DropBehavior.html">
+<link rel="import" href="../behaviours/ModeChangedBehavior.html">
+<link rel="import" href="../behaviours/ToasterTxBehavior.html">
+<link rel="import" href="../../generic-app/behaviours/UtilitiesBehavior.html">
+
+
+<dom-module id='layout-cpt'>
+	<style>
+		
+		.development::hover {
+			border-radius: 5px;
+			box-shadow: inset 0 0 10px #95FF68;
+		}
+			
+		.acceptingContainer {
+			border-radius: 5px;
+			box-shadow: inset 0 0 10px #95FF68;
+			margin: 5px;
+			padding: 5px;
+		}
+		
+		.development {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 16px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 300;
+			background-color:white;
+			font-family: "Open Sans";
+			margin: 1px;
+			padding: 5px;
+			height: auto;
+		};
+		
+		.development .icons {
+			border: none;
+			cursor: pointer;
+		}
+		
+		.development .container {		
+			background-color:rgb(250, 250, 250);
+			border: 1px dotted rgb(150, 150, 150);
+			padding: 5px;
+			margin: 10px;
+		}
+		
+		.operational {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 16px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 300;
+			background-color:rgb(250, 250, 250);
+			font-family: "Open Sans";
+			margin: 1px;
+			padding: 5px;
+			min-height: 200px;
+			border-radius: 4px;
+			border-width: 1px;
+            min-width: 100px;
+		}
+		
+	</style> 
+	<template>
+		
+		<!-- Development -->
+		<div draggable="false" hidden$='[[!isMode("Development", mode)]]'>
+			<paper-material elevation="1" class="layout auto-vertical flex development" >
+				<div class="layout flex horizontal">
+					<!-- Filters control -->
+					<div class="development icons">
+						<iron-icon title="filter the parent source of data provided by this component to sub-ccomponent" icon="filter-list" data-dialog="modal" on-click="txPathJsonEditorRequest"></iron-icon>
+					</div>
+					<!-- Provides computation -->
+					<div class="flex">
+						<span>Provides:</span>
+						<span>{{provides}}</span>
+					</div>
+					<!-- Flex control -->
+					<div class="layout horizontal development icons">
+						<iron-icon title="Switch to a flexible layout (take the remaining horizontal space) or not" id="iconLayoutFlex" icon="icons:fullscreen-exit" on-click="switchLayoutFlex"></iron-icon>
+					</div>
+					<!-- horizontal / vertical layout control -->
+					<div class="layout horizontal development icons">
+						<iron-icon title="Switch layout horizontal<=>vertical" id="iconLayoutHorizVert" icon="icons:swap-horiz" on-click="switchLayoutHorizVert"></iron-icon>
+					</div>
+					<!-- iterate layout control -->
+					<div class="layout horizontal development icons">
+						<iron-icon title="Switch to iterate the content over the found object or not (-)" id="iconLayoutIterate" icon="icons:autorenew" on-click="switchLayoutIterate"></iron-icon>
+					</div>
+                    <!-- code control -->
+					<div class="layout end-justified development icons">
+						<iron-icon title="Get the code of this element" id="iconLayoutCode" icon="icons:code" on-click="txCodeJsonRequest"></iron-icon>
+					</div>
+					<!-- delete control -->
+					<div class="layout end-justified development icons" hidden$='[[isUItopContainer(id)]]'>
+						<iron-icon title="Delete this component" id="iconLayoutDelete" icon="icons:delete" on-click="txRemoveNodeChild"></iron-icon>
+					</div>
+					<!-- Iron signals -->
+					<!--<iron-signals on-iron-signal-update="oo"></iron-signals>-->
+				</div>
+				
+                        <paper-material elevation="1" id="blockContainer" class="layout vertical flex development container" style="min-height:200px;">
+                        <!-- icons for layout acceptance -->
+                        <div class="layout horizontal">
+                                <!-- check if no element is currently dragged -->
+                                <template is="dom-if" if="[[_currentDragIsCompatible(0)]]">
+                                    <iron-icon icon="input"></iron-icon>
+                                </template>
+
+                                <!-- check if currently dragged element is compatible -->
+                                <template is="dom-if" if="[[_currentDragIsCompatible(1)]]">
+                                    <iron-icon icon="check-circle"></iron-icon>
+                                </template>
+
+                                <!-- check if currently dragged element is not compatible -->
+                                <template is="dom-if" if="[[_currentDragIsCompatible(2)]]">
+                                    <iron-icon icon="block"></iron-icon>
+                                </template>
+                        </div>
+                        <!-- where objects are dropped -->
+                        <div id="container" class="layout horizontal"></div>
+                        </paper-material>
+			</page-material>
+		</div>
+		
+		<!-- Operational -->
+		<div draggable="false" hidden$='[[!isMode("Operational", mode)]]'>
+			<paper-material elevation="1">
+                <div id="operational" class="layout horizontal flex operational">
+                    <content></content>
+                </div>
+			</paper-material>
+		</div>
+		
+		<!-- Icon -->
+		<div draggable="false" hidden$='[[!isMode("Icon", mode)]]'>
+			<div is="cpt_icon-cpt" draggable="false" imgsrc="layout"></div>
+		</div>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'layout-cpt',
+			
+			behaviors: [ToasterTxBehavior, DropBehavior, ModeChangedBehavior, UtilitiesBehavior],
+			
+			extends: 'div',
+			
+			properties: {
+				
+				// accepts data type
+				accepts:
+				{
+					type: String,
+					value: "*",
+					notify: true
+				},
+				
+				// provides data type
+				provides:
+				{
+					type: String,
+					value: "",
+					notify: true
+				},
+				
+				// current filter on the jsondata of the computed parents nodes
+				pathData:
+				{
+					type: Object,
+					value: {},
+					observer: 'updateProvides'
+				},
+                
+                pathDataArr:
+				{
+					type: Array,
+					value: []
+				},
+                
+                // current filter on the jsondata of the computed parents nodes
+				pathDataValidated:
+				{
+					type: String,
+					value: ""
+				},
+								
+				// 0: horiz, 1: vert
+				layoutHorizVert:
+				{
+					type: Boolean,
+					value: 0,
+                    observer: 'setLayoutHorizVert'
+				},
+				
+				// 1: flex
+				layoutFlex:
+				{
+					type: Boolean,
+					value:false,
+                    observer: 'setLayoutFlex'
+				},
+				
+				// 1: iterate
+				layoutIterate:
+				{
+					type: Boolean,
+					value:false,
+                    observer: 'setLayoutIterate'
+				}
+				
+			},
+            
+            observers: ['updatePathData(pathDataValidated.*)'],
+			
+			/* Layout config */
+			switchLayoutHorizVert: function(ev) {
+                console.log("/switchLayoutHorizVert");
+                
+                // Toggle value
+				this.layoutHorizVert = !this.layoutHorizVert;
+				                
+                // Change icon
+				this.$.iconLayoutHorizVert.icon = "icons:swap-" + (this.layoutHorizVert?"vert":"horiz");
+				
+				// update the structure to propagate the update to the parents
+                this.set('config.layoutHorizVert', this.layoutHorizVert);
+			},
+			
+			switchLayoutFlex: function(ev) {
+				console.log("/switchLayoutFlex");
+				
+                // Toggle value
+                this.layoutFlex = !this.layoutFlex;
+				
+                // Change icon
+                if (this.layoutFlex)
+					this.$.iconLayoutFlex.icon = "icons:fullscreen";
+				else
+                    this.$.iconLayoutFlex.icon = "icons:fullscreen-exit";
+                
+				// update the structure to propagate the update to the parents
+                this.set('config.layoutFlex', this.layoutFlex);
+			},
+			
+			switchLayoutIterate: function(ev) {
+				console.log("/switchLayoutIterate");
+                
+                // Toggle value
+				this.layoutIterate = !this.layoutIterate;
+				
+                // Change icon
+				this.$.iconLayoutIterate.icon = (this.layoutIterate?"icons:remove":"icons:autorenew");
+				
+				// update the structure to propagate the update to the parents
+                this.set('config.layoutIterate', this.layoutIterate);
+			},
+            
+            // setLayoutHorizVert
+            setLayoutHorizVert: function() {
+				var sOld = (this.layoutHorizVert?"horizontal":"vertical"),
+					sNew = (this.layoutHorizVert?"vertical":"horizontal");
+				
+                // trigger toaster information
+				this.sendToasterMsgDisplayRequest("Layout changed from " + sOld + " to " + sNew, "information");
+				
+                // Set the layout effect
+				$(this.$.container).removeClass(sOld);
+				$(this.$.container).addClass(sNew);
+                $(this.$.operational).removeClass(sOld);
+				$(this.$.operational).addClass(sNew);
+			},
+            
+            // setLayoutFlex
+            setLayoutFlex: function() {
+                // trigger toaster information
+                this.sendToasterMsgDisplayRequest("Layout changed to " + (this.layoutFlex?"flex":"not flex", "information"));
+					
+                // Set the layout effect
+				if (this.layoutFlex)
+					$(this).addClass("flex");
+				else
+					$(this).removeClass("flex");
+			},
+            
+            // setLayoutFlex
+            setLayoutIterate: function() {
+                // trigger toaster information
+				this.sendToasterMsgDisplayRequest("Layout changed to " + (this.layoutIterate?"iterate":"not iterate"), "information");
+                
+                // Set the layout effect (..)
+			},
+			
+			/* sert a rien pour l'instant Non Op */
+			_currentDragIsCompatible: function(type) {
+				if (type === 0)	return 1;
+				else return 0;
+			},
+            
+            // Hide the "Delete" control if it is UItopContainer (top container)
+            isUItopContainer: function(id) { return (id == 'UItopContainer');},
+			
+			/************** Path data **************/
+			txPathJsonEditorRequest: function(ev) {
+                console.log("/txPathJsonEditorRequest"); 
+                this.fire('pathJsonEditorRequest', { 'pathData': this.pathData});
+            },
+            
+            updatePathData: function(value) {
+                console.log("/updatePathData");
+                var pathData = {};
+                
+                console.log(this.pathDataValidated);
+                if (this.pathDataValidated)
+                    this.pathData = JSON.parse(this.pathDataValidated);
+                
+                console.log(this.pathData);
+                
+				// update the structure to propagate the update to the parents
+                //this.set('config.pathData', this.pathData);
+                console.log("/end updatePathData");
+                
+            },
+			
+			updateProvides: function(ev) {
+                console.log("/updateProvides");
+                var strProvides = "";
+                var coma = false;
+                var pathData = this.pathData;
+                console.log(pathData);
+                
+                for (var key in pathData) {
+                   if (pathData.hasOwnProperty(key))
+                   {
+                       if (coma) strProvides += ", ";
+                       strProvides += pathData[key].provides;
+                       coma = true;
+                   }
+                }
+                
+                this.set('provides', strProvides);
+                console.log("strProvides: " + strProvides);
+			}
+		});
+	</script>
+</dom-module>

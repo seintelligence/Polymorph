@@ -1,0 +1,144 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="stylesheet" href="../../bower_components/open-sans-fontface/open-sans.css">
+<script src="../../scripts/jquery.min.js"></script>
+
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+    
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<link rel="import" href="../../generic-app/data-exchanges/localStorage-cpt.html">
+<link rel="import" href="../../generic-app/data-exchanges/get-db-items-cpt.html">
+<link rel="import" href="../../generic-app/behaviours/ToasterTxBehavior.html">
+<link rel="import" href="../../generic-app/behaviours/PathQueryBehavior.html">
+<link rel="import" href="../../generic-app/behaviours/UtilitiesBehavior.html">
+
+
+<!-- styles for icons -->
+<link rel="import" href="../../styles/cpt_icon-styles.html">
+
+<dom-module is="existing-change-request-cpt">
+    <style>
+        .set {
+            color: var(--google-blue-300)
+        }
+        .unset {
+            color: var(--google-grey-300)
+        }
+        
+        paper-dialog.size-position {
+            position: fixed;
+            --paper-dialog-background-color: var(--paper-grey-3OO);
+        }
+        
+        paper-button[raised].colorful {
+            background: #4285f4;
+            color: #fff;
+            margin: 20px;
+        }
+        
+    </style>
+    <template>
+        <localStorage-cpt id="localStorage" local-storage-db="{{localStorageDb}}"></localStorage-cpt>
+        
+        <!-- Dialog box for new CR -->
+		<paper-dialog id="modalExistingCR" entry-animation="scale-up-animation" exit-animation="fade-out-animation" autoFitOnAttach modal>
+            <div class="layout vertical">
+                <h2>My Change Requests</h2>
+                
+                <!-- due date -->
+                <paper-dropdown-menu id="existingCR" label="Existing Change Requests">
+                    <paper-menu selected="1" class="dropdown-content">
+                        <template is="dom-repeat" items="{{myCRs}}">
+                            <paper-item value="{{item.id}}">{{item.name}}</paper-item>
+                        </template>
+                    </paper-menu>
+                </paper-dropdown-menu>
+                
+                <!-- Validation -->
+                <div class="layout horizontal end-justified">
+                    <paper-button tabindex="0" raised class="colorful custom" on-click="getExistingCRinfo">
+                        <iron-icon icon="check"></iron-icon>Select & Activate
+                    </paper-button>
+
+                    <paper-button tabindex="0" raised class="colorful custom" on-click="close">
+                        <iron-icon icon="clear"></iron-icon>cancel
+                    </paper-button>
+                </div>
+                
+            </div>
+		</paper-dialog>
+        
+    </template>
+    <script>
+		Polymer({
+			is: 'existing-change-request-cpt',
+            
+            properties: {
+                
+                activeChangeRequest: {
+                    type: String,
+                    value: "",
+                    notify: true
+                },
+                
+                myCRs: {
+                    type: Array,
+                    computed: 'getMyCRs(db)'
+                },
+                
+                filterGetCRs: {
+                    type: Array,
+                    value: ["type='ChangeRequest'"]
+                },
+                
+                localStorageDb: {
+                    observer: 'updatedLocalStorageDb'
+                }
+            },
+            
+			behaviors: [ToasterTxBehavior, UtilitiesBehavior, PathQueryBehavior],
+            
+            updatedLocalStorageDb: function() {
+                this.set('db', this.localStorageDb);
+            },
+            
+            open: function() {
+				this.$.modalExistingCR.open()
+            },
+            
+            close: function() { this.$.modalExistingCR.close();},
+            
+            getExistingCRinfo: function() {
+                this.set('activeChangeRequest', this.$.existingCR.selectedItem.value);
+                this.close();
+            },
+            
+            getMyCRs: function(db) {
+                console.log("/getMyCRs")
+                var pathData = [
+                    {
+                        "path": "ChangeRequest",
+                        "filters": []
+                    }
+                ];
+                
+                console.log(this.getPath(pathData));
+                // Get the objects of the container
+                return this.getPath(pathData);
+            },
+            
+            
+        });            
+    </script>
+</dom-module>

@@ -1,0 +1,26 @@
+<script type="text/javascript" src="../../scripts/underscore-min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery.min.js"></script>
+
+<script>
+	suscribeDbBehavior = {
+			
+        properties: {
+            db: {
+                type: Object,
+                value: {}
+            }
+        },
+              
+        listeners: { 'dbReady': 'dbReady'},
+
+        ready: function() {
+            console.log('/ready suscribeDbBehavior')
+        },
+        
+        dbReady: function() {
+            this.db = this.$.meta.byKey("db");
+            console.log("/dbReady", this.db)
+        }
+			
+	};
+</script>

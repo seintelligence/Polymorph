@@ -1,0 +1,75 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="export-cmd-cpt">
+    <style>
+        .set {
+            color: var(--google-blue-300)
+        }
+        .unset {
+            color: var(--google-grey-300)
+        }
+        
+        paper-dialog.size-position {
+            position: fixed;
+            --paper-dialog-background-color: var(--paper-grey-3OO);
+        }
+	</style>
+	<template>
+        
+        <!-- window for the "more" button -->
+        <paper-dialog id="modalMore" heading="Custom Size &amp; Position" class="size-position">
+            <div class="list short" role="list">
+                <paper-item>Export to Word</paper-item>
+                <paper-item>Export to Excel</paper-item>
+            </div>
+        </paper-dialog>
+        
+        <div class="layout horizonal flex" on-click="isOver" on-mouseout="isOut">
+            <div style="display: block">
+                <iron-icon class$="[[hasFilter(currentlyOver)]]" icon="icons:file-download" prefix on-click="callMoreModal"></iron-icon>
+            </div>
+        </div>
+        
+    </template>
+    <script>
+    
+		Polymer({
+			is: 'export-cmd-cpt',
+            
+            properties: {
+                
+                currentlyOver: {
+                    type: Boolean,
+                    value: false
+                }
+                
+            },
+            
+            hasFilter: function(currentlyOver) {
+                if ( currentlyOver )
+                    return "set";
+                else
+                    return "unset";
+            },
+            
+            isOver: function() { this.currentlyOver = true; },
+                
+            isOut: function() { this.currentlyOver = false; },
+            
+            /**************** More Modal Management ****************/
+            callMoreModal: function(ev) {
+                this.$.modalMore.style.top = ($(ev.target).offset().top ) + "px";
+                this.$.modalMore.style.left = ($(ev.target).offset().left  - 24)+ "px";
+                this.$.modalMore.open();  
+            }
+            
+        });
+    </script>
+</dom-module>

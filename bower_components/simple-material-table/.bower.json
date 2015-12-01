@@ -1,0 +1,46 @@
+{
+  "name": "simple-material-table",
+  "version": "0.5.0",
+  "authors": [
+    "Mathew Winters <wintersandroid@winters.org.nz>"
+  ],
+  "description": "An element providing simple material table element.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "table",
+    "material",
+    "ExpandJS"
+  ],
+  "main": "material-table.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/wintersandroid/simple-material-table/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "mat-paper": "ExpandJS/mat-paper#~0.9.5",
+    "mat-icon-button": "ExpandJS/mat-icon-button#~0.9.5",
+    "mat-icon": "ExpandJS/mat-icon#~0.9.5",
+    "mat-menu": "ExpandJS/mat-menu#~0.9.5",
+    "mat-option": "ExpandJS/mat-option#~0.9.5",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#~1.0.3"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  },
+  "_release": "0.5.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.5.0",
+    "commit": "2126cf0980656f1c305a106761e40b5a4ada00ff"
+  },
+  "_source": "git://github.com/wintersandroid/material-table.git",
+  "_target": "~0.5.0",
+  "_originalSource": "wintersandroid/material-table",
+  "_direct": true
+}

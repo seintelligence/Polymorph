@@ -1,0 +1,166 @@
+<link rel="import" href="../../../generic-app/behaviours/UtilitiesBehavior.html"/>
+<link rel="import" href="../../../generic-app/data-exchanges/get-db-cpt.html"/>
+<link rel="import" href="../get-view-content-cpt/get-view-content-cpt.html"/>
+<link rel="import" href="../get-view-structure-cpt/get-view-structure-cpt.html"/>
+<link rel="import" href="../../../designer-view-app/elements/view_constructor/container-cpt.html">
+<script src="../../../scripts/jquery.min.js"></script>
+
+<link rel="import" href="../../../bower_components/more-routing/more-route.html">
+
+<link rel="stylesheet" href="../../../bower_components/open-sans-fontface/open-sans.css">
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="../../../scripts/FileSaver.min.js"></script>
+<script src="../../../scripts/jquery.wordexport.js"></script>
+
+<dom-module id="get-view-page">
+	<style>
+        * { font-family: RobotoDraft, Helvetica, Arial, sans-serif;}
+	</style>
+	<template>
+        <more-route context name="get-view-page" params="{{params}}"></more-route>
+        
+        <get-db-cpt db_source="db2.json" db="{{db}}"></get-db-cpt> 
+        
+        <get-view-structure-cpt db="[[db]]"
+                                structure-data="{{structureData}}"
+                                view="[[view]]"></get-view-structure-cpt>
+        
+        <get-view-content-cpt db="[[db]]"
+                              structure-data="[[structureData]]"
+                              content-data="{{contentData}}"></get-view-content-cpt>
+
+        <div class="layout horizontal end-justified">
+            <!--<a class="word-export" href="javascript:void(0)"> Export as .doc </a>-->
+            <a class="word-export" on-click="sendExportRequest"> Export as .doc </a>
+            <change-requests-cpt id="changeRequests"
+                                 active-change-request="{{activeChangeRequest}}"></change-requests-cpt>
+        </div>
+        
+        <div is="container-cpt" id="UItopContainer"
+             content-data="[[contentData.UItopContainer]]"
+             structure-data="[[structureData.UItopContainer]]"
+             layout-iterate="true"
+             class="export"
+             active-change-request="[[activeChangeRequest]]"></div>
+        
+        <div id="exportWord" style="font-family: Calibri">
+                
+            <div id="contentWord" style="font-family: Calibri">
+            </div>
+        
+        </div>
+        
+    </template>
+    <script>
+        var global_exportWord;
+        //jQuery(document).ready(function($) {
+            //$("a.word-export").click(function(event) {
+                console.log($("#pagecontent2"));
+                //$("#pagecontent2").wordExport();
+                global_exportWord = $("#exportWord")
+            //});
+        //});
+        
+        Polymer({
+			is: 'get-view-page',
+            
+            properties: {
+                
+                contentData: {
+                    type: Object,
+                    value: {}
+                },
+                
+                structureData: {
+                    type: Array,
+                    value: []
+                },
+                
+                db: {
+                    type: Array,
+                    value: []                    
+                },
+                
+                view: {
+                    type: String,
+                    value: ""                    
+                },
+                
+                exportRequest: {
+                    type: Boolean,
+                    value: false                    
+                },
+            },
+            
+            observers: [
+                '_viewChanged(params.viewId)',
+                '_structure_content_changed(structureData, contentData)'
+            ],
+            
+            
+            listeners: {'readyExport': 'getCleanHtml',
+                        'changeElement': 'saveChangeElement'},
+            
+            ready: function() {
+                this.id = "get-view-page";
+                var exportedContainer = Polymer.dom(this.root).querySelector('#exportedContainer');
+            },
+
+            _viewChanged: function() { console.log("/_viewChanged"); this.set('view', this.params.viewId); console.log(this.view);},
+            
+            _structure_content_changed: function(structureData, contentData) {
+                console.log("/_structure_content_changed");
+                console.log(this.structureData);
+                console.log(this.contentData);                
+            },
+
+			behaviors: [UtilitiesBehavior],
+            
+            sendExportRequest: function() {
+                console.log("/sendExportRequest");
+                this.$.UItopContainer.hostRef = this;
+                this.exportRequest = true;
+                this.$.UItopContainer.exportRequest = true;
+            }, 
+            
+            getCleanHtml: function(ev) {
+                // exit if  this is not same as declared host for the received child
+                //          the child UItopContainer is still declared as not ready
+                //          the exportRequest for this top app is no more active - already executed
+                if(ev.detail.host != this.id ||
+                   this.$.UItopContainer.exportRequest != false ||
+                   this.exportRequest == false) return;
+                ev.stopPropagation();
+                
+                var cleanHTML = this.$.UItopContainer.cleanHTML;
+                var strCleanHTML = "";
+                
+                strCleanHTML = this.runThroughCleanHtmlChildren(cleanHTML);
+                console.log(strCleanHTML);
+                this.$.contentWord.innerHTML = strCleanHTML;
+                global_exportWord.wordExport();
+                //this.exportRequest = false;
+            },
+            
+            runThroughCleanHtmlChildren: function(cleanHTML) {
+                var strCleanHTML = "",
+                    that = this;
+                
+                cleanHTML.forEach(function(child) {
+                    if (Object.prototype.toString.call( child ) === '[object Array]')
+                        strCleanHTML += that.runThroughCleanHtmlChildren(child);
+                    else
+                        strCleanHTML += child;
+                });
+                
+                console.log(strCleanHTML);
+                return strCleanHTML;
+            },
+            
+            saveChangeElement: function(ev) {
+                this.$.changeRequests.attachChangeElement(ev.detail);
+            }
+        });
+    </script>
+</dom-module>

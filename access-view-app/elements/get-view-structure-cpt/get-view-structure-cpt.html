@@ -1,0 +1,46 @@
+<link rel="import" href="../../../generic-app/data-exchanges/get-db-items-cpt.html"/>
+
+<dom-module id="get-view-structure-cpt">
+	<template>
+        <get-db-items-cpt db="[[db]]" filters="[[filterView]]" data="{{foundViews}}"></get-db-items-cpt>
+    </template>
+    <script>
+        Polymer({
+			is: 'get-view-structure-cpt',
+            
+            properties: {
+                
+                foundViews: {
+                    type: Array,
+                    value: [],
+                },
+                
+                structureData: {
+                    type: Array,
+                    computed: 'getStructureFromView(foundViews)',
+                    notify: true  
+                },
+                
+                filterView: {
+                    type: Array,
+                    computed: 'createFilterView(view)'                    
+                },
+                
+                view: {
+                    type: String,
+                    value: "ID185"
+                },
+                
+                db: {
+                    type: Array,
+                    value: []
+                }
+            },
+            
+            createFilterView: function(view) { console.log("/createFilterView"); return ['id="' + view + '"']; },
+            
+            getStructureFromView: function(foundViews) { console.log(foundViews); return foundViews[0]; }
+            
+        });
+    </script>
+</dom-module>

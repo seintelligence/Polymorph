@@ -1,0 +1,60 @@
+<script>
+	exportBehavior = {
+        
+        properties: {
+            exportRequest: {
+                type: Boolean,
+                value: false,
+                notify: true,
+                reflectToAttribute: true,
+                observer: 'transferExportRequest'
+            }
+        },
+            
+        listeners: {'readyExport': 'getCleanHtml'},
+        
+        getCleanHtml: function(ev) {                
+            if( ev.detail.host != this.id ) return;
+            ev.stopPropagation();
+            console.log("/getCleanHtml")
+            console.log(this.id)
+
+            // access sibling or parent elements here
+            var elements = this.getExportChildNodes();
+
+            // check that all the elements are ready for export
+            var allReady = elements.every(function(elt) { return (elt.exportRequest == false);});
+            if (!allReady) return;
+
+            // prepare the cleanHTML data
+            this.cleanHTML = [
+                '<div class=' + this.getDivAttributes() + '>',
+                [],
+                '</div>'
+            ];
+
+            // add the cleanHTML content of child nodes
+            var children = [];
+            elements.forEach(function(el) { children.push(el.cleanHTML);});
+            this.cleanHTML[1] = children;
+
+            // fire the event readyExport to parent elements
+            console.log(this.cleanHTML);
+            this.exportRequest = false;
+            //this.hostRef.fire('readyExport', { host: this.hostRef.id });
+        },
+            
+        transferExportRequest: function() {
+            if ( !this.exportRequest  ) return;
+            console.log("/transferExportRequest")
+            console.log(this.exportRequest)
+            console.log(Polymer.dom(this));
+            var that = this;
+            var elements = this.getExportChildNodes();
+            elements.forEach(function(el){
+                el.hostRef = that;
+                el.exportRequest = true;
+            });
+        }
+    }
+</script>

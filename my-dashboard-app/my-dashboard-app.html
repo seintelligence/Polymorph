@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    
+<link rel="stylesheet" href="../bower_components/open-sans-fontface/open-sans.css">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+    
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+    
+<link rel="import" href="../bower_components/iron-meta/iron-meta.html">
+
+<link rel="import" href="../bower_components/more-routing/more-route-selector.html">
+    
+<link rel="import" href="../generic-app/generic-polymorph-page.html">
+<link rel="import" href="../generic-app/behaviours/UtilitiesBehavior.html">
+<link rel="import" href="../generic-app/behaviours/PathQueryBehavior.html">
+    
+<!-- specific content for this app -->
+<link rel="import" href="elements/toolbar-dashboard-cpt/toolbar-dashboard-cpt.html">
+
+<dom-module id="my-dashboard-app">
+    <style>
+
+        iron-selector > * {
+          display: none;
+        }
+        
+        iron-selector > .iron-selected {
+          display: block;
+        }
+        
+    </style>
+    <template>
+        <generic-polymorph-page toolbar-title="My Dashboard">
+            <div toolbar_content>
+                <toolbar-dashboard-cpt></toolbar-dashboard-cpt>
+            </div>
+            <div main_content>
+                <template is="dom-repeat" items="[[changeRequests(db)]]">
+                    <div is="h1-cpt" icon_caption="title <h1>"
+                        displayed-text="oo">
+                    </div>
+                </template>
+            </div>
+        </generic-polymorph-page>
+    </template>
+    
+    <script>
+    
+		Polymer({
+			is: 'my-dashboard-app',
+            
+            properties: {
+            },
+
+            behaviors: [UtilitiesBehavior, PathQueryBehavior],
+            
+            changeRequests: function(db) {
+                console.log('/changeRequests')
+                var foundChangeRequests = [],
+                    that = this,
+                    pathData = [
+                    {
+                        "path": "ChangeRequest",
+                        "filters": []
+                    }
+                ];
+                pathData.forEach(function(e) {
+                    foundChangeRequests = foundChangeRequests.concat.apply([], that.getItems(_.clone(e)));
+                });
+                return foundChangeRequests;
+            }
+        });
+    </script>
+
+</dom-module>
+
+</html>

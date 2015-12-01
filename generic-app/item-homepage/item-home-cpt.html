@@ -1,0 +1,52 @@
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="item-section-cpt.html">
+<link rel="import" href="item-data-cpt.html">
+
+<dom-module is="item-home-cpt">
+    
+    <template>
+        <item-section-cpt>
+            <item-data-cpt data="[[formatData(data, schema, 'type')]]"></item-data-cpt>&nbsp;&nbsp;
+        </item-section-cpt>
+        <item-section-cpt>
+            <item-data-cpt data="[[formatData(data, schema, 'id')]]"></item-data-cpt>&nbsp;-&nbsp;
+            <item-data-cpt data="[[formatData(data, schema, 'name')]]"></item-data-cpt>
+        </item-section-cpt>
+        <template is="dom-repeat" items="[[arrayIfyReduced(schema.attributes)]]" as="field">
+            <item-section-cpt>
+                <item-data-cpt data="[[formatData(data, schema, field.0)]]"></item-data-cpt>
+            </item-section-cpt>
+        </template>
+    </template>
+    
+    <script>
+		Polymer({
+			is: 'item-home-cpt',
+            
+            properties: {                
+                data: {
+                    type: Object,
+                    value: {}
+                },
+                
+                schema: {
+                    type: Object,
+                    value: {}
+                }
+            },
+            
+            formatData: function(data, schema, elt) {
+                if (schema.attributes === undefined) return;
+                return {'name': elt, 'type': schema.attributes[elt].type, 'value':data[elt]};
+            },
+            
+            arrayIfyReduced: function(obj) { return _.pairs(this.reduceObj(obj));},
+            
+            reduceObj: function(obj) { return _.omit(obj, ['id', 'name', 'type']);},
+            
+            arrayItem: function(change, elt) {return change[elt];}
+            
+        });
+    </script>
+    
+</dom-module>

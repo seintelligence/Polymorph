@@ -1,0 +1,165 @@
+<script type="text/javascript" src="../../scripts/underscore-min.js"></script>
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="localStorage-cpt">
+    <script>
+		Polymer({
+            
+			is: 'localStorage-cpt',
+            properties: {
+
+                    me: {
+                        type: Object,
+                        value: { id: "ID133"}                    
+                    },
+                
+                    centralDb: {
+                        type: Object,
+                        value: {},
+                    },
+
+                    localStorageDb: {
+                        type: Object,
+                        value: {},
+                        notify: true
+                    }
+            },
+
+            ready: function() {
+                console.log("localstorage is ready");
+                this.createLocalStorage();
+                this.releaseLocalStorageDb();
+            },
+            
+            increaseAndGetUniqueId: function() {
+                var lastId = alasql('SELECT id from UserStorage.tempId ORDER BY id DESC LIMIT 1');
+                if (lastId.length == 0)
+                    lastId = 0;
+                else
+                    lastId = lastId[0].id + 1;
+                alasql('INSERT INTO UserStorage.tempId (id) VALUES (' + lastId + ')');     
+                return "tmpUserStorage" + lastId;  
+            },
+            
+            // drop the local storage tables
+            dropLocalStorage: function() {
+                console.log("/dropLocalStorage")
+                alasql('DROP TABLE IF EXISTS UserStorage.items');
+                alasql('DROP TABLE IF EXISTS UserStorage.links');
+                alasql('DROP TABLE IF EXISTS UserStorage.tempId');
+            },
+            
+            createLocalStorage: function() {
+                console.log("/createLocalStorage")
+                alasql('CREATE localStorage DATABASE IF NOT EXISTS UserStorage');
+                alasql('ATTACH localStorage DATABASE UserStorage');
+                alasql('USE UserStorage');
+                alasql('CREATE TABLE IF NOT EXISTS UserStorage.items (\
+                            id String,\
+                            name String, \
+                            type String, \
+                            description String, \
+                            createdOn Date, \
+                            unstructAttributes JSON, \
+                            versions JSON); \
+                        CREATE TABLE IF NOT EXISTS UserStorage.links (\
+                            id String,\
+                            name String, \
+                            type String, \
+                            createdOn Date, \
+                            origin String, \
+                            destination String); \
+                        CREATE TABLE IF NOT EXISTS UserStorage.linksSchema (\
+                            id String,\
+                            name String, \
+                            createdOn Date, \
+                            origin String, \
+                            destination String); \
+                        CREATE TABLE IF NOT EXISTS UserStorage.nodesSchema (\
+                            id String,\
+                            placeholder String, \
+                            name String, \
+                            type String, \
+                            createdOn Date, \
+                            links JSON, \
+                            attributes JSON); \
+                        CREATE TABLE IF NOT EXISTS UserStorage.tempId (\
+                            id INT); '
+                );
+            },
+            
+            // flush the local storage content
+            flushLocalStorage: function() {
+                console.log("/flushLocalStorage")
+                alasql('DELETE FROM UserStorage.items');
+                alasql('DELETE FROM UserStorage.links');
+                alasql('DELETE FROM UserStorage.linksSchema');
+                alasql('DELETE FROM UserStorage.nodesSchema');
+                alasql('DELETE FROM UserStorage.tempId');
+            },
+            
+            // push items and links from db to the localstorage
+            pushToLocalStorage: function() {
+                console.log("/pushToLocalStorage")
+                alasql('SELECT * INTO UserStorage.items FROM ?', [this.centralDb.items]);
+                alasql('SELECT * INTO UserStorage.links FROM ?', [this.centralDb.links]);
+                alasql('SELECT * INTO UserStorage.linksSchema FROM ?', [this.centralDb.linksSchema]);
+                alasql('SELECT * INTO UserStorage.nodesSchema FROM ?', [this.centralDb.nodesSchema]);
+            },
+
+            releaseLocalStorageDb: function() {
+                console.log("/releaseLocalStorageDb");
+                var localStorageDb = { items: [], links: [] };
+                localStorageDb.items = alasql('SELECT * FROM UserStorage.items');
+                localStorageDb.links = alasql('SELECT * FROM UserStorage.links');
+                localStorageDb.linksSchema = alasql('SELECT * FROM UserStorage.linksSchema');
+                localStorageDb.nodesSchema = alasql('SELECT * FROM UserStorage.nodesSchema');
+                this.set('localStorageDb', localStorageDb);
+                console.log(this.localStorageDb)
+            },
+
+            /*************** Object operations ***************/
+            addObj: function(tb, obj, bCreatedBy) {
+                //var uId = _.uniqueId('UserStorage_');
+                var uId = this.increaseAndGetUniqueId();
+                obj.id = uId;
+                obj.createdOn = Date.now();
+                alasql('INSERT INTO UserStorage.' + tb  +' VALUES ' + JSON.stringify(obj));
+                if (!bCreatedBy) this.linkAuthorAndObj(uId);
+                this.releaseLocalStorageDb();
+                return uId;
+            },
+
+            updateObj: function(tb, obj) {
+                alasql('UPDATE UserStorage.' + tb  +' WHERE ');
+                this.releaseLocalStorageDb();
+            },
+            
+            // link author and object
+            linkAuthorAndObj: function(id_obj) {
+                var link_autor = { 'type' : 'is_created_by', 'name': 'is_created_by', 'origin': id_obj, 'destination': this.getAuthorId() };
+                var id_link_autor = this.addLink(link_autor, true);
+            },
+            
+            getAuthorId: function() { return this.me.id;},
+
+            /*************** Item operations ***************/
+            addItem: function(item, bCreatedBy) { return this.addObj('items', this.prepareItem(item), bCreatedBy); },
+            
+            prepareItem: function(item) {
+                var structuredAttributes = _.pick(item, 'id', 'name', 'type', 'description', 'createdOn');
+                var unstructAttributes = _.omit(item, 'id', 'name', 'type', 'description', 'createdOn');
+                structuredAttributes.unstructAttributes = unstructAttributes;
+                return structuredAttributes;
+            },
+
+            updateItem: function(item) { this.updateObj('items', item); },
+
+            /*************** Link operations ***************/
+            addLink: function(link, bCreatedBy) { return this.addObj('links', link, bCreatedBy); },
+
+            updateLink: function(link) { this.updateObj('links', link); },
+        });
+    </script>
+</dom-module>

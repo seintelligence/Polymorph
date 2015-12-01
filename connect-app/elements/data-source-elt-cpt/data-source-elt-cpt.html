@@ -1,0 +1,251 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/iron-icons/editor-icons.html">
+
+<script src="../modernizr.custom.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/draggabilly/1.2.0/draggabilly.pkgd.min.js"></script>
+<script src="../dragdrop.js"></script>
+
+<dom-module is="data-source-elt-cpt">
+    <style>
+        div.row {
+            display: table-row;
+            -webkit-transition-duration: .28s;
+            transition-duration: .28s;
+            -webkit-transition-timing-function: cubic-bezier(.4,0,.2,1);
+            transition-timing-function: cubic-bezier(.4,0,.2,1);
+            -webkit-transition-property: background-color;
+            transition-property: background-color;
+            border-top: 1px solid rgba(0,0,0,.12);
+            border-bottom: 1px solid rgba(0,0,0,.12);
+            height: 40px;
+            box-sizing: border-box;
+        }
+
+        div.cell {
+            display: table-cell;
+            text-align: right;
+            position: relative;
+            vertical-align: top;
+            height: 48px;
+            padding: 12px 18px 0;
+            box-sizing: border-box;
+        }
+        
+        div.col1 {width:1em}
+        div.col2 {width:300em}
+        div.col3 {width:1em}
+
+        div.non-numeric {
+            text-align: left;
+        }
+        
+        div.dragged {
+            background-color: aquamarine
+        }
+        
+        .is-dragging {
+            cursor: help;
+        }
+        
+        div.path_item {
+            text-align: center;
+            color:white;
+            width: 24px;
+            height: 24px;
+            border-bottom: 1px solid rgb(78, 78, 78);
+            background-color: rgb(117,117,117) 
+        }
+        
+        div.path_item:hover {
+            background-color: rgb(0,112,192);
+            cursor: pointer;
+        }
+        
+        div.path_item:first-child {
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+        }
+        
+        div.path_item:last-child {
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+        }
+        
+        div.path_selected_item {
+            background-color: rgb(0, 176, 240);
+        }
+        
+        div.path_static_item {
+            border-radius: 3px;
+            margin-bottom: 2px;
+        }
+    </style>
+    <template>
+        <template is="dom-repeat" items="{{elts}}">
+            <div class="row draggable"
+                 draggable="true"
+                 on-dragstart="drag" 
+                 id="[[setEltId(index)]]"
+                 on-click="toggleNested"
+                 style="[[highlighDevelopped(item.developped)]]">
+                
+                <div class="cell col1">[[setIdentifier(identifier, index)]]</div>
+                <template is="dom-if" if="[[isNodeEditor]]">
+                    <div class="cell col1" on-mouseleave="closePathMenu" on-mouseenter="openPathMenu">
+                        <div style="position:absolute;">
+                            <div class="path_item path_static_item" on-click="openPathMenu">/</div>
+                            
+                            <iron-collapse id="pathMenu">
+                                <div class="path_item path_selected_item" on-click="selectPathIcon">
+                                    <span style="display:inline-block; vertical-align: bottom;">/</span></div>
+                                <div class="path_item" on-click="selectPathIcon">//</div>
+                                <div class="path_item" on-click="selectPathIcon">.</div>
+                                <div class="path_item" on-click="selectPathIcon">..</div>
+                            </iron-collapse>
+                        </div>
+                    </div>
+                </template>
+                <div class="cell col2 non-numeric">
+                    <span style="[[setPadding(level)]]">
+                        <iron-icon icon="[[setIcon(item.*)]]"></iron-icon>
+                    </span>
+                    <span>[[item.title]]</span>
+                </div>
+                <template is="dom-if" if="[[isNodeEditor]]">
+                    <div class="cell col3">
+                        <iron-icon icon="icons:delete" id="[[setEltId(index)]]" on-click="removeNode"></iron-icon>
+                    </div>
+                </template>
+            </div>
+            <div>
+                <div is="data-source-elt-cpt"
+                     elts="[[item.children]]"
+                     level="[[increaseLevel(level)]]"
+                     identifier="[[setIdentifier(identifier, index, 1)]]"
+                     is-node-editor="[[isNodeEditor]]"
+                     hidden$="[[!item.developped]]">
+                </div>
+            </div>
+        </template>
+    </template>
+    <script>
+        Polymer({
+
+            is: 'data-source-elt-cpt',
+            
+            extends: 'div',
+
+            properties: {
+                elts: {
+                    type: Array,
+                    value: []
+                },
+                
+                level: {
+                    type: Number,
+                    value: 1
+                },
+                
+                identifier: {
+                    type: String,
+                    value: ""
+                },
+                
+                isNodeEditor: {
+                    type: Boolean,
+                    value: false
+                },
+                
+                selectedPah: {
+                    type: String,
+                    value: ''                    
+                }
+            },
+            
+            // initiate the drag and attach the model to it for later reuse
+            drag: function(ev) {
+                var data = JSON.stringify({'target': ev.target.id, 'data': ev.model.__data__});
+                ev.dataTransfer.setData("text/html", data);
+            },
+            
+            // set the element index in order to find it back later and make the link between schema and model
+            setEltId: function(id) {
+                return ('Elt' + this.identifier + (id + 1)).replace('.', '_');
+            },
+            
+            // set the padding of the node depending on the level to visudally indicate the childnodes
+            setPadding: function(level) {
+                return "padding-left:" + level * 10 + "em;";
+            },
+            
+            // increase the level for childnodes
+            increaseLevel: function(level) {
+                return level + 1;
+            },
+            
+            // set the identifier of the node based on the parent one : 1.2.x
+            setIdentifier: function(identifier, i, release) {
+                return this.identifier + (i + 1) + (release?'.':'');
+            },
+            
+            // set the icon aside/of the node
+            setIcon: function(item) {
+                base = item.base;
+                if (!base.children) sIcon = "icons:content-copy";
+                else if (base.developped) sIcon = "icons:folder-open";
+                else sIcon = "icons:folder";
+                return sIcon;
+            },
+            
+            // highlight the developped nodes in the list
+            highlighDevelopped: function(isDevelopped) {
+                var developped = 'rgb(0, 176, 240)',
+                    odd = 'rgb(255, 255, 255)',
+                    even = 'rgb(230, 230, 230)',
+                    isOdd = this.level % 2,
+                    bckColor = ((isDevelopped)? developped : ((isOdd)? odd : even ));
+                    
+                return 'background-color: ' + bckColor;
+            },
+
+            // toggle the nested nodes in the list
+            toggleNested: function(e) {
+                if(e.model.item.children) {
+                    e.model.item.developped != e.model.item.developped;
+                    e.model.set('item.developped', !e.model.item.developped);
+                }
+            },
+            
+            getPathMenu: function(ev) {
+                if(!ev.relatedTarget.id) return 0;
+                ev.stopPropagation();
+                return Polymer.dom(this.root).querySelector('#Elt0').querySelector('#pathMenu');
+            },
+            
+            // open the path icons
+            openPathMenu: function(ev) {
+                if (menu = this.getPathMenu(ev))
+                    menu.show();
+            },
+            
+            closePathMenu: function(ev) {
+                if (menu = this.getPathMenu(ev))
+                    menu.hide();
+            },
+            
+            selectPathIcon: function(ev) {
+                console.log(ev.model)
+                ev.stopPropagation();
+            },
+            
+            removeNode: function(ev) {
+                ev.stopPropagation();
+                Polymer.dom(this.root).querySelector('Elt1.1').remove();
+            }
+
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,25 @@
+<script>
+	ChangeRequestBehavior = {
+        properties: {
+        
+                activeChangeRequest: {
+                    type: String,
+                    value: "",
+                    observer: 'txActiveCR'
+                }
+        },
+        
+
+        txActiveCR: function(ev) {
+            console.log("/txActiveCR");
+            console.log(this.activeChangeRequest);
+            var that = this;
+              console.log(this.is, this.id)
+            childNodes = Polymer.dom(this.root).querySelectorAll('.export');
+            childNodes.forEach( function(node) {
+                node.setAttribute('active-change-request', that.activeChangeRequest);
+            });
+        }
+        
+    }
+</script>

@@ -1,0 +1,36 @@
+{
+  "name": "xp-master-behavior",
+  "license": "BSD-3-Clause",
+  "version": "0.9.10",
+  "main": "xp-master-behavior.html",
+  "description": "A behavior used to add master capabilities on the context element for a master-slave pattern",
+  "homepage": "http://expandjs.com/elements/xp-master-behavior",
+  "authors": [
+    "Giuliano Rullo <g.rullo@expandjs.com>",
+    "Maurizio Stefàno <m.stefano@expandjs.com>",
+    "Robert Manolea <r.manolea@expandjs.com>"
+  ],
+  "keywords": [
+    "web app",
+    "html5",
+    "expandjs",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*"
+  ],
+  "dependencies": {
+    "expandjs": "ExpandJS/expandjs#0.9.10",
+    "xp-array-behavior": "ExpandJS/xp-array-behavior#0.9.10",
+    "polymer": "Polymer/polymer#^1.1.0"
+  },
+  "_release": "0.9.10",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.9.10",
+    "commit": "577a56352d86c9a4055fc646faab439a1e3df787"
+  },
+  "_source": "git://github.com/ExpandJS/xp-master-behavior.git",
+  "_target": "0.9.10",
+  "_originalSource": "ExpandJS/xp-master-behavior"
+}

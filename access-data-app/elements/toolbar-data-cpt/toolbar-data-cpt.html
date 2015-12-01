@@ -1,0 +1,42 @@
+<dom-module is="toolbar-data-cpt">
+    <style>
+        paper-toolbar {
+            --paper-toolbar-background: var(--paper-grey-400);
+        }
+    </style>
+    <template>
+        
+        <!-- content of the toolbar -->
+        <h2>Main</h2>
+        <div on-click="openNavigateNodes">Back to views selection</div>
+        <h2>Visualize nodes</h2>
+        <div on-click="openVisuNodes">Visualize Nodes and links</div>
+        
+        <more-route id="navigateNodesRoute" name="navigate-nodes"></more-route>
+        <more-route id="visuNodesRoute" name="visu-nodes"></more-route>
+        
+    </template>
+    <script>
+		Polymer({
+			is: 'toolbar-data-cpt',
+            
+            properties: {
+                title: {
+                    type: String,
+                    value: "header"
+                }
+                
+            },
+            
+            openNavigateNodes: function() {
+                this.$.navigateNodesRoute.navigateTo();
+                event.stopPropagation();
+            },
+            
+            openVisuNodes: function() {
+                this.$.visuNodesRoute.navigateTo();
+                event.stopPropagation();
+            }
+        });    
+    </script>
+</dom-module>

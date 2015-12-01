@@ -1,0 +1,47 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-meta/iron-meta.html">
+
+<dom-module id="get-db-cpt">
+    <template>
+		<iron-ajax
+            auto
+            url="[[db_source_computed]]"
+            handle-as="json"
+            last-response="{{db}}"></iron-ajax>
+    </template>
+    <script>
+		Polymer({
+            
+			is: 'get-db-cpt',
+            
+            properties: {
+                
+                db_source: {
+                    type: String,
+                    value: ""
+                },
+                
+                db_source_computed: {
+                    type: String,
+                    computed: 'addRelativePath(db_source)'
+                },
+                
+                db: {
+                    type: Object,
+                    value: {},
+                    notify: true,
+                    observer: 'oo'
+                }
+            },
+            
+            oo: function() {
+                console.log("/getdbcpt");
+                console.log(this.db);
+            },
+            
+            addRelativePath: function(db_source) { return "../../../" + this.db_source;}
+            
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,345 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
+
+<link rel="import" href="../../../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../../bower_components/iron-input/iron-input.html">
+
+<link rel="import" href="cpt_icon-cpt.html">
+
+<link rel="import" href="../../../generic-app/data-exchanges/localStorage-cpt.html">
+<link rel="import" href="../../../generic-app/behaviours/TextCptBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/PathQueryBehavior.html">
+<link rel="import" href="../../../generic-app/basic-cpt/icon-with-tooltip-cpt.html">
+<link rel="import" href="../../../generic-app/basic-cpt/span-html-inject-cpt.html">
+
+<dom-module id='basic-txt-cpt'>
+	<style>
+		
+		.development {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 24px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 600;
+			font-family: "Open Sans";
+			margin: 5px;
+			padding: 5px;
+			border-radius: 4px;
+			border: 1px dotted rgb(150, 150, 150);
+		};
+		
+		.development .icons {
+			border: none;
+			cursor: pointer;
+		}
+		
+		.operational {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 16px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 300;
+			background-color:rgb(150, 150, 150);
+			font-family: "Open Sans";
+			margin: 5px;
+			padding: 5px;
+			min-height: 200px;
+			border-radius: 4px;
+		}
+        
+        div.text:hover { 
+            opacity: 1;
+            background-color:white;
+            border: 1px dotted black;
+            margin-bottom: 0px;
+        }
+        
+        input {
+            @apply(--my-text-theme);
+        }
+        
+        span {
+            @apply(--my-text-theme);
+        }
+        
+        input[disabled] {
+            cursor:pointer;
+        }
+        
+        .set {
+            color: var(--google-blue-300)
+        }
+        
+        .existChanges {
+            color: var(--google-grey-500)
+        }
+        
+	</style> 
+	<template>
+        
+        <localStorage-cpt id="localStorage" local-storage-db="{{localStorageDb}}"></localStorage-cpt>
+        
+        <!--<item-home-page id="itemHomePage"></item-home-page>-->
+        
+        <div class="layout vertical" style="display: none;">
+            <h2>Attach a new comment</h2>
+
+            <!-- title -->
+            <paper-input id="title" label="Title" required auto-validate error-message="mandatory">
+                <div suffix>*</div>
+            </paper-input>
+
+            <!-- abstract -->
+            <paper-textarea id="abstract" label="Abstract" required char-counter minlength="10" maxlength="100" error-message="Enter your comment but keep it as precise and detailed">
+                <div suffix>*</div>
+            </paper-textarea>
+        </div>
+		<div class="layout vertical flex development" hidden$='[[!isMode("Development", mode)]]' style='cursor: move;padding:5px;'>
+			<div class="layout horizontal">
+				<!-- data bind control -->
+				<div class="layout end-justified development icons">
+					<iron-icon title="Bind this component to the data fields of the parent container"
+                               id="iconLayoutLink"
+                               icon="icons:link"
+                               on-click="connectCpt"></iron-icon>
+				</div>
+				<!-- delete control -->
+				<div class="layout end-justified development icons">
+					<iron-icon title="Delete this component" id="iconLayoutDelete" icon="icons:delete" on-click="txRemoveNodeChild"></iron-icon>
+				</div>
+			</div>
+			<input is="iron-input" id="dev_input" class="style-scope paper-input" required="" autocomplete="off" placeholder="text" aria-describedby="" name="h1" aria-labelledby="paper-input-label-836" on-mouseout="displayedTextChanged">
+		</div>
+		
+		<!-- Operational -->
+		<div hidden$='[[!isMode("Operational", mode)]]' id="Operational" class="layout horizontal">
+            <div style="width:2em">
+                <icon-with-tooltip-cpt icon="icons:assignment-late"
+                                       class="existChanges"
+                                       tooltip="This element has change requests related to the active Change Request"
+                                       on-click="txCommentCreationPage"
+                                       hidden$="[[!hasRelatedChangeElements(relatedChangeElements, activeChangeRequest)]]">
+                <iron-icon icon="icons:assignment-late"
+                           class="existChanges"
+                           title="This element has change requests related to the active Change Request"
+                           hidden$="[[!hasRelatedChangeElements(relatedChangeElements, activeChangeRequest)]]">
+                </iron-icon>
+            </div>
+            <div class="text layout horizontal flex" on-mouseover="overTextField" on-mouseout="outTextField" on-dblclick="dblclickTextField">
+                <div class="text layout horizontal flex">
+                    <template is="dom-if" if="[[isHtml]]">
+                        <span is="span-html-inject-cpt"
+                              value-html="[[displayedDecodedText]]"
+                              hidden="{{bInEditMode}}"></span>
+                    </template>
+
+                    <template is="dom-if" if="[[!isHtml]]">
+                         <span hidden="{{bInEditMode}}">[[displayedDecodedText]]</span>
+                    </template>
+
+                    <input id="FieldText"
+                           value="{{displayedDecodedText}}"
+                           hidden="{{!bInEditMode}}"
+                           style="width:100%"/>
+                </div>
+                <div style="color: grey" class="layout horizontal" hidden$="{{!bOver}}">
+                    &nbsp;&nbsp;
+                    <icon-with-tooltip-cpt icon="icons:home"
+                                           tooltip="Open the object homepage"
+                                           on-click="openHomePage">
+                    </icon-with-tooltip-cpt>
+                    &nbsp;&nbsp;
+                    <div class="layout vertical flex" >
+                        <div hidden$="{{!bHasActiveCR}}" class="layout horizontal flex">
+                            <icon-with-tooltip-cpt icon="communication:chat"
+                                                   tooltip="Make a comment on this attribute"
+                                                   on-click="txCommentCreationPage">
+                            </icon-with-tooltip-cpt>
+                            <icon-with-tooltip-cpt icon="editor:mode-edit"
+                                                   tooltip="Request a modification on this attribute"
+                                                   on-click="dblclickTextField">
+                            </icon-with-tooltip-cpt>
+                            <icon-with-tooltip-cpt icon="communication:present-to-all"
+                                                   tooltip="Request to move this object (unlink) to another object">
+                            </icon-with-tooltip-cpt>
+                            <icon-with-tooltip-cpt icon="icons:add"
+                                                   tooltip="Request to add an object to this one">
+                            </icon-with-tooltip-cpt>
+                            <icon-with-tooltip-cpt icon="icons:clear"
+                                                   tooltip="Request to delete this object">
+                            </icon-with-tooltip-cpt>
+                        </div>
+                        <div class="layout horizontal end-justified">
+                            <iron-icon icon="icons:check"
+                                       class="set"
+                                       hidden$="{{!bInEditMode}}"
+                                       on-click="validateTextFieldChange"></iron-icon>
+                            <iron-icon icon="icons:clear"
+                                       hidden$="{{!bInEditMode}}"
+                                       on-click="cancelTextFieldChange"></iron-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+		</div>
+		
+		<!-- Icon -->
+		<div hidden$='[[!isMode("Icon", mode)]]'>
+			<div is="cpt_icon-cpt" draggable="false" imgsrc="[[icon_src]]" txt="[[icon_caption]]"></div>
+		</div>
+	</template>
+
+	<script>
+	  Polymer({
+        is: 'basic-txt-cpt',
+
+        behaviors: [ToasterTxBehavior, UtilitiesBehavior, TextCptBehavior, DropBehavior, ModeChangedBehavior, PathQueryBehavior],
+          
+        properties: {
+            icon_src: {
+                type: String,
+                value: ''
+            },
+            
+            icon_caption: {
+                type: String,
+                value: ''
+            },
+            
+            relatedChangeElements: {
+                type: Array,
+                value: [],
+                computed: 'getRelatedChangeElements(localStorageDb, nodeOwner,activeChangeRequest)'
+            },
+            
+            activeChangeRequest: {
+                type: String,
+                value: ""
+            },
+            
+            nodeOwner: {
+            },
+            
+            displayedText: {
+                type: String,
+                value: ""
+            },
+            
+            displayedDecodedText: {
+                type: String,
+                value: ""
+            },
+            
+            isHtml: {
+                type: Boolean,
+                value: false
+            },
+            
+            localStorageDb: {
+                observer:'transferlocalStorageDb'
+            }
+        },
+          
+        observers: ['getDisplayedDecodedText(displayedText, isHtml)'],
+          
+        getDisplayedDecodedText: function(displayedText, isHtml) {
+            if (this.isHtml) this.displayedDecodedText = this._decodeHtml(this.displayedText);
+            else this.displayedDecodedText = displayedText;
+        },
+          
+        txCommentCreationPage: function(commentCreationPage) {
+            this.fire('commentCreation', commentCreationPage);
+        },
+          
+        getRelatedChangeElements: function(db, nodeOwner, activeChangeRequest) {
+            console.log('/getRelatedChangeElements', this.db)
+            if(_.isEmpty(db) || !nodeOwner || !activeChangeRequest) return;
+            var pathData = [
+                {
+                    "path": "*",
+                    "filters": ['id="' + this.nodeOwner + '"'],
+                    "subPathData": {
+                        "path": "comments",
+                        "inverted": true,
+                        "filters": [],
+                        "subPathData": {
+                            "path": "Comment",
+                            "filters": [],
+                            "subPathData": {
+                                "path": "part_of_CR",
+                                "inverted": false,
+                                "filters": [],
+                                "subPathData": {
+                                    "path": "ChangeRequest",
+                                    "filters": ["id='" + this.activeChangeRequest + "'"],
+                                    "subPathData": {
+                                        "path": "part_of_CR",
+                                        "inverted": true,
+                                        "filters": [],
+                                        "subPathData": {
+                                            "path": "*",
+                                            "filters": []
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                                                
+                /*{
+                    "path": "*",
+                    "filters": ['id="' + this.nodeOwner + '"'],
+                    "subPathData": {
+                        "path": "request_change_to",
+                        "inverted": true,
+                        "filters": [],
+                        "subPathData": {
+                            "path": "ChangeElement",
+                            "filters": [],
+                            "subPathData": {
+                                "path": "part_of_CR",
+                                "inverted": false,
+                                "filters": [],
+                                "subPathData": {
+                                    "path": "ChangeRequest",
+                                    "filters": ["id='" + this.activeChangeRequest + "'"]
+                                }
+                            }
+                        }
+                    }
+                }*/
+                
+            ];
+
+            console.log(this.getPath(pathData))
+
+            // Get the objects of the container
+            return this.getPath(pathData);
+        },
+          
+          // Should we display or not an icon aside the element stating there is a related Change Element or Comment?
+          hasRelatedChangeElements: function() {
+              console.log('/hasRelatedChangeElements')
+              return (this.relatedChangeElements.length > 0 && this.activeChangeRequest != "")
+          },
+          
+          transferlocalStorageDb: function() { this.set('db', this.localStorageDb);},
+          
+          openHomePage: function() {
+              console.log(this.nodeOwner)
+              this.fire('openHomePage', { itemId: this.nodeOwner});
+          }
+		
+	  });
+	</script>
+</dom-module>

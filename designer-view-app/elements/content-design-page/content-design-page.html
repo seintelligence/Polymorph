@@ -1,0 +1,241 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/more-routing/more-route.html">
+    
+<link rel="import" href="../../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/editor-icons.html">
+
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<!-- Menu -->
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../../bower_components/paper-submenu/paper-submenu.html">
+    
+<link rel="import" href="../../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../../bower_components/paper-fab/paper-fab.html">
+    
+<link rel="import" href="../../../generic-app/behaviours/UtilitiesBehavior.html">
+
+<link rel="import" href="../components/d3js-tree-cpt.html">
+<link rel="import" href="../components/text-cpt.html">
+<link rel="import" href="../components/h1-cpt.html">
+<link rel="import" href="../view_constructor/container-cpt.html">
+
+<link rel="import" href="../../../generic-app/behaviours/ToasterRxBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/ToasterTxBehavior.html">
+
+<!-- Attributes selection -->
+<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+    
+<!-- Connection toolbar -->
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<!-- get the db -->
+<link rel="import" href="../../../generic-app/behaviours/suscribeDbBehavior.html">
+<link rel="import" href="../../../bower_components/iron-meta/iron-meta.html">
+
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../data_source_path_selection/data_source_path_selection-cpt.html">
+    
+<link rel="import" href="../../../bower_components/paper-drawer-panel/paper-drawer-panel.html" >
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../../../bower_components/iron-image/iron-image.html">
+
+<!-- styles for icons -->
+<link rel="import" href="../../../styles/cpt_icon-styles.html">
+ 
+<!-- JSON structre -->
+<link rel="import" href="../../../bower_components/iron-ajax/iron-ajax.html">
+    
+<!-- JSON dynamic HTML creation -->
+<link rel="import" href="../view_constructor/create-HTML-cpt.html">
+    
+<!-- JSON tree -->
+<link href="../../../scripts/JSON-tree/css/jsontree.css" rel="stylesheet">
+<script src="../../../scripts/JSON-tree/src/jsontree.js"></script>
+
+<dom-module is="content-design-page">
+    <template>
+        
+        <iron-meta id="meta" key="db"></iron-meta>
+        
+        <more-route id="content-design-page" name="content-design-page" context></more-route>        
+        
+		<!-- Dialog box for JSON path filtering configuration in development mode -->
+		<paper-dialog id="modalDataSource"
+                      entry-animation="scale-up-animation"
+                      exit-animation="fade-out-animation"
+                      autoFitOnAttach modal>
+            <div id="data_source_path_selection"
+                 is="data_source_path_selection-cpt"
+                 path-data-initial="[[pathDataInitial]]"
+                 path-data-validated="{{pathDataValidated}}"
+                 schema="[[db]]"
+                 tree-data="{{treeData}}"
+                 receives="[[receives]]"
+                 style="width:800px; min-height: 400px"></div>
+            
+		</paper-dialog>
+        
+        <!-- Dialog box for JSON code display in development mode -->
+		<paper-dialog id="modalCode"
+                      modal=""
+                      role="dialog"
+                      tabindex="-1"
+                      aria-modal="true"
+                      style="outline: none; box-sizing: border-box; position: static; display: none; width: 500px;"
+                      aria-hidden="true">
+			<h2>code</h2>
+            <div id="current_code_content"></div>
+			<div class="buttons">
+				<paper-button dialog-dismiss>Close</paper-button>
+			</div>
+		</paper-dialog>
+        
+		<!-- get the Json Structure
+		<iron-ajax
+            auto
+            url="../../../schema.json"
+            handle-as="json"
+            last-response="{{schema}}"></iron-ajax> -->
+        
+        <!-- main content -->
+        
+        <!-- The container receiving the drag drop -->
+        <div id="UItopContainer" class="flex" is="container-cpt" mode="Development" nodeChildren="{{nodeChildren}}" hidden$='[[!isMode("Development", mode)]]'></div>
+
+        <!-- the HTML dynamically created if in operational mode -->
+        <template is="dom-if" if="[[isMode('Operational', mode)]]">
+            <div is="create-HTML-cpt" node-children="[[nodeChildren]]"></div>
+        </template>
+        
+    </template>
+    <script>
+		Polymer({
+			is: 'content-design-page',
+            
+            properties: {
+            },
+            
+            behaviors: [suscribeDbBehavior],
+            
+            observers: ['validateFiltering(pathDataValidated.*)'],
+			
+			listeners: {
+				'pathJsonEditorRequest': 'callPathJsonEditorModal',
+				'codeJsonRequest': 'callCodeJsonModal',
+                '_notifyResize': 'updatePathJsonEditorModal',
+                'attSelectionRequest': 'callModalAttributes'
+			},
+            
+            attached: function() {
+                
+                // Indicate the children node that we are his parent (not necessary w. Polymer except for dynamically added)
+                this.$.UItopContainer.set('hostRef', this);
+            },
+            
+            ready: function() {
+            },
+            
+            /**************** Data Source Editor ****************/
+			callPathJsonEditorModal: function(ev) {
+                console.log("/callPathJsonEditorModal");
+                               console.log(ev);
+                // Get the data from the caller
+				var msg = ev.detail;
+				this.pathDataInitial = msg.pathData;
+                
+                // Set the latest tree
+                this.treeData = msg.treeData;
+                
+                // Set the received items
+                this.receives = msg.receives;
+                console.log(this.receives);
+                
+                // Reset the modal content
+                this.$.data_source_path_selection.resetModalContent();
+                
+                // Get the caller
+				this.callerDataSourceEditor = ev.srcElement;
+                
+                // Open
+                this.$.modalDataSource.toggle();
+                this.async(function() {
+				    this.$.modalDataSource.open();  
+                    this.$.modalDataSource.center();
+                });           
+			},
+                
+            updatePathJsonEditorModal: function(ev) {
+                console.log("/updatePathJsonEditorModal");
+				this.$.modalDataSource.notifyResize();  
+            },
+            
+			validateFiltering: function(value) {
+                console.log("/validateFiltering");
+                if (this.callerDataSourceEditor) {
+                    var caller = Polymer.dom(this.callerDataSourceEditor);
+                    caller.setAttribute("path-data-validated", JSON.stringify(this.pathDataValidated));
+                    caller.node.treeData = this.treeData;
+                }
+                
+                this.pathDataInitial = {};
+			},
+            
+            /**************** Attributes Modal Management ****************/
+            callModalAttributes: function(ev) {
+                
+                var msg = ev.detail;
+                this.attributesToBeSelected = msg.attributes;
+                
+                // Get the caller
+				this.callerAttributeSelector = ev.srcElement;
+                
+                // Open the modal window
+                this.$.modalAttributes.open();  
+            },
+            
+            txBindingAttributes: function(ev) {
+                console.log("/txBindingAttributes");
+                
+                if (this.callerAttributeSelector) {
+                    var caller = Polymer.dom(this.callerAttributeSelector);
+                    
+                    var selectedAttr = "";
+
+                    caller.setAttribute('displayed-text', "[[contentData." + selectedAttr + "]]");
+                    caller.setAttribute('bind-to-container', true);
+                }
+                
+            },
+                
+            isCurrentCallerBinded: function() {
+                if (this.callerAttributeSelector)
+                    return Polymer.dom(this.callerAttributeSelector).getAttribute('bind-to-container');
+                else
+                    return false;
+            },
+            
+            /**************** Get the JSON decorated string of the structure ****************/
+            callCodeJsonModal: function(ev) {
+                var msg = ev.detail;
+                var HTMLstructure = JSONTree.create(msg.nodeChildren);
+                document.getElementById("current_code_content").innerHTML = HTMLstructure;
+                this.$.modalCode.open();
+            }
+            
+        });    
+    </script>
+</dom-module>
+    

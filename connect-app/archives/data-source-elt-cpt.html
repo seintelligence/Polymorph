@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>oo</title>
+
+        <link rel="import" href="../bower_components/polymer/polymer.html">
+        <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+        <link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+        <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+        <link rel="import" href="../connect-app/data-source-elt-cpt.html">
+        <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="modernizr.custom.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/draggabilly/1.2.0/draggabilly.pkgd.min.js"></script>
+		<script src="dragdrop.js"></script>
+        
+        <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-pink.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        
+    </head>
+    
+    <dom-module is="data-source-elt-cpt">
+        <style>
+        </style>
+        <template>
+            <template is="dom-repeat" items="[[elts]]">
+                <tr class="draggable" id="[[setEltIndex('Elt', index)]]" on-click="toggleNested">
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <iron-icon icon="icons:folder"></iron-icon>
+                    </td>
+                    <td>[[item.title]]</td>
+                </tr>
+                <!--<iron-collapse id="[[setEltIndex('nestedElt', index)]]">
+                    <data-source-elt-cpt elts="[[item.children]]"></data-source-elt-cpt>
+                </iron-collapse>-->
+            </template>
+        </template>
+        <script>				
+            Polymer({
+
+                is: 'data-source-elt-cpt',
+                
+                properties: {
+                    elts: {
+                        type: Array,
+                        value: [],
+                        observer: 'oo'
+                    }
+                },
+                
+                oo: function() {
+                    console.log('/oo')
+                    console.log(this.elts)
+                },
+                
+                setEltIndex: function(id, index) {
+                    return id + index;
+                },
+                
+                toggleNested: function(e) {
+                    console.log(e.target.id, '#' + e.target.id);
+                    parent = Polymer.dom(this.root).querySelector('#nestedChildren')
+                    console.log(parent)
+                    Polymer.dom(this.root).querySelector('#nested' + e.target.id).toggle();
+                }
+                
+            });
+        </script>
+    </dom-module>
+</html>

@@ -1,0 +1,35 @@
+{
+  "name": "xp-object-behavior",
+  "license": "BSD-3-Clause",
+  "version": "0.9.10",
+  "main": "xp-object-behavior.html",
+  "description": "A behavior used to improve polymer's object mutation API on the context element.",
+  "homepage": "http://expandjs.com/elements/xp-object-behavior",
+  "authors": [
+    "Giuliano Rullo <g.rullo@expandjs.com>",
+    "Maurizio Stefàno <m.stefano@expandjs.com>",
+    "Robert Manolea <r.manolea@expandjs.com>"
+  ],
+  "keywords": [
+    "web app",
+    "html5",
+    "expandjs",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*"
+  ],
+  "dependencies": {
+    "expandjs": "ExpandJS/expandjs#0.9.10",
+    "polymer": "Polymer/polymer#^1.1.0"
+  },
+  "_release": "0.9.10",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.9.10",
+    "commit": "6485aef86c3256eee0f4a6fadb1c509c3e1175a8"
+  },
+  "_source": "git://github.com/ExpandJS/xp-object-behavior.git",
+  "_target": "0.9.10",
+  "_originalSource": "ExpandJS/xp-object-behavior"
+}

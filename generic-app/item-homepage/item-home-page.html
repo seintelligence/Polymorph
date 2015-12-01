@@ -1,0 +1,166 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="stylesheet" href="../../bower_components/open-sans-fontface/open-sans.css">
+
+<link rel="import" href="item-home-cpt.html">
+<link rel="import" href="item-traceability-cpt.html">
+
+<link rel="import" href="../../bower_components/iron-meta/iron-meta.html">
+
+<link rel="import" href="../../generic-app/behaviours/PathQueryBehavior.html">
+
+<!-- modal & dialog -->
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+
+<script src="../../scripts/underscore-min.js"></script>
+
+<dom-module is="item-home-page">
+    
+    <style>
+        paper-dialog.size-position {
+          width: 600px;
+          overflow: auto;
+        }
+        
+        paper-tabs {
+            --paper-tabs-selection-bar-color: var(--paper-blue-a100);
+          background-color: var(--paper-blue-300);
+          color: #fff;
+          box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        paper-tab {
+            --paper-tab-ink: var(--paper-blue-a100);
+            padding: 8px;
+            border: 1px solid;
+            border-color: #e0e0e0;
+            border-top: 0;
+            border-right: 0;
+                
+             
+         --paper-tab-content-unselected: {border: 1px solid;
+            border-color: #e0e0e0;
+            border-top: 0;
+            border-bottom: 1px;
+            } 
+        }
+    </style>
+    
+    <template>
+        
+        <!-- window for the "more" button -->
+        <paper-dialog id="modalHomePage" class="size-position" entry-animation="scale-up-animation" exit-animation="fade-out-animation" autoFitOnAttach modal>
+            
+        <paper-tabs selected="{{selectedTab}}">
+            <paper-tab>Homepage</paper-tab>
+            <paper-tab>Traceability</paper-tab>
+            <paper-tab>History</paper-tab>
+            <paper-tab>Change Requests</paper-tab>
+        </paper-tabs>
+
+        <iron-pages selected="{{selectedTab}}">
+            <div>
+                <item-home-cpt data="[[data]]" schema="[[nodesSchema]]"></item-home-cpt>
+            </div>
+            <div>
+                <item-traceability-cpt data="[[data]]" schema="[[linksSchema]]"></item-traceability-cpt>
+            </div>
+            <div>
+                <h2>History</h2>
+            </div>
+            <div>
+                <h2>Change Requests</h2>
+            </div>
+        </iron-pages>
+            
+            
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>Close</paper-button>
+            </div>
+		</paper-dialog>
+        
+    </template>
+    
+    <script>
+		Polymer({
+			is: 'item-home-page',
+            
+            properties: {  
+                
+                db: {
+                    observer: 'oo'
+                },
+                
+                selectedTab: {
+                    type: String,
+                    value: "0"
+                },
+                
+                itemId: {
+                    type: String,
+                    value: "",
+                    observer: 'idchanged'
+                },
+                
+                data: {
+                    type: Object,
+                    value: {}
+                },
+                
+                nodesSchema:  {
+                    type: Object,
+                    value: {}
+                },
+                
+                linksSchema:  {
+                    type: Object,
+                    value: []
+                }
+                
+            },
+            
+			behaviors: [UtilitiesBehavior, PathQueryBehavior],
+            
+            ready: function() { },
+            
+            oo: function() {
+                console.log('/itemHomePage', this.db);
+            },
+            
+            idchanged: function() {
+                console.log("/idChanged", this.db)
+                if( this.itemId == "") return;
+                
+                nodePath =
+                {
+                    "path": "*",
+                    "filters": ["id='" + this.itemId + "'"]
+                };
+                this.data = this.getItems(_.clone(nodePath))[0];
+
+                schemaPath =
+                {
+                    "path": "*",
+                    "filters": ["name='" + this.data.type + "'"]
+                };
+                this.nodesSchema = this.getNodesSchema(_.clone(schemaPath))[0];
+                
+                schemaPath =
+                {
+                    "path": "*",
+                    "filters": ["name IN " + this._reconstructSQLqueryArray(_.keys(this.nodesSchema.links))]
+                };
+                this.linksSchema = this.getLinksSchema(_.clone(schemaPath));
+            },
+            
+            /****************** Menu Management ******************/
+            openModal: function() { this.$.modalHomePage.open(); },
+            
+            closeModal: function() { this.$.modalHomePage.close(); }
+            
+        });
+    </script>
+    
+</dom-module>

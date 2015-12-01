@@ -1,0 +1,100 @@
+<!--
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-styles/shadow.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../bower_components/more-routing/more-route.html">
+
+<link rel="import" href="polyfora-user-ref.html">
+
+<dom-module id="polyfora-thread">
+
+  <style>
+
+    :host {
+      display: block;
+      padding: 16px;
+    }
+
+    header {
+      @apply(--paper-font-headline);
+    }
+
+    .byline {
+      @apply(--paper-font-caption);
+      margin-top:    -8px;
+      margin-bottom: 8px;
+    }
+
+    .posts {
+      @apply(--shadow-elevation-2dp);
+    }
+
+    .post {
+      @apply(--layout-horizontal);
+      border-top:    1px solid #eeeeee;
+      border-bottom: 1px solid #eeeeee;
+      padding: 8px 16px;
+    }
+    .post:first-child {
+      border-top-width: 0;
+    }
+    .post:last-child {
+      border-bottom-width: 0;
+    }
+
+    .post .body {
+      @apply(--layout-flex);
+      @apply(--paper-font-body1);
+    }
+
+    .post .author {
+      width: 80px;
+      text-align: right;
+    }
+
+  </style>
+
+  <template>
+    <more-route context name="thread" params="{{params}}"></more-route>
+
+    <header>{{_thread.title}}</header>
+    <div class="byline"><span>by </span><polyfora-user-ref user="[[_thread.author]]" hero></polyfora-user-ref></div>
+
+    <section class="posts">
+      <template is="dom-repeat" items="[[_thread.posts]]" as="post">
+        <section class="post" layout horizontal cross-fade>
+          <div class="body" flex>[[post.body]]</div>
+          <polyfora-user-ref class="author" user="[[post.author]]"></polyfora-user-ref>
+        </section>
+      </template>
+    </section>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'polyfora-thread',
+
+      observers: [
+        '_threadChanged(params.forumId, params.threadId, data)',
+      ],
+
+      _threadChanged: function() {
+        this._forum  = this.data && this.data.forumsById[this.params.forumId];
+        this._thread = this._forum && this._forum.threadsById[this.params.threadId];
+      },
+    });
+
+  </script>
+
+</dom-module>

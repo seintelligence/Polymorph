@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../../../scripts/alasql.min.js"></script>
+        <script src="../../../scripts/underscore-min.js"></script>
+        <link rel="import" href="../../../bower_components/polymer/polymer.html">
+        <link rel="import" href="../../../bower_components/more-routing/more-route.html">
+
+        <link rel="import" href="../../../generic-app/generic-polymorph-page.html">
+        
+        <link rel="import" href="../../../generic-app/data-exchanges/localStorage-cpt.html"s>
+
+        <!-- specific content for this app -->
+        <link rel="import" href="../../elements/add-json-entries-cpt/add-json-entries-cpt.html">
+        <link rel="import" href="../../../generic-app/data-exchanges/get-db-cpt.html">
+
+    </head>
+</html>
+
+<dom-module id="navigate-nodes-cpt">
+	<template>
+        
+        <more-route id="navigateNodesRoute" name="navigate-nodes" context></more-route>
+        <more-route id="visuNodesRoute" name="visu-nodes"></more-route>
+        
+        <!-- get db -->
+        <get-db-cpt db_source="db2.json" db="{{json}}"></get-db-cpt>
+        <!-- get localstorage -->
+        <localStorage-cpt id="localStorage"
+                          local-storage-db="{{localStorageDb}}"
+                          central-db="[[json]]">
+        </localStorage-cpt>
+        <div is="add-json-entries-cpt" json="[[localStorageDb]]"></div>
+        <div class="layout vertical">
+            <a on-click="addElement">add Element</a>
+            <a on-click="reinitializeLocalStorage">reinitialize</a>
+            <a on-click="openVisuNodes">open Visu Nodes</a>
+        </div>
+        
+	</template>
+	<script>
+		Polymer({
+			is: 'navigate-nodes-cpt',
+			
+			properties: {
+                json: {
+                    type: Object
+                }
+            },
+            
+            ready: function() {
+                console.log(alasql.engines);
+            /*Here, "UserStorage" is the name of localStorage database, where "MyUserStorage" is a memory AlaSQL                 database.
+
+            You can use localStorage in two modes: SET AUTOCOMMIT ON to immediate save data to localStorage after                 each statement or SET AUTOCOMMIT OFF. In this case you need to use COMMIT statement to save all data                 from in-memory mirror to localStorage.*/
+                
+            },
+            
+            addElement: function() {
+                newItem = {
+                    id: "ID198",
+                    name: "Test",
+                    type: "Feature",
+                    description: "mega test",
+                    UItopContainer: {}
+                };
+
+                var id_item = this.$.localStorage.addItem(newItem);
+                
+                comment = {
+                    description: 'heyyyyyyyyyy'
+                };
+                this.addComment(comment, id_item)
+            },
+            
+            reinitializeLocalStorage: function() {
+                this.$.localStorage.dropLocalStorage();
+                this.$.localStorage.createLocalStorage();
+                this.$.localStorage.pushToLocalStorage();
+                this.$.localStorage.releaseLocalStorageDb();
+            },
+            
+            addComment: function(comment, id_item) {
+                
+                comment.type = "Comment";
+                var id_author = this.$.localStorage.me.id;
+                var id_comment = this.$.localStorage.addItem(comment);
+                
+                // link author and comment
+                var link_autor = { 'type' : 'is_created_by', 'origin': id_comment, 'destination': id_author };
+                var id_link_autor = this.$.localStorage.addLink(link_autor);
+                
+                // link comment and item
+                var link_item = { 'type' : 'request_change_to', 'origin': id_comment, 'destination': id_item };
+                var id_link_item = this.$.localStorage.addLink(link_item);
+                
+                console.log(id_link_autor);
+                console.log(id_link_item);
+            },
+
+            openVisuNodes: function() {
+                this.$.visuNodesRoute.navigateTo();
+                event.stopPropagation();
+            }
+            
+		});
+	</script>
+</dom-module>
+</html>

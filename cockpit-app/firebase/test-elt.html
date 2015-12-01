@@ -1,0 +1,71 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
+  <link rel="import" href="../bower_components/firebase-element/firebase-collection.html">
+  <link rel="import" href="../bower_components/firebase-element/firebase-document.html">
+
+<dom-module id='test-elt'>
+  <template>
+	<firebase-collection
+          order-by-child="height"
+          location="https://blazing-fire-3873.firebaseio.com/Requirements"
+          data="{{requirements}}"></firebase-collection>
+
+    <header>
+      <h1>Test Requirements                  </h1>
+    </header>
+    <section>
+		
+		<div class="layout horizontal">
+			<div class="layout vertical">
+			  <template is="dom-repeat" items="{{ requirements }}" as="requirement">
+				<Requirements-elt Name="{{ requirement.Title }}" Description="{{ requirement.Description }}"  Comment="{{ requirement.Comment }}"></Requirements-elt>
+			  </template>
+			</div>
+		</div>
+    </section>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'test-elt',
+    properties: {
+      requirements: {
+        type: Array,
+        value: [
+          {
+            name: "EUR",
+            description: "fuck"
+          },
+		  {
+            name: "USD",
+            description: "1.0"
+          }
+        ]
+      },
+	  containers: {
+        type: Array,
+        value: [
+          {
+            name: "Test1",
+            description: "fuck",
+			ref: "Requirements-elt"
+          },
+		  {
+            name: "Test2",
+            description: "1.0",
+			ref: "Requirements-elt"
+          }
+        ]
+      }
+	}
+  });
+  
+</script>

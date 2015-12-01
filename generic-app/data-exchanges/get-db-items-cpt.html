@@ -1,0 +1,120 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<script src="../../scripts/alasql.min.js"></script>
+
+<dom-module id="get-db-items-cpt">
+    <script>
+		Polymer({
+            
+			is: 'get-db-items-cpt',
+            
+            properties: {
+                
+                db: {
+                    type: Object,
+                    value: {}
+                },
+                
+                filters: {
+                    type: Array,
+                    value: []
+                },
+                
+                filters_computed: {
+                    type: String,
+                    computed: 'filtersHaveChanged(filters)'
+                },
+                
+                orders: {
+                    type: Array,
+                    value: []
+                },
+                
+                orders_computed: {
+                    type: String,
+                    computed: 'ordersHaveChanged(orders)'              
+                },
+                
+                columns: {
+                    type: Array,
+                    value: ['*']
+                },
+                
+                columns_computed: {
+                    type: String,
+                    computed: 'columnsHaveChanged(columns)'
+                },
+                
+                data: {
+                    type: Array,
+                    value: [],
+                    notify: true
+                },
+                
+                type: {
+                    type: String,
+                    value: 'items'               
+                }
+            },
+            
+            observers: ['requestHasChanged(db, filters_computed, orders_computed, columns_computed)'],
+            
+            //addRelativePath: function(db_source) { return "../" + this.db_source;},
+            
+            filtersHaveChanged: function(filters) {
+                var strFilters = "";
+                if (filters.length) {
+                    strFilters = " WHERE ";
+                    
+                    filters.forEach(function(f, i) {
+                        if (i > 0 ) strFilters += " AND ";
+                        strFilters += f;
+                    });
+                }
+                return strFilters;
+            },
+                
+            ordersHaveChanged: function(orders) {
+                var strOrders = "";
+                if (orders.length) {
+                    strOrders += " ORDER BY ";
+                    orders.forEach(function(o, i) {
+                        if (i > 0 ) strOrders += ", ";
+                        strOrders += o[0] + " "+ o[1];
+                    });
+                }
+                return strOrders;
+            },
+            
+            columnsHaveChanged: function(columns) {
+                var strColumns = "";
+                if (columns.length) {
+                    columns.forEach(function(c, i) {
+                        if (i > 0 ) strColumns += ", ";
+                        strColumns += c;
+                    }); 
+                }
+                return strColumns;                
+            },
+            
+            requestHasChanged: function() {
+                console.log("/requestHasChanged");
+                var filters_computed = this.filters_computed,
+                    orders_computed = this.orders_computed,
+                    columns_computed = this.columns_computed;
+                
+                console.log([this.db])
+                console.log(this.filters)
+                console.log('SEARCH ' + this.type + ' / FROM ?')
+                // else search the artefacts with filter if any from the specified db
+                items = alasql('SEARCH ' + this.type + ' / FROM ?', [this.db]);
+                
+                if (filters_computed || orders_computed || columns_computed) {
+                    var request = 'SELECT ' + columns_computed + ' FROM ?' + filters_computed + orders_computed;
+                    items = alasql(request, [items]);
+                }
+                this.set('data', items);
+            }
+        });
+    </script>
+</dom-module>

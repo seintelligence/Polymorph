@@ -1,0 +1,205 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="stylesheet" href="../../bower_components/open-sans-fontface/open-sans.css">
+
+<!-- behaviours dependencies -->
+<link rel="import" href="../behaviours/UtilitiesBehavior.html">
+<link rel="import" href="../behaviours/ToasterRxBehavior.html">
+<link rel="import" href="../behaviours/ToasterTxBehavior.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+    
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+
+<link rel="import" href="new-change-request-cpt.html">
+<link rel="import" href="existing-change-request-cpt.html">
+
+<!-- styles for icons -->
+<link rel="import" href="../../styles/cpt_icon-styles.html">
+
+<dom-module is="change-requests-cpt">
+    <style>
+        .set {
+            color: var(--google-blue-300)
+        }
+        .unset {
+            color: var(--google-grey-300)
+        }
+        
+        paper-dialog.size-position {
+            position: fixed;
+            --paper-dialog-background-color: var(--paper-grey-3OO);
+        }
+        
+        paper-button[raised].colorful {
+            background: #4285f4;
+            color: #fff;
+            margin: 20px;
+        }
+        
+        #CR_icon {
+            --iron-icon-height: 48px;
+            --iron-icon-width: 48px;
+        }
+        
+    </style>
+    <template>
+        
+        <localStorage-cpt id="localStorage" local-storage-db="{{localStorageDb}}"></localStorage-cpt>
+                
+        <!-- Dialog box for new CR -->
+        <new-change-request-cpt id="newChangeRequest"
+                                active-change-request="{{activeChangeRequest}}">
+        </new-change-request-cpt>
+        
+        <!-- Dialog box for existing CR -->
+        <existing-change-request-cpt id="existingChangeRequest"
+                                     active-change-request="{{activeChangeRequest}}">
+        </existing-change-request-cpt>
+        
+        <!-- window for the "change request" commands -->
+        <paper-dialog id="modalMore" heading="Custom Size &amp; Position" class="size-position">
+            <div hidden$="[[!hasActiveCR(activeChangeRequest)]]">
+                <paper-item on-click="createNewCR">
+                    Create a Change Request
+                </paper-item>
+                <paper-item on-click="selectExistingCR">
+                    Open an existing Change Request
+                </paper-item>
+            </div>
+            <div hidden$="[[hasActiveCR(activeChangeRequest)]]">
+                <paper-item on-click="createNewCR">
+                    Modify the active Change Request
+                </paper-item>
+                <paper-item on-click="createNewCR">
+                    Delete the active Change Request
+                </paper-item>
+                <paper-item on-click="closeActiveCR">
+                    Close the active Change Request
+                </paper-item>
+            </div>
+        </paper-dialog>
+        
+		<!-- Dialog box for comments -->
+		<paper-dialog id="modalCOmment" entry-animation="scale-up-animation" exit-animation="fade-out-animation" autoFitOnAttach modal>
+		</paper-dialog>
+        
+        <div class="layout horizonal flex" on-click="isOver" on-mouseout="isOut">
+            <div style="display: block">
+                <iron-icon id="CR_icon" class$="[[hasCR_Active(activeChangeRequest)]]" icon="icons:assignment-late" prefix on-click="callMoreModal"></iron-icon>
+            </div>
+        </div>
+        
+    </template>
+    <script>
+		Polymer({
+			is: 'change-requests-cpt',
+            
+            properties: {
+                
+                currentlyOver: {
+                    type: Boolean,
+                    value: false
+                },
+                
+                localStorageDb: {
+                    type: Object,
+                    value: {}                    
+                },
+                
+                activeChangeRequest: {
+                    type: Object,
+                    value: {},
+                    notify: true,
+                    observer: 'oo'
+                }
+            },
+            
+            oo: function() {
+                console.log("/ooooooo", this.activeChangeRequest)
+            },
+            
+            behaviours: [ToasterTxBehavior, UtilitiesBehavior],
+            
+            hasCR_Active: function(activeChangeRequest) {
+                if ( _.isEmpty(activeChangeRequest) )
+                    return "unset";
+                else
+                    return "set";
+            },
+            
+            hasActiveCR: function(activeChangeRequest) { return _.isEmpty(activeChangeRequest);},
+            
+            isOver: function() { this.currentlyOver = true; },
+                
+            isOut: function() { this.currentlyOver = false; },
+            
+            /**************** More Modal Management ****************/
+            callMoreModal: function(ev) {
+                this.$.modalMore.style.top = ($(ev.target).offset().top ) + "px";
+                var offsetRight = $( window ).width() - $(ev.target).offset().left;
+                this.$.modalMore.style.right = (offsetRight - 24) + "px";
+                this.$.modalMore.open();  
+            },
+            
+            createNewCR: function(ev) {
+                this.$.newChangeRequest.open(); 
+                this.$.modalMore.close();
+            },
+            
+            selectExistingCR: function(ev) {
+                this.$.existingChangeRequest.open(); 
+                this.$.modalMore.close();
+            },
+            
+            closeActiveCR: function(ev) {
+                this.activeChangeRequest = {};
+                this.$.modalMore.close();
+            },
+            
+            addComment: function(comment, id_item) {
+                
+                comment.type = "Comment";
+                var id_comment = this.$.localStorage.addItem(comment);
+                
+                // link comment and item
+                var link_item = { 'type' : 'request_change_to', 'origin': id_comment, 'destination': id_item };
+                var id_link_item = this.$.localStorage.addLink(link_item);
+            },
+            
+            attachChangeElement: function(changeElement) {
+                console.log("/attachChangeElements");
+                console.log(changeElement)
+                console.log(this.activeChangeRequest)
+                var id_changeElement = this.$.localStorage.addItem(changeElement.is);
+                
+                // link change element to active CR
+                var link_activeCR = {
+                    'type' : 'part_of_CR',
+                    'origin': id_changeElement,
+                    'destination': changeElement.part_of_CR
+                };
+                var id_link_activeCR = this.$.localStorage.addLink(link_activeCR);
+                
+                // link change element to the node to which a change is required
+                var link_ownerNode = {
+                    'type' : 'request_change_to',
+                    'origin': id_changeElement,
+                    'destination': changeElement.request_change_to
+                };
+                var id_link_ownerNode = this.$.localStorage.addLink(link_ownerNode);
+                
+            }
+        });            
+    </script>
+</dom-module>

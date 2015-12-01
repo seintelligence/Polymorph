@@ -1,0 +1,75 @@
+<script type="text/javascript" src="../../scripts/underscore-min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery.min.js"></script>
+
+<script>
+	UtilitiesBehavior = {
+			
+			_arrayify: function(obj) { return [obj]; },
+        
+            _echoObject: function(obj) { console.log(obj); return obj;},
+        
+            _echoArray: function(arr) { console.log(arr); return arr;},
+        
+            /*
+				data: {
+					computed: '_parse(barData)'
+				}                                   */
+            _parse: JSON.parse,
+
+            _stringify: JSON.stringify,
+
+            _cloneObj: function(obj) { return this._parse( this._stringify( obj ) ); },
+        
+            // D3 method to convert obj children to array children
+            _convertChildrenObjToArr: function(obj)
+            {                    
+                var childrenArr = [];
+                var children = obj.children
+
+                for (var key in children)
+                {
+                   var child;
+                   if (children.hasOwnProperty(key))
+                   {
+                       child = children[key];
+                       if (child.children)
+                            child = this._convertChildrenObjToArr(child);
+                       childrenArr.push(child);
+                   }
+                }
+                obj.children = childrenArr;
+                return obj;
+            },
+        
+            _simpleStringify: function(object){
+                var simpleObject = {};
+                console.log("/_simpleStringify");
+                for (var prop in object ){
+                    if (!object.hasOwnProperty(prop)){
+                        continue;
+                    }
+                    else if (typeof(object[prop]) == 'object'){
+                        continue;
+                    }
+                    else if (typeof(object[prop]) == 'function'){
+                        continue;
+                    }
+                    else {
+                        simpleObject[prop] = object[prop];
+                    }
+                }
+                var cleanedJson = JSON.stringify(simpleObject) ;
+                console.log(cleanedJson);
+                return cleanedJson;
+            },
+        
+            // For SQL, Join the array to make it understandable for a SQL query
+            _reconstructSQLqueryArray: function(arr) { return '("' + arr.join('","' ) + '")'; },
+        
+            // Decode HTML            
+            _decodeHtml: function(encodedHtml) {
+                return $('<div/>').html(encodedHtml).text();
+            }
+			
+	};
+</script>

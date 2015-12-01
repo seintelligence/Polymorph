@@ -1,0 +1,61 @@
+<link rel="stylesheet" href="../../bower_components/open-sans-fontface/open-sans.css">
+<link rel="stylesheet" href="../../generic-app/behaviours/UtilitiesBehavior.html">
+
+<dom-module is="item-data-cpt">
+    
+    <style>
+        *{font-family: "Open Sans", sans-serif;}
+        .title {
+            text-transform: capitalize;
+            color: #757575;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'Roboto', 'Noto', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 24px;
+        }
+        .section {
+            position: relative;
+            padding: 8px;
+            border: 1px solid;
+            border-color: #e0e0e0;
+            border-top: 0
+        }
+        
+        #htmlHere > img {
+            height: auto;
+            max-width: 100%;
+        }
+        
+    </style>
+    
+    <template>
+            <div>
+                <div class="title">[[data.name]]</div>
+                <span id="htmlHere"></span>
+            </div>
+    </template>
+    
+    <script>
+		Polymer({
+			is: 'item-data-cpt',
+            
+            properties: {                
+                data: {
+                    observer: 'insertCleanHTML'
+                }
+            },
+            
+            behaviors: [UtilitiesBehavior],
+            
+            insertCleanHTML: function(data) {
+                Polymer.dom(this.$.htmlHere).innerHTML  = this._decodeHtml(this.data.value);
+            }
+            
+        });
+    </script>
+    
+</dom-module>

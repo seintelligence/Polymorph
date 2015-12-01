@@ -1,0 +1,174 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<!-- Include Required Prerequisites -->
+<script src="../../scripts/jquery.min.js"></script>
+<script src="../../scripts/moment/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css"/>
+
+
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
+
+<!-- Include Date Range Picker -->
+<script src="../../scripts/bootstrap-daterangepicker/daterangepicker.js"></script>
+<link rel="stylesheet" href="../../scripts/bootstrap-daterangepicker/daterangepicker.css" />
+
+<dom-module id="date-picker-cpt">
+    <style>
+        #reportrange {
+            background: #fff;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            width: 100%
+        }
+        
+        #reportrange.invalid {
+            border: 1px solid #DB4437;
+        }
+        
+        #reportrange.div {
+            font-style: Roboto;
+            font-size: 14px;
+            color: var(--paper-grey-400);
+        }
+        
+        span.error[invalid] {
+            visibility: visible;
+            color: #db4437;
+            font-family: 'Roboto', 'Noto', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.011em;
+            line-height: 20px;
+        }
+        
+        span.error {
+            visibility: hidden;
+        }
+        
+    </style>
+    <template>
+         <div id="reportrange" class$="{{getReportRangeClass(invalid)}}">
+            <div>Due date:</div>
+            <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+            <span></span> <b class="caret"></b>
+        </div>
+        <span class="error" id="error">Mandatory due date is missing</span>
+    </template>
+    <script>
+        /****** http://www.daterangepicker.com/ ******/
+		Polymer({
+			is: 'date-picker-cpt',
+            
+            properties: {
+                singleDatePicker: {
+                    type: Boolean,
+                    value: false
+                },
+                
+                title: {
+                    type: String,
+                    value: "date"
+                },
+                
+                opens: {
+                    type: String,
+                    value: "center"
+                },
+                
+                drops: {
+                    type: String,
+                    value: "down"
+                },
+                
+                startDate: {
+                    notify: true
+                },
+                
+                endDate: {
+                    notify: true
+                },
+                
+                autovalidate: {
+                    type: Boolean,
+                    value: false
+                },
+                
+                invalid: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                }
+                
+            },
+
+            ready: function() {
+                console.log("/ready");
+                var that = this;
+                var input = Polymer.dom(this.root).querySelector('#reportrange');
+                $(input).daterangepicker({
+                    "showDropdowns": true,
+                    "showWeekNumbers": true,
+                    "singleDatePicker": this.singleDatePicker,
+                    "autoApply": true,
+                    "dateLimit": {
+                        "days": 7
+                    },
+                    "opens": this.opens,
+                    "drops": this.drops,
+                    "startDate": this.startDate, //"10/08/2015"
+                    "endDate": this.endDate,
+                    "maxDate": "10/14/2015"
+                });
+                
+                $(input).on('apply.daterangepicker', function(ev, picker) {
+                    console.log(picker.startDate.utc())
+                    that.startDate = new Date(picker.startDate.format('MMMM DD, YYYY HH:MM:SS'));
+                    if (that.singleDatePicker) that.endDate = "";
+                    else that.endDate = picker.endDate.format('YYYY-MM-DD');
+                    that.cb(picker.startDate, picker.endDate);
+                    
+                    if (this.autovalidate) this.validate();
+                });
+                
+                $(input).on('cancel.daterangepicker', function(ev, picker) {
+                    that.startDate = "";
+                    that.endDate = "";
+                    that.cb("", "");
+                });
+            },
+            
+            cb: function (start, end) {
+                var strEnd = "";
+                if (!this.singleDatePicker && end) strEnd = ' - ' + end.format('MMMM D, YYYY');
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + strEnd);
+            },
+            
+            validate: function() {
+                if (this.startDate === undefined || this.endDate === undefined && this.singleDatePicker) {
+                    this.invalid = true;
+                    this.$.error.setAttribute('invalid', true);
+                } else {
+                    this.invalid = false;
+                    this.$.error.removeAttribute('invalid');
+                } 
+                console.log("/validate")
+                console.log(this.invalid);
+            },
+            
+            getReportRangeClass: function(invalid) {
+                console.log(invalid)
+                if (invalid)
+                    return "pull-right invalid";
+                return "pull-right";
+            }
+        
+        });
+        
+    </script>
+</dom-module>

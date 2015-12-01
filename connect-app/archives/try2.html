@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>oo</title>
+
+        <link rel="import" href="../bower_components/polymer/polymer.html">
+        <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="modernizr.custom.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/draggabilly/1.2.0/draggabilly.pkgd.min.js"></script>
+		<script src="dragdrop.js"></script>
+    </head>
+    <body>
+        <oo-cpt></oo-cpt>
+    </body>
+    <dom-module is="oo-cpt">
+        <style>
+        .grid {
+            margin: 0 auto;
+            max-width: 50em;
+            padding: 0 1em;
+            font-size: 1.5em;
+        }
+
+        .grid__item {
+            margin: 0.5%;
+            width: 49%;
+            padding: 0.3em;
+            border-radius: 4px;
+            background: rgb(212, 212, 212);
+            color: rgb(0, 112, 192);
+            font-size: 0.9em;
+            text-align: left;
+        }
+            
+        .nested_items .grid__item {
+            padding-left: 1em;
+        }
+
+        .elt {
+            content: '';
+            padding: 0.3em;
+            margin: 0.5em;
+            margin-left: 1em;
+            left: 2em;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+            
+        .grid__item:hover {
+            cursor: move;
+            cursor: -webkit-grab;
+            cursor: grab;
+        }
+
+        .grid__item:active {
+            cursor: -webkit-grabbing;
+            cursor: grabbing;
+        }
+
+        .is-dragging {
+            background: #575e5a;
+        }
+
+        .is-active {
+            z-index: 100;
+        }
+
+        .is-dropped {
+            opacity: 0;
+            -webkit-transform: scale3d(0.7,0.7,1) !important;
+          transform: scale3d(0.7,0.7,1) !important;
+        }
+
+        .is-complete {
+            opacity: 1;
+            -webkit-transition: opacity 0.3s, -webkit-transform 0.3s !important;
+            transition: opacity 0.3s, transform 0.3s !important;
+            -webkit-transform: scale3d(1,1,1) !important;
+            transform: scale3d(1,1,1) !important;
+        }
+
+        .animate {
+            -webkit-transition: all 0.3s ease-out;
+            transition: all 0.3s ease-out;
+        }
+
+        .drop-area {
+            position: fixed;
+            top: 100%;
+            left: 0;
+            z-index: 99;
+            width: 100%;
+            width: calc(100% + 20px);
+            height: 100%;
+            background: #76d39f;
+            text-align: center;
+            overflow: auto;
+            -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.6,0,0.4,1);
+            transition: transform 0.5s cubic-bezier(0.6,0,0.4,1);
+            -webkit-transform: translate3d(0,20px,0);
+            transform: translate3d(0,20px,0);
+        }
+
+        .drop-area.show {
+            -webkit-transform: translate3d(0,-100%,0);
+          transform: translate3d(0,-100%,0);
+        }
+
+        .drop-area > div {
+            width: 100%;
+            width: calc(100% - 20px);
+            padding: 2em 2em 5em;
+            -webkit-transition: -webkit-transform 0.4s 0.3s;
+            transition: transform 0.4s 0.3s;
+            -webkit-transform: translate3d(0,50%,0);
+            transform: translate3d(0,50%,0);
+        }
+
+        .drop-area.show > div {
+            -webkit-transform: translate3d(0,0,0);
+            transform: translate3d(0,0,0);
+        }
+
+        .drop-area__item {
+            position: relative;
+            display: inline-block;
+            margin: 0.4em 0;
+            width: 100%;
+            max-width: 30em;
+            height: 3em;
+            padding: 0.3em 0.5em;
+            background: #fff;
+            color: #919f97;
+            font-size: 1.5em;
+            text-align: left;
+            padding: 0.9em 1em;
+            border-radius: 4px;
+            -webkit-transition: -webkit-transform 0.3s, background 0.3s, color 0.3s;
+            transition: transform 0.3s, background 0.3s, color 0.3s;
+        }
+
+        .drop-area__item.highlight {
+            background: rgba(0,0,0,0.15);
+            color: #fff;
+            -webkit-transform: scale3d(1.08,1.08,1);
+            transform: scale3d(1.08,1.08,1);
+        }
+
+        .drop-area__item::before {
+            content: '';
+            position: absolute;
+            top: 0.3em;
+            left: 3.25em;
+            bottom: 0.3em;
+            right: 0.3em;
+            background: rgba(75,136,102,0.1);
+            border-radius: 4px;
+        }
+
+        .drop-area__item::after {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-family: FontAwesome;
+            pointer-events: none;
+            color: #62b989;
+            content: '\f00c';
+            font-size: 1.75em;
+            margin: 0.35em;
+            opacity: 0;
+            -webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+            transition: opacity 0.3s, transform 0.3s;
+            -webkit-transform: scale3d(0.5,0.5,1);
+            transform: scale3d(0.5,0.5,1);
+        }
+
+        .drop-feedback.drop-area__item::after {
+            opacity: 1;
+            -webkit-transform: scale3d(1,1,1);
+            transform: scale3d(1,1,1);
+        }
+
+        .dummy {
+            margin: 1em auto 2.5em;
+            width: 50%;
+            max-width: 30em;
+            height: 1.5em;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+            box-shadow: 0 1.5em 0 -0.6em rgba(0,0,0,0.1);
+        }
+
+        .drop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            opacity: 0;
+            -webkit-transition: opacity 0.3s;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .drop-area.show + .drop-overlay {
+            opacity: 1;
+        }
+
+        .helper {
+            position: absolute !important;
+            margin: 0;
+        }
+
+        @media screen and (max-width: 50em) {
+            .grid__item {
+                font-size: 1.5em;
+            }
+            .drop-area {
+                font-size: 0.8em;
+            }
+        }
+
+        @media screen and (max-width: 25.5em) {
+            .grid {
+                padding: 0 2em;
+            }
+            .grid__item {
+                font-size: 1em;
+            }
+        }
+
+        </style>
+        <template>
+            <div class="container">
+                <div class="content">
+                    <div id="grid" class="grid">
+                        
+                        <div class="nested_items">
+                            <div class="draggable grid__item">
+                                <div class="elt">1</div>
+                            </div>
+                            <div class="nested_items">
+                                <div class="draggable grid__item">
+                                    <div class="elt">2</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="draggable grid__item">
+                            <div class="elt">2</div>
+                        </div>
+                        <div class="draggable grid__item">
+                            <div class="elt">3</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="drop-area" class="drop-area">
+                <div>
+                    <div class="dummy"></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-excel-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-pdf-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-sound-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-word-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-archive-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-text-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-archive-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-image-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-powerpoint-o"></i></div>
+                    <div class="drop-area__item"><i class="fa fa-fw fa-file-code-o"></i></div>
+                </div>
+            </div>
+            <div class="drop-overlay"></div>
+        </template>
+        <script>
+			
+            Polymer({
+
+                is: 'oo-cpt',
+
+                ready: function() {
+                    var body = document.body,
+					dropArea = document.getElementById( 'drop-area' ),
+					droppableArr = [], dropAreaTimeout;
+
+                    // initialize droppables
+                    [].slice.call( document.querySelectorAll( '#drop-area .drop-area__item' )).forEach( function( el ) {
+                        droppableArr.push( new Droppable( el, {
+                            onDrop : function( instance, draggableEl ) {
+                                // show checkmark inside the droppabe element
+                                classie.add( instance.el, 'drop-feedback' );
+                                clearTimeout( instance.checkmarkTimeout );
+                                instance.checkmarkTimeout = setTimeout( function() { 
+                                    classie.remove( instance.el, 'drop-feedback' );
+                                }, 800 );
+                                // ...
+                            }
+                        } ) );
+                    } );
+
+                    // initialize draggable(s)
+                    [].slice.call(document.querySelectorAll( '#grid .grid__item' )).forEach( function( el ) {
+                        new Draggable( el, droppableArr, {
+                            draggabilly : { containment: document.body },
+                            scroll : true,
+                            scrollable : '#drop-area',
+                            scrollSpeed : 20,
+                            scrollSensitivity : 10,
+                            onStart : function() {
+                                // add class 'drag-active' to body
+                                classie.add( body, 'drag-active' );
+                                // clear timeout: dropAreaTimeout (toggle drop area)
+                                clearTimeout( dropAreaTimeout );
+                                // show dropArea
+                                classie.add( dropArea, 'show' );
+                            },
+                            onEnd : function( wasDropped ) {
+                                var afterDropFn = function() {
+                                    // hide dropArea
+                                    classie.remove( dropArea, 'show' );
+                                    // remove class 'drag-active' from body
+                                    classie.remove( body, 'drag-active' );
+                                };
+
+                                if( !wasDropped ) {
+                                    afterDropFn();
+                                }
+                                else {
+                                    // after some time hide drop area and remove class 'drag-active' from body
+                                    clearTimeout( dropAreaTimeout );
+                                    dropAreaTimeout = setTimeout( afterDropFn, 400 );
+                                }
+                            }
+                        } );
+                    } );
+                }
+            });
+        </script>
+    </dom-module>
+</html>

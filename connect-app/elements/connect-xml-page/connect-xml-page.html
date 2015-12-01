@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <title>Fancytree - Example: Glyph Extension / Bootstrap Theme</title>
+
+        <link rel="import" href="../../../bower_components/polymer/polymer.html">
+        <link rel="import" href="../data-source-elt-cpt/data-source-elt-cpt.html">
+        <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+        <link rel="import" href="../../../bower_components/iron-icons/editor-icons.html">
+        <link rel="import" href="../../../bower_components/iron-ajax/iron-ajax.html">
+        <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+        <link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
+        
+        <link rel="import" href="../../../bower_components/more-routing/more-route.html">
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+        <script src="../../../scripts/xmlToJSON.js" type="text/javascript" ></script>
+        <script src="../../../scripts/underscore-min.js" type="text/javascript"></script>
+        <script src="../../../scripts/jquery.min.js" type="text/javascript"></script>
+        <script src="../../../scripts/jquery-ui.min.js" type="text/javascript"></script>
+        <script src="../../../scripts/dropzone.js"></script>
+		<script src="../modernizr.custom.js"></script>
+        
+        <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-pink.min.css">
+        
+    </head>
+
+    <connect-xml-page></connect-xml-page>
+<dom-module is="connect-xml-page">
+    <style></style>
+    <template>    
+        <style type="text/css">
+            
+            @font-face {
+                font-family: "Roboto Condensed";
+                font-style: normal;
+                src: local('Roboto Regular'), local('Roboto-Regular'), url('styles/Roboto/Roboto-Regular.ttf') format('truetype');
+            }
+            
+            @ {
+                font-family: 'Roboto','Helvetica','Arial',sans-serif!important;
+            }
+            .mdl-shadow--2dp {
+                box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+            }
+            .mdl-data-table {
+                position: relative;
+                border: 1px solid rgba(0,0,0,.12);
+                border-collapse: collapse;
+                white-space: nowrap;
+                font-size: 13px;
+                background-color: #fff;
+            }
+            
+            .mdl-data-table tbody tr {
+                position: relative;
+                height: 48px;
+                -webkit-transition-duration: .28s;
+                transition-duration: .28s;
+                -webkit-transition-timing-function: cubic-bezier(.4,0,.2,1);
+                transition-timing-function: cubic-bezier(.4,0,.2,1);
+                -webkit-transition-property: background-color;
+                transition-property: background-color;
+            }
+
+            .mdl-data-table td {
+                position: relative;
+                vertical-align: top;
+                height: 48px;
+                border-top: 1px solid rgba(0,0,0,.12);
+                border-bottom: 1px solid rgba(0,0,0,.12);
+                padding: 12px 18px 0;
+                box-sizing: border-box;
+            }
+            
+            .mdl-data-table thead {
+                padding-bottom: 3px;
+            }
+            
+            .mdl-color-text--grey-600 {
+                color: #757575 !important;
+            }
+
+            ::selection {
+                background: #b3d4fc;
+                text-shadow: none;
+            }
+            
+            div.table {
+                display: table;
+                border: 1px solid rgba(0,0,0,.12);
+                border-collapse: collapse;
+                white-space: nowrap;
+                font-size: 13px;
+                color: #757575 !important;
+                font-family: 'Roboto Condensed';
+                background-color: #fff;
+            }
+            div.row {
+                display:table-row;
+                text-align: right;
+                position: relative;
+                vertical-align: top;
+                padding: 12px 18px 0;
+                box-sizing: border-box;
+            }
+            div.legend {
+                position: relative;
+                height: 48px;
+                text-align: right;
+                font-size: 12px;
+                line-height: 24px;
+                letter-spacing: 0;
+                vertical-align: bottom;
+                font-weight: 550;
+                padding-bottom: 3px;
+            }
+            div.cell {
+                display: table-cell;
+                text-align: right;
+                position: relative;
+                vertical-align: top;
+                height: 48px;
+                padding: 12px 18px 0;
+                box-sizing: border-box;
+            }
+            div.col1 {width:1em}
+            div.col2 {width:300em}
+            div.col3 {width:1em}
+            
+            div.non-numeric {
+                text-align: left;
+            }
+            
+            div.uploadFileZone {
+                background-color: #d3ebff
+            }
+            
+            div#dropArea {
+                min-height:24px;
+                text-align:center;
+                vertical-align: middle;
+            }
+            
+        </style>
+        
+        <more-route context id="connect-xml-page" name="connect-xml-page"></more-route>
+            
+        <iron-ajax
+            auto
+            url="../try.xml"
+            handle-as="text"
+            last-response="{{xmlAjax}}"></iron-ajax>
+        
+            <form action="/file-upload" class="dropzone">
+                <div class="fallback">
+                    <input name="file" type="file" multiple />
+                </div>
+            </form>
+        
+        <h1>Drag here</h1>
+        <div class="layout horizontal flex">
+            <div class="table mdl-shadow--2dp">  
+                <div class="legend">
+                    <div class="cell col1">ID</div>
+                    <div class="cell col2 non-numeric">Node</div>
+                </div>
+                <div is="data-source-elt-cpt"
+                     elts="[[result]]"
+                     level=0></div>
+            </div>
+        </div>
+        
+        <h1>Drop here</h1>
+        <div class="layout horizontal flex">
+            <div class="table mdl-shadow--2dp">  
+                <div class="legend">
+                    <div class="cell col1">ID</div>
+                    <div class="cell col1">Path</div>
+                    <div class="cell col2 non-numeric">Node</div>
+                    <div class="cell col3">Commands</div>
+                </div>
+                <div id="dropEffectiveArea">
+                    <div id="dropArea"
+                         on-drop="drop"
+                         on-dragover="allowDrop">...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </template>
+    <script>
+		Polymer({
+            
+			is: 'connect-xml-page',
+            
+            properties: {
+                xmlAjax: {
+                    type: String,
+                    value: "",
+                    observer: "handleResponse"
+                },
+                
+                incKey: {
+                    type: Number,
+                    value: 1
+                },
+                
+                result: {
+                    
+                }
+                
+            },
+            
+            ready: function() {
+                
+                var droppableArr = [];
+                
+				// initialize droppables
+				[].slice.call( document.querySelectorAll( '#dropArea' )).forEach( function( el ) {
+					droppableArr.push( new Droppable( el, {
+						onDrop : function( instance, draggableEl ) {
+                            console.log("dropped")
+							// show checkmark inside the droppabe element
+							classie.add( instance.el, 'drop-feedback' );
+							clearTimeout( instance.checkmarkTimeout );
+							instance.checkmarkTimeout = setTimeout( function() { 
+								classie.remove( instance.el, 'drop-feedback' );
+							}, 800 );
+							// ...
+						}
+					} ) );
+				} );
+                
+            },
+            
+            allowDrop: function(ev) {
+                ev.preventDefault();
+            },
+            
+            drop: function(ev) {
+                ev.preventDefault();
+                if(ev.target.id !== "dropArea") return;
+                var data = ev.dataTransfer.getData("text/html");
+                console.log(JSON.parse(data).data);
+                data = JSON.parse(data).data;
+                //$(document.getElementById(data)).clone().appendTo(ev.target);
+                
+                
+                var nodeCopy = document.createElement('div', 'data-source-elt-cpt');
+                
+                var nodeCopy = document.createElement('div', 'data-source-elt-cpt');
+                nodeCopy.elts = [data.item];
+                console.log(nodeCopy.elts)
+                nodeCopy.identifier = data.identifier;
+                nodeCopy.level = data.level;
+                nodeCopy.isNodeEditor = true;
+                nodeCopy.className = "sortable";
+                this.$.dropEffectiveArea.insertBefore(nodeCopy, this.$.dropArea);
+                
+                $("#dropEffectiveArea").sortable({
+                    axis: "y",
+                    revert: true,
+                    scroll: false,
+                    cursor:'move'
+                });
+                
+                //console.log($(document.getElementById(data)).clone(), ev.target);
+                //ev.target.appendChild($(document.getElementById(data)).clone());
+            },
+            
+            handleResponse: function() {
+                
+                var that = this;
+                console.log("/handleResponse")
+                if(!this.xmlAjax) return;
+                var result = xmlToJSON.parseString(this.xmlAjax);
+                
+                result = this.convertJSONtoFancyTree(result);
+                this.result = result;
+                console.log(this.result, result);
+            },
+            
+            convertJSONtoFancyTree: function(nodes, isNotFolder) {
+                var that = this,
+                    convertedNodes = {},
+                    finalNodes = [],
+                    attr = [];
+                
+                convertedNodes = _.pairs(nodes);
+                convertedNodes.forEach(function(node) {
+                    attr = [];
+                    node[1].title = node[0];
+                    node[1].key = that.incKey;
+                    node[1].folder = !isNotFolder;
+                    if(node[1][0]) {
+                        if (_.has(node[1][0], '_text'))
+                            node[1].folder = false; 
+                        else {
+                            attr = that.convertJSONtoFancyTree( node[1][0]._attr, true );
+                            node[1][0] = _.omit(node[1][0], '_attr');
+                            node[1].children = _.union(attr, that.convertJSONtoFancyTree(node[1][0]));
+                        }
+                    }
+                    node[1] = _.omit(node[1], '0');
+                    that.incKey = that.incKey + 1;
+                    finalNodes.push(node[1]);
+                });
+                
+                //finalNodes[0] = _.omit(finalNodes[0], 'children');
+                return finalNodes;
+            }
+            
+        });
+    </script>
+</dom-module>

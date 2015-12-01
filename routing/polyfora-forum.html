@@ -1,0 +1,112 @@
+<!--
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-styles/shadow.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../bower_components/more-routing/more-route.html">
+
+<link rel="import" href="polyfora-user-ref.html">
+
+<dom-module id="polyfora-forum">
+
+  <style>
+
+    :host {
+      display: block;
+      padding: 16px;
+    }
+
+    header {
+      @apply(--paper-font-headline);
+    }
+
+    .headers {
+      @apply(--paper-font-caption);
+      @apply(--layout-horizontal);
+      margin-bottom: -8px;
+    }
+    .headers > * {
+      padding: 0 8px;
+    }
+
+    .title {
+      @apply(--layout-flex);
+    }
+    .author {
+      width: 80px;
+    }
+
+    .thread {
+      @apply(--shadow-elevation-2dp);
+      @apply(--layout-horizontal);
+      @apply(--paper-font-subhead);
+      margin: 8px 0;
+      cursor: pointer;
+    }
+    .thread > * {
+      padding: 8px;
+    }
+
+  </style>
+
+  <template>
+    <more-route context name="forum" params="{{params}}"></more-route>
+
+    <header>{{_forum.title}}</header>
+
+    <section class="headers" layout horizontal>
+      <div class="title">Thread</div>
+      <div class="posts">Posts</div>
+      <div class="author">Author</div>
+    </section>
+
+    <template is="dom-repeat" items="[[_forum.threads]]" as="thread">
+      <section class="thread" layout horizontal center on-tap="_onThreadTapped" thread-id$="[[thread.id]]">
+        <div class="title">[[thread.title]]</div>
+        <div class="posts">[[thread.posts.length]]</div>
+        <polyfora-user-ref class="author" user="[[thread.author]]"></polyfora-user-ref>
+      </section>
+    </template>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'polyfora-forum',
+
+      properties: {
+
+        data: Object,
+
+      },
+
+      observers: [
+        '_forumChanged(params.forumId, data)',
+      ],
+
+      _forumChanged: function() {
+        this._forum = this.data && this.data.forumsById[this.params.forumId];
+      },
+
+      _onThreadTapped: function(event) {
+        var threadId = event.currentTarget.getAttribute('thread-id');
+        // In addition to routing via a `more-route` element, more-routing's
+        // JavaScript API also exposes helpers:
+        MoreRouting.navigateTo('thread', {forumId: this._forum.id, threadId: threadId});
+        event.stopPropagation();
+      },
+
+    });
+
+  </script>
+
+</dom-module>

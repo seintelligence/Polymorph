@@ -1,0 +1,50 @@
+<!-- styles for icons -->
+<link rel="import" href="../styles/cpt_icon-styles.html">
+
+<dom-module is="generic-toolbar-cpt">
+    <style>
+        paper-toolbar {
+            --paper-toolbar-background: var(--paper-grey-400);
+        }
+    </style>
+    <template>
+        
+        <!-- include the styles for icons -->
+        <style include="cpt_icon-styles"></style>
+        
+        <!-- header of the toolbar -->
+        <paper-toolbar>
+            <div class="title" style="margin-left:0px">[[title]]</div>
+            &nbsp;
+            <paper-fab mini
+                       icon="icons:close"
+                       class="UIcatalogIcons"
+                       title="Close the menu"
+                       on-click="closeDrawer"></paper-fab>
+        </paper-toolbar>
+        
+        <!-- content of the toolbar -->
+        <div>
+            <h2>Close the app</h2>
+            <content></content>
+        </div>
+        
+    </template>
+    <script>
+		Polymer({
+			is: 'generic-toolbar-cpt',
+            
+            properties: {
+                title: {
+                    type: String,
+                    value: "header"
+                }
+                
+            },
+            
+            closeDrawer: function() {
+                this.fire('closeDrawer')
+            }
+        });    
+    </script>
+</dom-module>

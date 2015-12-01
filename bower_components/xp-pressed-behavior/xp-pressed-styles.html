@@ -1,0 +1,51 @@
+<!--
+@license
+Copyright (c) 2015 The ExpandJS authors. All rights reserved.
+This code may only be used under the BSD style license found at https://expandjs.github.io/LICENSE.txt
+The complete set of authors may be found at https://expandjs.github.io/AUTHORS.txt
+The complete set of contributors may be found at https://expandjs.github.io/CONTRIBUTORS.txt
+-->
+
+<!--
+This stylesheet is used to stylize a pressable element.
+
+@stylesheet xp-pressed-styles
+@description A stylesheet used to stylize a pressable element
+@keywords web app, html5, expandjs, web-components
+@group stylesheets
+@homepage http://expandjs.com/elements/xp-pressed-styles
+@repository https://github.com/ExpandJS/xp-pressed-behavior
+
+@dependency polymer Polymer/polymer#^1.1.0
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="xp-pressed-styles">
+
+    <template>
+
+        <style>
+            :host {
+                cursor: pointer;
+                display: inline-block;
+                outline: 0;
+                overflow: visible;
+                position: relative;
+                text-align: left;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                -webkit-tap-highlight-color: transparent;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+
+            :host([disabled]) {
+                cursor: not-allowed !important;
+                pointer-events: none !important;
+            }
+        </style>
+
+    </template>
+
+</dom-module>

@@ -1,0 +1,82 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="../echo-html-elt.html">
+
+<link rel="import" href="Cockpit-interface-elt.html">
+<link rel="import" href="Function-elt.html">
+
+<link rel="import" href="../generic-app/behaviours/UtilitiesBehavior.html">
+
+<dom-module id='Service-elt'>
+	<style>
+		:host {
+		  width:100%
+		}
+	</style>
+	<template>
+		
+		<Cockpit-interface-elt id="CallFunctions" data="{{functions}}"></Cockpit-interface-elt>
+			
+		<paper-material elevation="1">
+			<a class="anchor" id="anchor"></a>
+			<div class="layout horizontal center">
+				<div class="center layout flex-1">&nbsp;</div>
+				<div class="container center layout flex-12">
+					<div class="page-header"><h1 id="title"><span>[[eltDataSet._id]]</span> - <span>[[eltDataSet.data.1.__text]]</span></h1></div>
+					<div class="page-header"><h2>Service Description</h2></div>
+					<div id="description"><echo-html-elt html="[[eltDataSet.data.2.__text]]"></echo-html-elt></div>
+					<div class="page-header"><h2>Design Implementation</h2></div>
+					<div id="design"><echo-html-elt html="[[eltDataSet.data.3.__text]]"></echo-html-elt></div>
+					<template is="dom-repeat" items="{{functions}}" observe="type" as="function">
+						<Function-elt data="{{function}}"></Function-elt>
+						<p>&nbsp;</p>
+					</template>
+				</div>
+				<div class="center layout flex-1">&nbsp;</div>
+			</div>
+		</paper-material>
+		
+  </template>
+  <script>
+	  Polymer({
+		is: 'Service-elt',
+		
+		behaviors: [UtilitiesBehavior],
+		
+		properties: {
+			eltDataSet: {
+				notify: true,
+				type: Object,
+				value: function() {	return [{"name":"aa"}];}
+			},
+			
+			data: {
+				type: Array,
+				notify: true,
+			}
+			
+		},
+		
+		observers: ['updateElt(data.splices)'],
+		
+		updateElt: function(data) {
+			this.eltDataSet = this.data;
+			
+			this.$.CallFunctions.customRequest = "Breakdowns,Children,sPartReference|contains|RepFunctions/Groups,Children,sItemId|==(Text)|" + this.eltDataSet["_id"] + "/Groups,Below,Only Function";
+			this.$.CallFunctions.attrRequest = "sItemId,sDescription,sDetailedDescription,sUDA_DesignImplementation,sRef";
+			this.$.CallFunctions.generateRequest();
+			//this.$.CallFunctions.generateRequest();
+		}
+		
+	  });
+	</script>
+</dom-module>
+

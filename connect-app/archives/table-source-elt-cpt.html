@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>oo</title>
+
+        <link rel="import" href="../bower_components/polymer/polymer.html">
+        <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+        <link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+        <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+        <link rel="import" href="../connect-app/data-source-elt-cpt.html">
+        <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="modernizr.custom.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/draggabilly/1.2.0/draggabilly.pkgd.min.js"></script>
+		<script src="dragdrop.js"></script>
+        
+        <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-pink.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        
+    </head>
+    
+    <dom-module is="table-source-elt-cpt">
+        <style>
+        </style>
+        <template>
+            <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+                <thead>
+                    <tr>
+                        <th class="mdl-data-table__cell--non-numeric">Material</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <data-source-elt-cpt elts="[[elts]]"></data-source-elt-cpt>
+                </tbody>
+            </table>
+        </template>
+        <script>				
+            Polymer({
+
+                is: 'table-source-elt-cpt',
+                
+                properties: {
+                    elts: {
+                        type: Array,
+                        value: []
+                    }
+                },
+                
+                setEltIndex: function(id, index) {
+                    return id + index;
+                },
+                
+                toggleNested: function(e) {
+                    console.log(e.target.id, '#' + e.target.id);
+                    parent = Polymer.dom(this.root).querySelector('#nestedChildren')
+                    console.log(parent)
+                    Polymer.dom(this.root).querySelector('#nested' + e.target.id).toggle();
+                }
+                
+            });
+        </script>
+    </dom-module>
+</html>

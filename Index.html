@@ -1,154 +1,33 @@
 <!DOCTYPE html>
 <html>
-    
-<link rel="stylesheet" href="bower_components/open-sans-fontface/open-sans.css">
-<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
-<script src="scripts/jquery.min.js"></script>
 
 <link rel="import" href="bower_components/polymer/polymer.html">
 
-<link rel="import" href="bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="bower_components/iron-icons/hardware-icons.html">
-<link rel="import" href="bower_components/iron-icons/image-icons.html">
-<link rel="import" href="bower_components/iron-icons/editor-icons.html">
 
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
 
-<!-- Menu -->
-<link rel="import" href="bower_components/paper-item/paper-item.html">
-<link rel="import" href="bower_components/paper-menu/paper-menu.html">
-<link rel="import" href="bower_components/paper-styles/paper-styles.html">
-<link rel="import" href="bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="bower_components/paper-submenu/paper-submenu.html">
-    
-<link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
-<link rel="import" href="bower_components/paper-header-panel/paper-header-panel.html">
-<link rel="import" href="bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="bower_components/paper-card/paper-card.html">
-    
-<link rel="import" href="elements/UtilitiesBehavior.html">
-
-<link rel="import" href="elements/ui editor elements/behaviours/DragBehavior.html">
-<link rel="import" href="elements/ui editor elements/behaviours/ToasterRxBehavior.html">
-<link rel="import" href="elements/ui editor elements/behaviours/ToasterTxBehavior.html">
-<link rel="import" href="elements/ui%20editor%20elements/behaviours/ModeChangedBehavior.html">
-
-<!-- Attributes selection -->
-<link rel="import" href="bower_components/paper-radio-button/paper-radio-button.html">
-    
-<!-- Connection toolbar -->
-<link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
-<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
-
-    
-<link rel="import" href="bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="elements/ui editor elements/data_source_path_selection/data_source_path_selection-cpt.html">
-    
-<link rel="import" href="bower_components/paper-drawer-panel/paper-drawer-panel.html" >
-<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 
-<link rel="import" href="bower_components/iron-image/iron-image.html">
+<link rel="import" href="generic-app/generic-polymorph-page.html">
 
-<!-- styles for icons -->
-<link rel="import" href="../../styles/cpt_icon-styles.html">
- 
-<!-- JSON structre -->
-<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
-    
-<!-- JSON dynamic HTML creation -->
-<link rel="import" href="elements/ui%20editor%20elements/view_constructor/create-HTML-cpt.html">
-    
-<!-- JSON tree -->
-<link href="scripts/JSON-tree/css/jsontree.css" rel="stylesheet">
-<script src="scripts/JSON-tree/src/jsontree.js"></script>
+<polymorph-app></polymorph-app>
 
-<div is="visual-ui-editor-library-cpt" style="display:inline-block; width:100%"></div>
-
-<dom-module id="visual-ui-editor-library-cpt">
+<dom-module id="polymorph-app">
 	<style>
         
-        * { font-family: RobotoDraft, Helvetica, Arial, sans-serif;}
-        
-        paper-toolbar {
-            --paper-toolbar-background: var(--paper-grey-400);
+        :host: {
+            display:inline-block;
+            width:100%;
         }
-        
-		#UIElementsCatalog div {
-			margin:4px;
-			width:75px;
-			cursor: move;
-			text-align:center;
-			padding:2px;
-			list-style-type:none;
-		}
-		
-		paper-progress {
-		  display: block;
-		  width: 100%;
-		   --paper-progress-active-color: var(--paper-light-blue-500);
-		}
-		
-        paper-toggle-button.blue {
-            --paper-toggle-button-checked-bar-color:  var(--paper-light-blue-500);
-            --paper-toggle-button-checked-button-color:  var(--paper-light-blue-500);
-            --paper-toggle-button-checked-ink-color: var(--paper-light-blue-500);
-            --paper-toggle-button-unchecked-bar-color:  var(--paper-light-blue-900);
-            --paper-toggle-button-unchecked-button-color:  var(--paper-light-blue-900);
-            --paper-toggle-button-unchecked-ink-color: var(--paper-light-blue-900);
-        }
-        
-        paper-dialog {
-            --paper-dialog-background-color: #EEEEEE;
-        }
-	  
-	   toggleHelperBold { font-weight: 500;}
-	  
-		.container {
-			background-color:rgb(240, 240, 240);
-			min-height: 40px;
-			border-radius: 4px;
-			display: block;
-			padding: 5px;
-		};
-		
-		.acceptingContainer {
-			border-radius: 5px;
-			box-shadow: inset 0 0 10px #95FF68;
-		}
-		
-		.refusingContainer {
-			border-radius: 5px;
-			box-shadow: inset 0 0 10px #FF6868;
-		}
-		
-		.dragged {
-			opacity: 0.5;
-		}
-        
-        [drawer] {
-           position:relative;
-        }
-        
-        paper-item.menu-trigger {
-            
-        }
-        
-        paper-menu.menu-content {
-            margin-left: 1em;
-        }
-        
+                
         paper-dialog.size-position {
             position: fixed;
             --paper-dialog-background-color: var(--paper-grey-3OO);
             top: 16px;
             right: 16px;
-        }
-        
-        paper-radio-button {
-          display: block;
         }
         
         paper-fab.icon {
@@ -166,174 +45,181 @@
 	</style>
 	<template>
         
-        <!-- include the styles for icons -->
-        <style include="cpt_icon-styles"></style>
-	
-		<!-- get the Json Structure -->
-		<!--<getJsonStructure-cpt json_schema="{{json_schema}}"></getJsonStructure-cpt>-->
-		<iron-ajax
-            auto
-            url="schema.json"
-            handle-as="json"
-            on-response="schemaReceived"></iron-ajax>
-        
-        <!-- window for the "attributes" selection -->
-        <paper-dialog id="modalOpenView" modal="" role="dialog" tabindex="-1" aria-modal="true">
-            <h2>Select the view to edit</h2>
-            <div class="layout vertical">
-                <paper-dropdown-menu label="Select a view">
-                  <paper-menu class="dropdown-content">
-                    <paper-item>[[item]]</paper-item>
-                  </paper-menu>
-                </paper-dropdown-menu>
+        <generic-polymorph-page toolbar-title="Polymorph App">
+            <div toolbar_content>
+                try it!
             </div>
-            <div class="buttons">
-				<paper-button dialog-dismiss>Cancel</paper-button>
-				<paper-button dialog-confirm>Validate</paper-button>
-			</div>
-        </paper-dialog>
-        
-        <!-- window for the "more" button -->
-        <paper-dialog id="modalMore" heading="Custom Size &amp; Position" class="size-position">
-            <paper-item>Exit the editor</paper-item>
-            <paper-item>Suggestions</paper-item>
-            <paper-item>Help</paper-item>
-            <paper-item>Sign Out</paper-item>
-        </paper-dialog>
-            
-        <!-- content with drawer -->
-        <paper-drawer-panel id="contentDrawer" force-narrow="true" defaultSelected="drawer" >
-            <paper-header-panel drawer >
-                <paper-toolbar>
-                    <div class="title" style="margin-left:0px">UI configuration</div>
-                    <paper-fab mini icon="icons:close" class="UIcatalogIcons" title="Close the menu" on-click="hideCatalogMenu"></paper-fab>
-                </paper-toolbar>
-                 <!-- The catalog of UI elements to DnD -->
+            <div main_content>
                 
-            </paper-header-panel>
-
-            <paper-header-panel main>
-                <!-- The application main toolbar -->
-                <paper-toolbar>
-                    <paper-icon-button icon="menu" on-tap="showCatalogMenu"></paper-icon-button>
+                <div class="layout vertical">
                     
-                    <div class="flex horizontal layout" >
-                            <span style="display: inline; vertical-align: bottom; float: left; "><iron-image position="bottom" style="width:35px; height:35px;" sizing="contain" preload fade src="images/SEI_final%20LinkedIn%20Square%20transp.png"></iron-image>
-                                </span>
-                            <span style="display: inline; vertical-align: bottom"><h3>&nbsp;Polymorph</h3></div>
-                    </span>
-                    <!--<Cockpit-connect is-connected="{{isConnected}}"></Cockpit-connect>-->
-                    
-                    <paper-icon-button icon="more-vert" on-tap="callMoreModal"></paper-icon-button>
-                </paper-toolbar>
-
-                <!-- Progress bar
-                <div class="layout flex horizontal"><paper-progress value="90"></paper-progress></div> -->
-
-                <div>&nbsp;</div>
-                
-                <!-- Main content -->                    
-                <div class="layout wrap horizontal">
-
-                    <paper-card style="margin:30px;">
-                        <div class="card-content">
-                            <h2>
-                                <paper-fab icon="icons:build" class="icon"></paper-fab>
-                                &nbsp;Polymorph Configuration
-                            </h2>
+                    <div class="layout horizontal flex">
+                        <div class="layout flex">
+                            <paper-card style="padding:30px;width:100%;margin: 10px">
+                                <div class="card-content">
+                                    <h2>
+                                        <paper-fab icon="icons:build" class="icon"></paper-fab>
+                                        &nbsp;My Dasbhoard
+                                    </h2>
+                                </div>
+                                <div class="card-content">
+                                    To find your current actions,
+                                    To identify pending or in progress activities you are involved in
+                                    To access your different views
+                                </div>
+                                <div class="card-actions">
+                                    <a href="my-dashboard-app/" target="_blank">
+                                        <paper-button>Enter the app</paper-button>
+                                    </a>
+                                </div>
+                            </paper-card>
                         </div>
-                        <div class="card-actions">
-                            <paper-button>Configure...</paper-button>
+                        <div class="layout flex">
+                            <paper-card style="padding:30px;width:100%;margin: 10px">
+                                <div class="card-content">
+                                    <h2>
+                                        <paper-fab icon="icons:speaker-notes" class="icon"></paper-fab>
+                                        &nbsp;My Meetings
+                                    </h2>
+                                </div>
+                                <div class="card-content">
+                                    To create Minutes of Meetings
+                                    To access past Minutes of Meetings
+                                </div>
+                                <div class="card-actions">
+                                    <a href="my-meetings-app/" target="_blank">
+                                        <paper-button>Enter the app</paper-button>
+                                    </a>
+                                </div>
+                            </paper-card>
                         </div>
-                    </paper-card>
-
-                    <paper-card style="margin:30px;">
-                        <div class="card-content">
-                            <h2>
-                            <paper-fab icon="image:movie-creation" class="icon"></paper-fab>&nbsp;Model it!</h2>
-                        </div>
-                        <div class="card-content">
-                            Define the model you want to apply onto your data
-                        </div>
-                        <div class="card-actions">
-                            <paper-button on-click="openView">Edit the model</paper-button>
-                        </div>
-                    </paper-card>
-
-                    <paper-card style="margin:30px;">
-                        <div class="card-content">
-                            <h2>
-                                <paper-fab icon="hardware:cast-connected" class="icon"></paper-fab>
-                                &nbsp;Connect it!
-                            </h2>
-                        </div>
-                        <div class="card-content">Connect Polymorph with your data sources!</div>
-                        <div class="card-actions">
-                            <paper-button on-click="Visual UI Designer.html">Create a data source</paper-button>
-                        </div>
-                    <div class="card-actions">
-                        <paper-button>Select your data source:</paper-button>
-                      </div>
-                    </paper-card>
-
-                    <paper-card style="margin:30px;">
-                        <div class="card-content">
-                            <h2>
-                            <paper-fab icon="image:movie-creation" class="icon"></paper-fab>&nbsp;Create it!</h2>
-                        </div>
-                        <div class="card-content">
-                            Create custom views fitting specific needs
-                        </div>
-                        <div class="card-content">
-                            Describe how you want to display your data
-                        </div>
-                        <div class="card-actions">
-                            <paper-button on-click="openView">Edit Views</paper-button>
-                            <a href="Visual%20UI%20Designer.html" target="_blank">
-                                <paper-button>Create Views</paper-button>
-                            </a>
-                        </div>
-                    </paper-card>
-
-                    <paper-card style="margin:30px;">
-                      <div class="card-content">
-                          <paper-fab icon="image:camera" class="icon"></paper-fab>
-                          <h2>Access the views!</h2>
                     </div>
-                      <div class="card-content">Search by name, by user or user groups, by project or by activity</div>
-                      <div class="card-actions">
-                        <paper-button>Select a view</paper-button>
-                      </div>
-                    </paper-card>
+                    
+                    <div class="layout horizontal flex">
+                        <div class="layout flex">
+                            <paper-card style="padding:30px;width:100%;margin: 10px">
+                                <div class="card-content">
+                                    <h2>
+                                        <paper-fab icon="icons:build" class="icon"></paper-fab>
+                                        &nbsp;Polymorph Configuration
+                                    </h2>
+                                </div>
+                                <div class="card-content">
+                                    All the configurations of Polymer
+                                </div>
+                                <div class="card-actions">
+                                    <paper-button>Enter the app</paper-button>
+                                </div>
+                            </paper-card>
+                        </div>
+                        <div class="layout flex">
+                            <paper-card style="padding:30px;width:100%;margin: 10px">
+                                <div class="card-content">
+                                    <h2>
+                                        <paper-fab icon="image:movie-creation" class="icon"></paper-fab>
+                                        &nbsp;Model it!
+                                    </h2>
+                                </div>
+                                <div class="card-content">
+                                    Define the model you want to apply onto your data
+                                </div>
+                                <div class="card-actions">
+                                    <paper-button on-click="openView">Enter the app</paper-button>
+                                </div>
+                            </paper-card>
+                        </div>
+                    </div>
 
-               </div>
-            </paper-header-panel>
-        </paper-drawer-panel>
-		
-		<!-- paper toasts - messages bubbling in the bottom of the window -->
-		<!-- information -->
-		<paper-toast id="toasterInformation" text="[[toasterMessage]]" class="" aria-hidden="true"></paper-toast>
-		<!-- warning -->
-		<paper-toast id="toasterWarning" text="[[toasterMessage]]" class="" aria-hidden="true">
-			<span role="button" tabindex="0" style="color: #eeff41;margin: 10px" onclick="console.log('CANCEL')">Cancel</span>
-		</paper-toast>
-		<!-- error -->
-		<paper-toast id="toasterError" text="[[toasterMessage]]" class="" aria-hidden="true">
-			<span id="label" class="style-scope paper-toast">Connection timed out. Showing limited messages.</span>
-		</paper-toast>
+                    <div class="layout wrap horizontal">
+                        <div class="layout flex">
+                            <paper-card style="padding:30px;width:100%;margin: 10px">
+                                <div class="card-content">
+                                    <h2>
+                                        <paper-fab icon="hardware:cast-connected" class="icon"></paper-fab>
+                                        &nbsp;Connect it!
+                                    </h2>
+                                </div>
+                                <div class="card-content">
+                                    <p>Connect Polymorph with your data sources!</p>
+                                    <p>Create or edit data sources</p>
+                                </div>
+                                <div class="card-actions">
+                                    <a href="/connect-app/" target="_blank">
+                                        <paper-button>Enter the app</paper-button>
+                                    </a>
+                                </div>
+                            </paper-card>
+                        </div>
+                        <div class="layout flex">
+                            <paper-card style="padding:30px;width:100%;margin: 10px">
+                                <div class="card-content">
+                                    <h2>
+                                        <paper-fab icon="image:movie-creation" class="icon"></paper-fab>
+                                        &nbsp;Design it!
+                                    </h2>
+                                </div>
+                                <div class="card-content">
+                                    <p>Design custom views fitting specific needs.</p>
+                                    <p>Describe how you want to display your data.</p>
+                                    <p>Manage the views</p>
+                                </div>
+                                <div class="card-actions">
+                                    <a href="designer-view-app/" target="_blank">
+                                        <paper-button>Enter the app</paper-button>
+                                    </a>
+                                </div>
+                            </paper-card>
+                        </div>
+                    </div>
+
+                    <div class="layout wrap horizontal">
+                        <div class="layout flex">
+                            <paper-card style="padding:30px;width:100%;margin: 10px">
+                                <div class="card-content">
+                                    <h2>
+                                        <paper-fab icon="image:camera" class="icon"></paper-fab>
+                                        &nbsp;Access the views!
+                                    </h2>
+                                </div>
+                                <div class="card-content">
+                                    Search by name, by user or user groups, by project or by activity
+                                </div>
+                                <div class="card-actions">
+                                    <a href="access-view-app/" target="_blank">
+                                        <paper-button>Enter the app</paper-button>
+                                    </a>
+                                </div>
+                            </paper-card>
+                        </div>
+                        <div class="layout flex">
+                            <paper-card style="padding:30px;width:100%;margin: 10px">
+                                <div class="card-content">
+                                    <h2>
+                                        <paper-fab icon="image:camera" class="icon"></paper-fab>
+                                        &nbsp;Access the data!
+                                    </h2>
+                                </div>
+                                <div class="card-content">
+                                    Navigate in the stored data, add new ones, modify or delete existing ones
+                                </div>
+                                <div class="card-actions">
+                                    <a href="access-data-app/" target="_blank">
+                                        <paper-button>Enter the app</paper-button>
+                                    </a>
+                                </div>
+                            </paper-card>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>                 
+            
+        </generic-polymorph-page>
 		
 	</template>
 	<script>
 		Polymer({
-			is: 'visual-ui-editor-library-cpt',
-			
-			behaviors: [DragBehavior, ToasterTxBehavior, ToasterRxBehavior, UtilitiesBehavior, ModeChangedBehavior],
-
-			extends: 'div',
-
-			properties: {
-				
-            },
+			is: 'polymorph-app',
             
             openView: function() {
                 this.$.modalOpenView.open();

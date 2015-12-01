@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    
+<link rel="stylesheet" href="../bower_components/open-sans-fontface/open-sans.css">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+    
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../bower_components/more-routing/more-route-selector.html">
+    
+<link rel="import" href="../generic-app/generic-polymorph-page.html">
+    
+<!-- specific content for this app -->
+<link rel="import" href="elements/toolbar-cpt/toolbar-cpt.html">
+<link rel="import" href="elements/content-design-page/content-design-page.html">
+    
+<designer-app></designer-app>
+<dom-module id="designer-app">
+    <style>
+
+        iron-selector > * {
+          display: none;
+        }
+        
+        iron-selector > .iron-selected {
+          display: block;
+        }
+        
+    </style>
+    <template>
+        <generic-polymorph-page toolbar-title="View Designer">
+            <div toolbar_content>
+                <toolbar-cpt></toolbar-cpt>
+            </div>
+            <div main_content>
+                <more-route-selector>
+                    <iron-selector>
+                        <content-design-page></content-design-page>
+                    </iron-selector>
+                </more-route-selector>
+            </div>
+        </generic-polymorph-page>
+    </template>
+    
+    <script>
+    
+		Polymer({
+			is: 'designer-app',
+            
+            properties: {
+                
+            }
+        });
+    </script>
+
+</dom-module>
+
+</html>

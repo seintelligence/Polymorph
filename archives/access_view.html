@@ -1,0 +1,43 @@
+
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+All projects
+Project xx
+Project yyy
+
+All activities
+Activity xxx
+Activity yyy
+
+User Defined
+You
+Other (search)
+
+Search by
+Name
+Description
+Date Range
+
+<link rel="import" href="../bower_components/more-routing/more-routing.html"/>
+
+
+<dom-module id="access_view-app">
+    
+    <template>
+        <more-routing-config driver="hash"></more-routing-config>
+            <more-route name="home" path="/"></more-route>
+            <more-route name="customers" path="/customers">
+            <more-route name="customer-contact" path="/:custext"></more-route>
+        </more-route>
+    </template>
+    
+    <script>
+    
+		Polymer({
+			is: 'access_view-app',
+            
+        });
+    </script>
+
+</dom-module>
+

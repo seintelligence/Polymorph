@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+    
+<link rel="stylesheet" href="../bower_components/open-sans-fontface/open-sans.css">
+    
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+    
+<link rel="import" href="../generic-app/generic-polymorph-page.html">
+    
+<!-- specific content for this app -->
+<link rel="import" href="elements/toolbar-design-cpt/toolbar-design-cpt.html">
+<link rel="import" href="elements/content-design-cpt/content-design-cpt.html">
+
+<div is="designer-view-app" style="display:inline-block; width:100%"></div>
+
+<dom-module id="designer-view-app">
+    <style>
+
+        iron-selector > * {
+          display: none;
+        }
+        
+        iron-selector > .iron-selected {
+          display: block;
+        }
+        
+    </style>
+	<template>
+        
+        <!-- window for the "attributes" selection -->
+        <paper-dialog id="modalAttributes" modal="" role="dialog" tabindex="-1" aria-modal="true">
+            <h2>Select the attribute to connect</h2>
+            <div class="layout vertical">
+                <paper-radio-group selected="1" on-change="txBindingAttributes">
+                    <template is="dom-repeat"  items="[[attributesToBeSelected]]">
+                        <paper-radio-button name="[[index]]">[[item]]</paper-radio-button>
+                    </template>
+                </paper-radio-group>
+            </div>
+            <div class="buttons">
+				<paper-button dialog-dismiss hidden$="[[isCurrentCallerBinded(callerAttributeSelector)]]">Deleted Binding</paper-button>
+				<paper-button dialog-dismiss>Cancel</paper-button>
+				<paper-button dialog-confirm>Validate</paper-button>
+			</div>
+        </paper-dialog>
+        
+        <generic-polymorph-page id="genericDrawer" toolbar-title="Design Views">
+            <div toolbar_content>
+                <toolbar-design-cpt></toolbar-design-cpt>
+            </div>
+            <div main_content>
+                <content-design-page></content-design-page>
+            </div>
+        </generic-polymorph-page>
+		
+	</template>
+	<script>
+		Polymer({
+			is: 'designer-view-app',
+
+			extends: 'div',
+
+			properties: {
+				mode:
+				{
+					type: String,
+					value: "Development",
+					notify: true
+				},
+				
+				uniqueID:
+				{
+					value: 0
+				},
+                
+                pathDataInitial: {
+                    type: Object,
+                    value: {}
+                },
+				
+				pathDataValidated: {
+                    type: Object,
+                    value: {}
+                },
+                
+                attributesToBeSelected: {
+                    type: Array,
+                    value: []
+                },
+                
+                callerDataSourceEditor: {},
+                
+                callerAttributeSelector: {},
+                
+                nodeChildren: {
+					type: Object,
+					value: function() { return {}; }
+                },
+                
+                schema: {
+					type: Object,
+                    value: {}
+                },
+                
+                treeData: {
+					type: Object,
+                    value: {},
+                    
+                }
+                
+			},       
+            
+            listeners: {'closeDrawer': 'closeDrawer', 
+                        'openDrawer': 'openDrawer'},
+			
+			saveView: function() { this.sendToasterMsgDisplayRequest("UI view saved", "information");}, 
+			
+            
+            /**************** Mode Management ****************/
+			isMode: function(mode) { return this.mode == mode; },
+			
+			sendModeChangedRequest: function(mode) {
+				this.mode = mode; 
+				this.sendToasterMsgDisplayRequest("UI mode switched to " + mode, "information");
+				this.$.UItopContainer.fire('UImodeChangedRequest', { "mode": this.mode });
+			},
+            
+			modeTogglechange: function() {
+				if ( this.isMode('Development') )
+					this.sendModeChangedRequest('Operational');
+				else 
+					this.sendModeChangedRequest('Development');
+			},
+            
+            /****************** Menu Management ******************/
+            openDrawer: function() { this.$.genericDrawer.openDrawer(); },
+            
+            closeDrawer: function() { this.$.genericDrawer.closeDrawer(); }
+		});
+	</script>
+</dom-module>
+</html>

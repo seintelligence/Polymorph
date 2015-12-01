@@ -1,0 +1,110 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../behaviours/DropBehavior.html">
+<link rel="import" href="../behaviours/ModeChangedBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/ToasterTxBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/UtilitiesBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/exportBehavior.html">
+<link rel="import" href="../../../generic-app/change-requests/ChangeRequestBehaviour.html">
+
+<link rel="import" href="../../../generic-app/data-filtering/filter-data-cpt.html">
+<link rel="import" href="../../../generic-app/export/export-cmd-cpt.html">
+<link rel="import" href="../../../generic-app/change-requests/change-requests-cpt.html">
+
+<link rel="import" href="../components/cpt_icon-cpt.html">
+
+<link rel="import" href="layout-cpt.html">
+
+<dom-module id="container-cpt">
+    <template>
+        <!-- Development -->
+		<div draggable="false" hidden$='[[!isMode("Development", mode)]]'>
+            <div is="layout-cpt" id="[[id]]" mode="Development" config="{{config}}" node-children="{{nodeChildren}}"></div>
+        </div>
+            
+        <!-- Operational -->
+        <div class="layout vertical flex" id="container" hidden$='[[!isMode("Operational", mode)]]'>
+            <div class="layout horizontal">
+                <filter-data-cpt wide-filter="{{wideFilter}}"></filter-data-cpt>
+                <export-cmd-cpt></export-cmd-cpt>
+            </div>
+            
+             <!-- if it is an iterative layout -->
+            <template is="dom-if" if="[[layoutIterate]]" id="layoutIterate">
+                <template is="dom-repeat" items="[[contentData]]" as="item">
+                    <div is="layout-cpt" id="[[structureData.id]]" content-data="[[item]]" structure-data="[[structureData]]" layout-horiz-vert="[[structureData.id.config.layoutHorizVert]]" layout-flex="[[structureData.id.config.layoutFlex]]" hidden$="[[checkFiltering(item, wideFilter)]]" class="export"></div>
+                </template>
+            </template>
+            
+            <!-- if it is not an iterative layout -->
+            <template is="dom-if" if="[[!layoutIterate]]" id="layoutNotIterate">
+                <div is="layout-cpt" id="[[structureData.id]]" content-data="[[contentData]]" structure-data="[[structureData]]" layout-horiz-vert="[[structureData.id.config.layoutHorizVert]]" layout-flex="[[structureData.id.config.layoutFlex]]" class="export"></div>
+            </template>
+        </div>
+            
+        <!-- Icon -->
+        </div>
+            <div draggable="false" hidden$='[[!isMode("Icon", mode)]]'>
+                <div is="cpt_icon-cpt" draggable="false" imgsrc="layout"></div>
+            </div>
+        </div>
+
+    </template>
+    <script>
+		Polymer({
+            
+			is: 'container-cpt',
+            
+			extends: 'div',
+            
+			behaviors: [ToasterTxBehavior, DropBehavior, ModeChangedBehavior, UtilitiesBehavior, exportBehavior, ChangeRequestBehavior],
+            
+            properties: {
+                
+                contentData: {
+                    type: Array,
+                    value: []
+                },
+                
+                structureData: {
+                    type: Object,
+                    value: {}
+                },
+                
+                wideFilter: {
+                    type: String,
+                    value: "",
+                    notify: true
+                },
+                
+                receives: {}
+    
+            },
+            
+            checkFiltering: function(item, searchVal) {
+                
+                if ( searchVal === undefined) searchVal = "";
+                
+                for (var key in item)
+                {
+
+                    if (item.hasOwnProperty(key) && typeof item[key] === 'string')
+                    {
+                        if ( item[key].toLowerCase().indexOf(searchVal.toLowerCase()) > -1 )
+                        {
+                            return false;
+                        }
+                    }
+
+                }
+                
+                return true;
+            },
+            
+            getDivAttributes: function() { return '"layout vertical"';},
+            
+            getExportChildNodes: function() { return Polymer.dom(this.$.container).querySelectorAll("#" + this.structureData.id); }
+            
+        });
+    </script>
+</dom-module>

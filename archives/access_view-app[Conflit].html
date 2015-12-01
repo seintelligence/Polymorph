@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+    
+<link rel="stylesheet" href="bower_components/open-sans-fontface/open-sans.css">
+<link rel="import" href="bower_components/polymer/polymer.html">
+    
+    
+<!-- styles for icons -->
+<link rel="import" href="styles/cpt_icon-styles.html">
+
+<link rel="import" href="bower_components/more-routing/more-routing.html"/>
+    
+<link rel="import" href="elements/access-view-app/table-view-cpt.html"/>
+<link rel="import" href="elements/generic/data-filtering/filter-data-cpt.html"/>
+    
+<link rel="import" href="elements/filter-block-cpt.html"/>
+    
+<link rel="import" href="elements/get-db-cpt.html"/>
+<link rel="import" href="elements/get-db-items-cpt.html"/>
+    
+<link rel="import" href="elements/date-picker-cpt.html"/>
+
+<link rel="import" href="elements/generic-app/behaviours/UtilitiesBehavior.html"/>
+<link rel="import" href="elements/generic-app/behaviours/PathQueryBehavior.html"/>
+
+<access_view-app></access_view-app>
+
+<dom-module id="access_view-app">
+    <style>
+        @font-face {
+            font-family: "Roboto Condensed";
+            font-style: normal;
+            src: local('Roboto Regular'), local('Roboto-Regular'), url('styles/Roboto/Roboto-Regular.ttf') format('truetype');
+        }
+        
+        @font-face {
+            font-family: "Roboto Light";
+            src: local('Roboto Light'), local('Roboto-Light'), url('styles/Roboto/Roboto-Light.ttf') format('truetype');
+        }
+        
+        * { font-family: "Roboto Condensed"; font-weight:300}
+        
+        .separator {
+           margin: 20px; 
+        }
+        
+        paper-card {
+           margin: 20px; 
+        }
+        
+    </style>
+    <template>
+        <!-- include the styles for icons -->
+        <style include="cpt_icon-styles"></style>
+        
+		<iron-ajax
+            auto
+            url="[[db_source_computed]]"
+            handle-as="json"
+            last-response="{{db}}"></iron-ajax>
+        
+        <!-- Get db -->
+        <get-db-cpt db_source="db2.json" db="{{db}}"></get-db-cpt>
+        
+        <!-- Get all the views -->
+        <get-db-items-cpt db="[[db]]" filters="[[filterGetViews]]" data="{{views}}"></get-db-items-cpt>
+        
+        <!-- Get all the views -->
+        <get-db-items-cpt db="[[db]]" filters="[[filterGetViews]]" data="{{views}}"></get-db-items-cpt>
+        
+        <!-- Get latest views -->
+        <get-db-items-cpt db="[[db]]" filters="[[filterGetViews]]" orders='[[orderGetLatest]]' data="{{viewsLatest}}"></get-db-items-cpt>
+        
+        <get-db-items-cpt db="[[searched]]" columns='["id"]' data="{{FilteredViews}}"></get-db-items-cpt>
+        
+        <!-- Get my views -->
+        <!-- query=users[name=me]/has_created/views -->
+        
+        <div class="horizontal flex layout">
+            <div class="layout vertical separator">
+                                
+                <paper-card heading="By Date">
+                    <div class="card-content">Search views by date of creation</div>
+                    <div class="card-actions">
+                        <date-picker-cpt date-filter="{{dateFilter]]"></date-picker-cpt>
+                    </div>
+                </paper-card>
+                
+                <div is="filter-block-cpt" 
+                     db="[[db]]" 
+                     heading="By projects"
+                     s-items="projects"
+                     description="Search by projects"
+                     filter-get-items="[[filterGetProjects]]"
+                     filter="{{filterProjects}}"></div>
+                
+                <div is="filter-block-cpt" 
+                     db="[[db]]" 
+                     heading="By activities"
+                     s-items="activities"
+                     description="Search by activities"
+                     filter-get-items="[[filterGetActivities]]"
+                     filter="{{filterActivities}}"></div>
+                
+                <div is="filter-block-cpt" 
+                     db="[[db]]" 
+                     heading="By users"
+                     s-items="users"
+                     description="Search by users"
+                     filter-get-items="[[filterGetUsers]]"
+                     filter="{{filterUsers}}"></div>
+            </div>
+            
+            <!-- Main Content -->
+            <div  class="layout vertical separator">
+                <div class="layout horizontal">
+                    <div class="layout flex">&nbsp;</div>
+                    <div class="layout end-justified">
+                        <filter-data-cpt wide-filter="{{wideFilter}}"></filter-data-cpt>
+                    </div>
+                </div>
+                
+                <div is="table-view-cpt" title="Favorites" views="[[favorites]]" hidden$="[[!isExistingSearched]]"></div>
+                
+                <div is="table-view-cpt" title="Matching current activities" views="[[current]]" hidden$="[[!isExistingSearched]]"></div>
+                
+                <div is="table-view-cpt" title="Latest" views="[[viewsLatest]]" hidden$="[[!isExistingSearched]]"></div>
+                
+                <div is="table-view-cpt" title="Your views" views="[[latest]]" hidden$="[[!isExistingSearched]]"></div>
+                
+                <div is="table-view-cpt" title="Search results" views="[[searched]]" hidden$="[[isExistingSearched]]"></div>
+                
+            </div>
+        </div>
+        
+        <more-routing-config driver="hash"></more-routing-config>
+            <more-route name="home" path="/"></more-route>
+            <more-route name="customers" path="/customers">
+            <more-route name="customer-contact" path="/:custext"></more-route>
+        </more-route>
+    </template>
+    
+    <script>
+    
+		Polymer({
+			is: 'access_view-app',
+            
+			behaviors: [UtilitiesBehavior, PathQueryBehavior],
+            
+            properties: {
+                
+                views: {
+                    type: Array,
+                    value: []
+                },
+                
+                favorites: {
+                    type: Array,
+                    value: [
+                        { "name": "oo"},
+                        { "name": "bb"}
+                    ]
+                },
+                
+                searched: {
+                    type: Array,
+                    computed: 'search_results(filterProjects, filterActivities, filterUsers, db)'
+                },
+                
+                isExistingSearched: {
+                    type: Boolean,
+                    computed: 'existingSearched(searched)'
+                },
+                
+                filterGetViews: {
+                    type: Array,
+                    value: ["type='View'"]
+                },
+                
+                filterGetProjects: {
+                    type: Array,
+                    value: ["type='Project'"]
+                },
+                
+                filterProjects: {
+                    type: Array
+                },
+                
+                filterGetActivities: {
+                    type: Array,
+                    value: ["type='Activity'"]
+                },
+                
+                filterActivities: {
+                    type: Array
+                },
+                
+                filterGetUsers: {
+                    type: Array,
+                    value: ["type='User'"]
+                },
+                
+                filterUsers: {
+                    type: Array
+                },
+                
+                orderGetLatest: {
+                    type: Array,
+                    value: [["created_on", "DESC"]]                    
+                },
+                
+                all_projects_checked: {
+                    type: Boolean,
+                    value: true                    
+                },
+                
+                all_activities_checked: {
+                    type: Boolean,
+                    value: true                    
+                },
+                
+                all_users_checked: {
+                    type: Boolean,
+                    value: true                    
+                }
+            },
+            
+            search_results: function(filterProjects, filterActivities, filterUsers) {
+                console.log("/search_results");
+                var foundFilterViews = [];
+                
+                
+                // Get the id of the complete list of views
+                var views_id = this.extractOnlyId(this.views);
+                
+                // by default, set each filter to the complete list of views id
+                var foundFilterProjects = views_id,
+                    foundFilterActivities = views_id,
+                    foundFilterUsers = views_id;
+                
+                // Get the filtered views if any filter
+                if (filterProjects.length)
+                    var foundFilterProjects = this.getFoundFilterItems(filterProjects, 'Project', 'is_a_view_of');
+                
+                if (filterActivities.length)
+                    var foundFilterActivities = this.getFoundFilterItems(filterActivities, 'Activity', 'is_a_view_of');
+                
+                if (filterUsers.length)
+                    var foundFilterUsers = this.getFoundFilterItems(filterUsers, 'User', 'is_created_by');
+                
+                // Get the intersection of the filters
+                foundFilterViews = _.intersection(foundFilterProjects, foundFilterActivities, foundFilterUsers);
+                
+                // Get the views from the list of id
+                var that = this;
+                var pathData = [
+                    {
+                        "path": "View",
+                        "filters": ['id IN ' + this._reconstructSQLqueryArray(foundFilterViews)]
+                    }
+                ];
+                pathData.forEach(function(e) {
+                    foundFilterViews = foundFilterViews.concat.apply([], that.getItems(_.clone(e)));
+                });
+                
+                return foundFilterViews;
+            },
+            
+            existingSearched: function(searched) {
+                console.log(this.filterProjects);
+                console.log(this.filterActivities);
+                console.log(this.filterUsers);
+                var l = this.filterProjects.indexOf('*') + this.filterActivities.indexOf('*') || this.filterUsers.indexOf('*')
+                console.log(l);
+                if (l == 0)
+                    return true;
+                else
+                    return false;
+            },
+            
+            extractOnlyId: function(arr) {
+                var arr_id = [];
+                arr.forEach(function(e) { arr_id.push(e.id); });
+                return arr_id;
+            },
+            
+            getFoundFilterItems: function(filter, sItem, sLink) {
+                
+                var foundItems = [],
+                    that = this;
+                
+                var strFilter = 'id IN ' + this._reconstructSQLqueryArray(filter);
+                
+                var pathData = [
+                    {
+                        "path": sItem,
+                        "filters": ['id IN ' + this._reconstructSQLqueryArray(filter)],
+                        "subPathData": {
+                            "path": sLink,
+                            "inverted": true,
+                            "filters": [],
+                            "subPathData": {
+                                "path": "View",
+                                "filters": []
+                            }
+                        }
+                    }
+                ];
+                
+                // Get the objects of the container
+                pathData.forEach(function(e) { foundItems = foundItems.concat.apply([], that.getItems(_.clone(e))); });
+
+                // Get the ID in order to later make an intersection of all the filters
+                return this.extractOnlyId(foundItems);
+            }
+            
+        });
+    </script>
+
+</dom-module>
+
+</html>

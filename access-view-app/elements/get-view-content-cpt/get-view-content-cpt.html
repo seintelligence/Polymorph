@@ -1,0 +1,130 @@
+<script src="../../../scripts/alasql.min.js"></script> 
+<script src="../../../scripts/underscore-min.js"></script>
+
+<link rel="import" href="../../../generic-app/behaviours/UtilitiesBehavior.html"/>
+<link rel="import" href="../../../generic-app/behaviours/PathQueryBehavior.html"/>
+
+<dom-module id="get-view-content-cpt">
+	<style>
+        * { font-family: RobotoDraft, Helvetica, Arial, sans-serif;}
+	</style>
+    <script>
+        Polymer({
+			is: 'get-view-content-cpt',
+            
+            properties: {
+                
+                contentData: {
+                    type: Object,
+                    value: {},
+                    notify: true                   
+                },
+                
+                structureData: {
+                    type: Array,
+                    value: []
+                },
+                
+                db: {
+                    type: Array,
+                    value: []
+                }
+                
+            },
+            
+            observers: ['structureChanged(db, structureData)'],
+			
+			behaviors: [UtilitiesBehavior, PathQueryBehavior],
+                
+            structureChanged: function(db, structureData) {
+                
+                // Check if we have received structure and the content
+                if ( _.isEmpty(this.structureData) || _.isEmpty(this.db) ) return;
+                
+                // Reduce the structure data
+                var structureData = JSON.parse(JSON.stringify(this.structureData.UItopContainer));
+                structureData.nodeChildren = this.getOnlyHasPathData(structureData.nodeChildren);
+                
+                // Get the uppermost object
+                var obj = structureData;
+                
+                var tmpContentData = {};
+                
+                // Iteratively get the content
+                tmpContentData["UItopContainer"] = this.getContainerData(obj);
+                this.set('contentData', tmpContentData);
+            },
+            
+            // Reduce structure to only structure items with pathData
+            getOnlyHasPathData: function(nodeChildren) {
+                var tmpNodeChildren = nodeChildren;
+                nodeChildren = [];
+                
+                // Get the children node which are containers ==> nodes
+                for( key in tmpNodeChildren)
+                {
+                    if ( _.has(tmpNodeChildren[key].config, 'pathData' ) )
+                    {                        
+                        var tmp = tmpNodeChildren[key];
+                        tmp.nodeChildren = this.getOnlyHasPathData(tmpNodeChildren[key].nodeChildren);
+                        nodeChildren.push( tmp );
+                    }
+                }
+                return nodeChildren;
+            },
+            
+            // Run through the container structure and get its data
+            getContainerData: function() {
+                var foundItems = [];
+                var that = this;
+                var containerData = [];
+                var nodes = [];
+                
+                // get the function arguments
+                var arg = [].slice.call(arguments);
+                
+                // get the current object
+                var obj = arg.shift();
+                
+                var pathData = obj.config.pathData;
+                var nodeChildren = obj.nodeChildren;
+                
+                // Get the objects of the container
+                pathData.forEach(function(e) { foundItems = foundItems.concat.apply([], that.getItems(_.clone(e))); });
+                
+                // Get the unique list of objects + 
+                // For each found item, iterate and search for the children item
+                foundItems.forEach(function(foundItem) {
+                    
+                    // if similar, then skip else:
+                    if (_.findWhere(containerData, foundItem) == null) {
+                        
+                        foundItem.nodeChildren = {};
+                        
+                        // Get the node children
+                        nodeChildren.forEach( function(nodeChild) {
+                            
+                            var tmpNode = JSON.parse(JSON.stringify(nodeChild));
+                            var nodeChildPathData = tmpNode.config.pathData;
+                            
+                            tmpNode.config.pathData = [];
+                            
+                            // Introduce in the pathData the current found item to start the sql query from here
+                            nodeChildPathData.forEach(function(path) {
+                                path.filters.push('id = "' + foundItem.id + '"');
+                                tmpNode.config.pathData.push(path);
+                            });
+                            
+                            foundItem.nodeChildren[nodeChild.id] = that.getContainerData(tmpNode);
+                        });
+                        containerData.push( foundItem );
+                    }
+                    
+                });
+                    
+                // Return the unique list of objects
+                return containerData;
+            }
+        });
+    </script>
+</dom-module>

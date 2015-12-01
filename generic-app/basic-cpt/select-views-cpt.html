@@ -1,0 +1,99 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+  <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+  <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+  <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+  <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+
+<!-- JSON structre -->
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<script src="../../scripts/alasql.min.js"></script>
+
+<dom-module id="select-views-cpt">
+    <template>
+		<!-- get the Json Structure -->
+		<iron-ajax
+            auto
+            url="../db2.json"
+            handle-as="json"
+            last-response="{{json}}"></iron-ajax>
+        
+      <paper-dropdown-menu label="Select a view to open it" selected-item="{{selectedView}}">
+        <paper-menu class="dropdown-content">
+          <template is="dom-repeat" items="[[views]]" as="view">
+            <paper-item id="[[view.name]]">[[view.name]]</paper-item>
+          </template>
+        </paper-menu>
+      </paper-dropdown-menu>
+        
+        <template is="dom-if" if="[[selectedView]]">
+            <paper-fab mini noink icon="arrow-forward" title="arrow-forward" on-click="openSelectedView"></paper-fab>
+        </template>
+        
+        <content></content>
+    </template>
+
+    <script>
+        
+		Polymer({
+			is: 'select-views-cpt',
+            
+            extends: 'div',
+            
+            properties: {
+                json: {
+                    type: Object,
+                    value: {},
+                    observer: 'views_received'
+                },
+                
+                views: {
+                    type: Array,
+                    value: []
+                },
+                
+                selectedView: {
+                    observer: 'selectedViewChanged'
+                }
+            },
+            
+            selectedViewChanged: function(ev) {
+                console.log(this.selectedView.id);
+                
+            },
+            
+            openSelectedView: function() {
+                var mapForm = document.createElement("form");
+                    mapForm.target = "Map";
+                    mapForm.method = "POST"; // or "post" if appropriate
+                    mapForm.action = "../access_view.html";
+
+                var mapInput = document.createElement("input");
+                    mapInput.type = "hidden";
+                    mapInput.name = "id";
+                    mapInput.value = this.selectedView.id;
+                
+                mapForm.appendChild(mapInput);
+
+                this.appendChild(mapForm);
+
+                map = window.open("", "Map");
+
+                if (map) {
+                    mapForm.submit();
+                } else {
+                    alert('You must allow popups for this map to work.');
+                }
+            },
+            
+            views_received: function() {
+                
+                // Get the views
+                this.views = alasql('SEARCH views/ FROM ?', [this.json]);
+                console.log(this.views);
+            }
+            
+        });
+        
+    </script>
+
+</dom-module>

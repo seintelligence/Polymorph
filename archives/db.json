@@ -1,0 +1,267 @@
+{
+    "items": {
+        "ID1": {
+            "id": "ID1",
+            "name": "To Compute APS position",
+            "type": "Feature",
+            "description": "This feature aims at computing"
+        },
+
+        "ID2": {
+            "id": "ID2",
+            "name": "To Sense APS position",
+            "type": "Feature",
+            "description": "This feature aims at sensing"
+        },
+
+        "ID3": {
+            "id": "ID3",
+            "name": "System Drive By Wire",
+            "type": "Feature",
+            "description": "This system aims at providing the drive by wire capability"
+        },
+
+        "ID4": {
+            "id": "ID4",
+            "name": "System Fuel Information",
+            "type": "Feature",
+            "description": "This system aims at providing the fuel information"
+        },
+
+        "ID6": {
+            "id": "ID6",
+            "name": "To Sense Fuel Level",
+            "type": "Feature",
+            "description": "This functions aims at sensing the fuel level"
+        },
+
+        "ID7": {
+            "id": "ID7",
+            "name": "To Compute Fuel Level",
+            "type": "Feature",
+            "description": "This <b>functions</b> aims at computing the fuel level &lt;img src=&quot;images/SEI_lighter.png&quot;&gt;"
+        },
+        
+        "ID9": {
+            "id": "ID9",
+            "name": "Fuel level computation",
+            "type": "Requirement",
+            "description": "The function \"To Compute Fuel Level\" shall compute the fuel level based on TBD."
+        },
+        
+        "ID11": {
+            "id": "ID11",
+            "name": "Project ECU EPM44",
+            "type": "Project",
+            "description": "Project of BOSCH ECU EPM44"
+        },
+        
+        "ID14": {
+            "id": "ID14",
+            "name": "Project Vehicle R2",
+            "type": "Project",
+            "description": "Project of the model R2"
+        },
+        
+        "ID185": {
+            "id": "ID185",
+            "name": "view Example",
+            "type": "View",
+            "created_on": "14-10-2015",
+            "description": "this is a test",
+			"UItopContainer": {
+			  "id": "UItopContainer",
+			  "is": "container-cpt",
+			  "nodeChildren": {
+				"UItopContainer_1": {
+				  "id": "UItopContainer_1",
+				  "is": "h1-cpt",
+				  "nodeChildren": {
+
+				  },
+				  "config": {
+					"displayedText": "{{contentData.name}}"
+				  }
+				},
+				"UItopContainer_3": {
+					  "id": "UItopContainer_3",
+					  "is": "text-cpt",
+					  "nodeChildren": {
+
+					  },
+					  "config": {
+						"displayedText": "{{contentData.description}}"
+					  }
+				},
+				"UItopContainer_2": {
+				  "id": "UItopContainer_2",
+				  "is": "container-cpt",
+				  "nodeChildren": {
+					"UItopContainer_2_1": {
+					  "id": "UItopContainer_2_1",
+					  "is": "h1-cpt",
+					  "nodeChildren": {
+
+					  },
+					  "config": {
+						"displayedText": "{{contentData.name}}"
+					  }
+					},
+					"UItopContainer_2_2": {
+					  "id": "UItopContainer_2_2",
+					  "is": "text-cpt",
+					  "nodeChildren": {
+
+					  },
+					  "config": {
+						"displayedText": "{{contentData.description}}"
+					  }
+					}
+				  },
+				  "config": {
+					"pathData":  [
+						{
+							"path": "Feature",
+							"filters": [],
+							"subPathData": {
+								"path": "owns_function",
+								"filters": [],
+								"subPathData": {
+									"path": "Feature",
+									"filters": [],
+									"subPathData": {}
+								}
+							}
+						}
+					],
+					"contentData": "{{contentData.nodeChildren.UItopContainer_2}}",
+					"structureData": "{{structureData.nodeChildren.UItopContainer_2}}",
+					"layoutIterate": true,
+					"layoutFlex": false,
+					"layoutHorizVert": true
+				  }
+				}
+			  },
+			  "config": {
+				"pathData": [
+					{
+						"path": "Project",
+						"filters": [],
+						"subPathData": {
+							"path": "owns_function",
+							"filters": [],
+							"subPathData": {
+								"path": "Feature",
+								"filters": [],
+								"subPathData": {}
+							}
+						}
+					}
+				],
+				"contentData": "{{contentData.UItopContainer}}",
+				"structureData": "{{structureData.UItopContainer}}",
+				"layoutIterate": true,
+				"layoutFlex": false,
+				"layoutHorizVert": true
+			  }
+			}
+		},
+        
+        "ID143": {
+            "id": "ID143",
+            "name": "Validation",
+            "type": "Activity",
+            "description": "c'est oo"
+        },
+        
+        "ID144": {
+            "id": "ID144",
+            "name": "Verification",
+            "type": "Activity",
+            "description": "c'est pp"
+        },
+        
+        "ID132": {
+            "id": "ID132",
+            "name": "admin",
+            "type": "User"
+        },
+        "ID133": {
+            "id": "ID133",
+            "name": "Matthieu Aubron",
+            "type": "User"
+        }
+
+    },
+    "links": {
+        "ID5": {
+            "id": "ID5",
+            "type": "owns_function",
+            "origin": "ID3",
+            "destination": "ID1"
+        },
+        
+        "ID11": {
+            "id": "ID11",
+            "type": "owns_function",
+            "origin": "ID3",
+            "destination": "ID2"
+        },
+        
+        "ID8": {
+            "id": "ID8",
+            "type": "owns_function",
+            "origin": "ID4",
+            "destination": "ID6"
+        },
+        
+        "ID10": {
+            "id": "ID10",
+            "type": "owns_function",
+            "origin": "ID4",
+            "destination": "ID7"
+        },
+        
+        "ID12": {
+            "id": "ID12",
+            "type": "owns_function",
+            "origin": "ID11",
+            "destination": "ID3"
+        },
+        
+        "ID13": {
+            "id": "ID13",
+            "type": "owns_function",
+            "origin": "ID11",
+            "destination": "ID4"
+        },
+        
+        "ID141": {
+            "id": "ID141",
+            "type": "is_a_view_of",
+            "origin": "ID185",
+            "destination": "ID11"
+        },
+        
+        "ID147": {
+            "id": "ID147",
+            "type": "is_a_view_of",
+            "origin": "ID185",
+            "destination": "ID144"
+        },
+        
+        "ID142": {
+            "id": "ID142",
+            "type": "is_created_by",
+            "origin": "ID185",
+            "destination": "ID133"
+        },
+        
+        "ID145": {
+            "id": "ID145",
+            "type": "is_favorite_of",
+            "origin": "ID143",
+            "destination": "ID133"
+        }
+    }
+}

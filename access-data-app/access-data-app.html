@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    
+<link rel="stylesheet" href="../bower_components/open-sans-fontface/open-sans.css">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+    
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../bower_components/more-routing/more-route-selector.html">
+    
+<link rel="import" href="../generic-app/generic-polymorph-page.html">
+    
+<!-- specific content for this app -->
+<link rel="import" href="elements/toolbar-data-cpt/toolbar-data-cpt.html">
+<link rel="import" href="elements/navigate-nodes-cpt/navigate-nodes-cpt.html">
+<link rel="import" href="elements/visu-nodes-cpt/visu-nodes-cpt.html">
+
+<dom-module id="access-data-app">
+    <style>
+
+        iron-selector > * {
+          display: none;
+        }
+        
+        iron-selector > .iron-selected {
+          display: block;
+        }
+        
+    </style>
+    <template>
+        <generic-polymorph-page toolbar-title="Access Data">
+            <div toolbar_content>
+                <toolbar-data-cpt></toolbar-data-cpt>
+            </div>
+            <div main_content>
+                <more-route-selector>
+                    <iron-selector>
+                        <navigate-nodes-cpt></navigate-nodes-cpt>
+                        <visu-nodes-cpt></visu-nodes-cpt>
+                    </iron-selector>
+                </more-route-selector>
+            </div>
+        </generic-polymorph-page>
+    </template>
+    
+    <script>
+    
+		Polymer({
+			is: 'access-data-app',
+            
+            properties: {
+                
+            }
+        });
+    </script>
+
+</dom-module>
+
+</html>

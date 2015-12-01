@@ -1,0 +1,703 @@
+{
+	"items": [{
+			"id": "ID1",
+			"name": "To Compute APS position",
+			"type": "Feature",
+			"description": "This feature aims at computing"
+		},
+
+		{
+			"id": "ID2",
+			"name": "To Sense APS position",
+			"type": "Feature",
+			"description": "This feature aims at sensing"
+		},
+
+		{
+			"id": "ID3",
+			"name": "System Drive By Wire",
+			"type": "Feature",
+			"description": "This system aims at providing the drive by wire capability"
+		},
+
+		{
+			"id": "ID4",
+			"name": "System Fuel Information",
+			"type": "Feature",
+			"description": "This system aims at providing the fuel information &lt;br&gt;&lt;img src=&quot;/images/examples/fuel level sensing.png&quot;&gt;"
+		},
+
+		{
+			"id": "ID6",
+			"name": "To Sense Fuel Level",
+			"type": "Feature",
+			"description": "This functions aims at sensing the fuel level"
+		},
+
+		{
+			"id": "ID7",
+			"name": "To Compute Fuel Level",
+			"type": "Feature",
+			"description": "This <b>functions</b> aims at computing the fuel level"
+		},
+
+		{
+			"id": "ID9",
+			"name": "Fuel level computation",
+			"type": "Requirement",
+			"description": "The function \"To Compute Fuel Level\" shall compute the fuel level based on TBD."
+		},
+
+		{
+			"id": "ID11",
+			"name": "Project ECU EPM44",
+			"type": "Project",
+			"description": "Project of BOSCH ECU EPM44"
+		},
+
+		{
+			"id": "ID14",
+			"name": "Project Vehicle R2",
+			"type": "Project",
+			"description": "Project of the model R2"
+		},
+
+		{
+			"id": "ID185",
+			"name": "view Example",
+			"type": "View",
+			"created_on": "14-10-2015",
+			"description": "this is a test",
+			"UItopContainer": {
+				"id": "UItopContainer",
+				"is": "container-cpt",
+				"nodeChildren": {
+					"UItopContainer_1": {
+						"id": "UItopContainer_1",
+						"is": "h1-cpt",
+						"nodeChildren": {
+
+						},
+						"config": {
+							"displayedText": "{{contentData.name}}",
+							"bindAttribute": "name"
+						}
+					},
+					"UItopContainer_3": {
+						"id": "UItopContainer_3",
+						"is": "text-cpt",
+						"nodeChildren": {
+
+						},
+						"config": {
+							"displayedText": "{{contentData.description}}",
+							"bindAttribute": "description"
+						}
+					},
+					"UItopContainer_2": {
+						"id": "UItopContainer_2",
+						"is": "container-cpt",
+						"nodeChildren": {
+							"UItopContainer_2_1": {
+								"id": "UItopContainer_2_1",
+								"is": "h1-cpt",
+								"nodeChildren": {
+
+								},
+								"config": {
+									"displayedText": "{{contentData.name}}",
+									"bindAttribute": "name"
+								}
+							},
+							"UItopContainer_2_2": {
+								"id": "UItopContainer_2_2",
+								"is": "text-cpt",
+								"nodeChildren": {
+
+								},
+								"config": {
+									"displayedText": "{{contentData.description}}",
+									"bindAttribute": "description"
+								}
+							}
+						},
+						"config": {
+							"pathData": [{
+								"path": "Feature",
+								"filters": [],
+								"subPathData": {
+									"path": "owns_function",
+									"filters": [],
+									"subPathData": {
+										"path": "Feature",
+										"filters": [],
+										"subPathData": {}
+									}
+								}
+							}],
+							"contentData": "{{contentData.nodeChildren.UItopContainer_2}}",
+							"structureData": "{{structureData.nodeChildren.UItopContainer_2}}",
+							"layoutIterate": true,
+							"layoutFlex": false,
+							"layoutHorizVert": true
+						}
+					}
+				},
+				"config": {
+					"pathData": [{
+						"path": "Project",
+						"filters": [],
+						"subPathData": {
+							"path": "owns_function",
+							"filters": [],
+							"subPathData": {
+								"path": "Feature",
+								"filters": [],
+								"subPathData": {}
+							}
+						}
+					}],
+					"contentData": "{{contentData.UItopContainer}}",
+					"structureData": "{{structureData.UItopContainer}}",
+					"layoutIterate": true,
+					"layoutFlex": false,
+					"layoutHorizVert": true
+				}
+			}
+		},
+
+		{
+			"id": "ID143",
+			"name": "Validation",
+			"type": "Activity",
+			"description": "c'est oo"
+		},
+
+		{
+			"id": "ID144",
+			"name": "Verification",
+			"type": "Activity",
+			"description": "c'est pp"
+		},
+
+		{
+			"id": "ID132",
+			"name": "admin",
+			"type": "User"
+		}, {
+			"id": "ID133",
+			"name": "Matthieu Aubron",
+			"type": "User"
+		}, {
+			"id": "ID1343",
+			"name": "A new world",
+			"type": "ChangeRequest",
+			"createdOn": 1447765048756,
+			"description": "zezeze",
+			"unstructAttributes": {
+				"abstract": "A little abstract would be better",
+				"dueDate": "2015-10-05T20:10:00.000Z",
+				"priority": "2"
+			}
+		},
+
+		{
+			"id": "ID1344",
+			"name": "A new world",
+			"type": "Comment",
+			"createdOn": 1447765048756,
+			"description": "A nice Comment to have"
+		},
+
+		{
+			"id": "ID1345",
+			"name": "A new requirement",
+			"type": "Requirement",
+			"createdOn": 1447765048756,
+			"description": "A nice requirement to have",
+			"target": "The function \"To Compute Fuel\" shall compute the fuel level based on the sensed input XXX"
+		}
+
+	],
+	"links": [{
+			"id": "ID5",
+			"name": "owns_function",
+			"type": "owns_function",
+			"origin": "ID3",
+			"destination": "ID1"
+		},
+
+		{
+			"id": "ID11",
+			"name": "owns_function",
+			"type": "owns_function",
+			"origin": "ID3",
+			"destination": "ID2"
+		},
+
+		{
+			"id": "ID8",
+			"name": "owns_function",
+			"type": "owns_function",
+			"origin": "ID4",
+			"destination": "ID6"
+		},
+
+		{
+			"id": "ID10",
+			"name": "owns_function",
+			"type": "owns_function",
+			"origin": "ID4",
+			"destination": "ID7"
+		},
+
+		{
+			"id": "ID12",
+			"name": "owns_function",
+			"type": "owns_function",
+			"origin": "ID11",
+			"destination": "ID3"
+		},
+
+		{
+			"id": "ID13",
+			"name": "owns_function",
+			"type": "owns_function",
+			"origin": "ID11",
+			"destination": "ID4"
+		},
+
+		{
+			"id": "ID141",
+			"name": "is_a_view_of",
+			"type": "is_a_view_of",
+			"origin": "ID185",
+			"destination": "ID11"
+		},
+
+		{
+			"id": "ID147",
+			"name": "is_a_view_of",
+			"type": "is_a_view_of",
+			"origin": "ID185",
+			"destination": "ID144"
+		},
+
+		{
+			"id": "ID142",
+			"name": "is_created_by",
+			"type": "is_created_by",
+			"origin": "ID185",
+			"destination": "ID133"
+		},
+
+		{
+			"id": "ID145",
+			"name": "is_favorite_of",
+			"type": "is_favorite_of",
+			"origin": "ID143",
+			"destination": "ID133"
+		},
+
+		{
+			"id": "ID148",
+			"name": "is_created_by",
+			"type": "is_created_by",
+			"origin": "ID7",
+			"destination": "ID133"
+		},
+
+		{
+			"id": "ID1343",
+			"name": "is_created_by",
+			"type": "is_created_by",
+			"origin": "ID7",
+			"destination": "ID133"
+		},
+
+		{
+			"id": "ID1343",
+			"name": "is_created_by",
+			"type": "is_created_by",
+			"origin": "ID7",
+			"destination": "ID133"
+		},
+
+		{
+			"id": "ID1345",
+			"name": "part_of_CR",
+			"type": "part_of_CR",
+			"origin": "ID1344",
+			"destination": "ID1343"
+		},
+
+		{
+			"id": "ID1346",
+			"name": "comments",
+			"type": "comments",
+			"origin": "ID1344",
+			"destination": "ID7"
+		},
+
+		{
+			"id": "ID1347",
+			"name": "created_by",
+			"type": "created_by",
+			"origin": "ID1343",
+			"destination": "ID133"
+		},
+
+		{
+			"id": "ID1348",
+			"name": "created_by",
+			"type": "created_by",
+			"origin": "ID1344",
+			"destination": "ID133"
+		},
+
+		{
+			"id": "ID1349",
+			"name": "is_requirement_of",
+			"type": "is_requirement_of",
+			"origin": "ID1345",
+			"destination": "ID7"
+		}
+
+	],
+	"linksSchema": [{
+			"id": "ID1142",
+			"placeholder": "search for any item with a basic link to any other item",
+			"name": "is_linked_to",
+			"origin": ["*"],
+			"destination": ["*"]
+		},
+
+		{
+			"id": "ID1151",
+			"placeholder": "is an element of a CR",
+			"name": "part_of_CR",
+			"origin": ["ID1155", "ID1154"],
+			"destination": ["ID1153"]
+		},
+
+		{
+			"id": "ID1151",
+			"placeholder": "A comment for",
+			"name": "comments",
+			"origin": ["ID1155"],
+			"destination": ["*"]
+		},
+
+		{
+			"id": "ID1151",
+			"placeholder": "An element of a CR request a change to",
+			"name": "request_change_to",
+			"origin": ["ID1154"],
+			"destination": ["*"]
+		},
+
+		{
+			"id": "ID1143",
+			"placeholder": "search for any element linked to a requirement",
+			"name": "is_requirement_of",
+			"origin": ["ID1150"],
+			"destination": ["ID1148", "ID1149"]
+		}, {
+			"id": "ID1144",
+			"placeholder": "search for parent requirements of a requirement",
+			"name": "is_sub_requirement_of",
+			"origin": ["ID1150"],
+			"destination": ["ID1148", "ID1149"]
+		}, {
+			"id": "ID1145",
+			"placeholder": "search for any element below a requirement",
+			"name": "is_parent_requirement_of",
+			"origin": ["ID1150"],
+			"destination": ["ID1148", "ID1149"]
+		}, {
+			"id": "ID1146",
+			"placeholder": "search for any requirements",
+			"name": "has_requirements",
+			"origin": ["ID1148", "ID1149"],
+			"destination": ["ID1150"]
+		}, {
+			"id": "ID1147",
+			"placeholder": "search for any parents",
+			"name": "has_parents",
+			"origin": ["ID1148", "ID1149"],
+			"destination": ["ID1150"]
+		}, {
+			"id": "ID1190",
+			"placeholder": "owns function",
+			"name": "owns_function",
+			"origin": ["*"],
+			"destination": ["ID1148"]
+		}, {
+			"id": "ID1191",
+			"placeholder": "is a view of",
+			"name": "is_a_view_of",
+			"origin": ["ID1200"],
+			"destination": ["ID1151"]
+		}
+
+	],
+	"nodesSchema": [{
+			"id": "ID1148",
+			"placeholder": "is a feature",
+			"name": "Feature",
+			"type": "Feature",
+			"links": {
+				"has_requirements": true,
+				"is_linked_to": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			}
+		}, {
+			"id": "ID1200",
+			"placeholder": "is a view",
+			"name": "View",
+			"type": "View",
+			"links": {
+				"is_view_of": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			}
+		}, {
+			"id": "ID1149",
+			"placeholder": "is a product",
+			"name": "Product",
+			"type": "Product",
+			"links": {
+				"has_requirements": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			}
+		}, {
+			"id": "ID1150",
+			"placeholder": "is a requirement",
+			"name": "Requirement",
+			"type": "Requirement",
+			"links": {
+				"is_parent_requirement_of": true,
+				"is_sub_requirement_of": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			}
+		}, {
+			"id": "ID1153",
+			"placeholder": "is a project",
+			"name": "Project",
+			"type": "Project",
+			"links": {
+				"is_parent_requirement_of": true,
+				"is_sub_requirement_of": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"created_on": {
+					"type": "date"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			}
+		}, {
+			"id": "ID1151",
+			"placeholder": "is an activity",
+			"name": "Activity",
+			"type": "Activity",
+			"links": {
+				"is_an_activity_of": true,
+				"is_sub_activity_of": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			}
+		},
+
+		{
+			"id": "ID1152",
+			"placeholder": "is a user",
+			"name": "User",
+			"type": "User",
+			"links": {
+				"is_responsible_for": true,
+				"is_created_by": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			}
+		},
+
+		{
+			"id": "ID1153",
+			"placeholder": "is a change request",
+			"name": "ChangeRequest",
+			"type": "ChangeRequest",
+			"links": {
+				"part_of_CR": true,
+				"is_created_by": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"abstract": {
+					"type": "html"
+				},
+				"dueDate": {
+					"type": "date"
+				},
+				"priority": {
+					"type": "number"
+				}
+			}
+		},
+
+		{
+			"id": "ID1155",
+			"placeholder": "is a comment",
+			"name": "Comment",
+			"type": "Comment",
+			"links": {
+				"part_of_CR": true,
+				"is_created_by": true,
+				"request_change_to": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"abstract": {
+					"type": "html"
+				}
+			}
+		},
+
+		{
+			"id": "ID1154",
+			"placeholder": "is a change element",
+			"name": "ChangeElement",
+			"type": "ChangeElement",
+			"links": {
+				"part_of_CR": true,
+				"is_created_by": true,
+				"request_change_to": true
+			},
+			"attributes": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "html"
+				},
+				"id": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"abstract": {
+					"type": "html"
+				}
+			}
+		}
+
+	]
+}

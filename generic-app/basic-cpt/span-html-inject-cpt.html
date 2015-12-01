@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../generic-app/behaviours/UtilitiesBehavior.html">
+
+<dom-module is="span-html-inject-cpt">
+    <template>
+        <content></content>
+    </template>
+    
+    <script>
+		Polymer({
+			is: 'span-html-inject-cpt',
+            
+            extends: 'span',
+            
+            properties: {
+                isEncoded: {
+                    type: Boolean,
+                    value: false
+                },
+                
+                valueHtml: {
+                    type: String,
+                    value: ''
+                }
+            },
+            
+            ready: function() {
+                console.log('/ready span-html-inject-cpt')
+            },
+            
+            observers: ['injectHtmlContent(isEncoded, valueHtml)'],
+            
+            behaviors: [UtilitiesBehavior],
+            
+            injectHtmlContent: function(isEncoded, valueHtml) {
+                console.log('/injectHtmlContent')
+                var toInjectHtml = this.valueHtml;
+                if (this.isEncoded) toInjectHtml = this._decodeHtml(this.valueHtml);
+                this.innerHTML = toInjectHtml;
+            }
+            
+        });
+    </script>
+</dom-module>

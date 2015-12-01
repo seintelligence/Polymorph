@@ -1,0 +1,34 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<dom-module is="icon-with-tooltip-cpt">
+    <template>
+        <div>
+            <iron-icon icon="[[icon]]" on-click="clicked"></iron-icon>
+            <paper-tooltip>[[tooltip]]</paper-tooltip>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'icon-with-tooltip-cpt',
+            
+            properties: {
+                
+                icon: {
+                    type: String,
+                    value: ""
+                },
+                
+                tooltip: {
+                    type: String,
+                    value: ""
+                }
+            },
+            
+            clicked: function() {
+                this.fire('clicked');
+            }
+        });        
+    </script>
+</dom-module>

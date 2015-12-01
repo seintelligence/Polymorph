@@ -1,0 +1,35 @@
+{
+  "name": "xp-referral-behavior",
+  "license": "BSD-3-Clause",
+  "version": "0.9.10",
+  "main": "xp-referral-behavior.html",
+  "description": "A behavior used to add self referencing capabilities on the context element",
+  "homepage": "http://expandjs.com/elements/xp-referral-behavior",
+  "authors": [
+    "Giuliano Rullo <g.rullo@expandjs.com>",
+    "Maurizio Stefàno <m.stefano@expandjs.com>",
+    "Robert Manolea <r.manolea@expandjs.com>"
+  ],
+  "keywords": [
+    "web app",
+    "html5",
+    "expandjs",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*"
+  ],
+  "dependencies": {
+    "expandjs": "ExpandJS/expandjs#0.9.10",
+    "polymer": "Polymer/polymer#^1.1.0"
+  },
+  "_release": "0.9.10",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.9.10",
+    "commit": "cc659a0a7334366d011bb0b5f4f577fcb05d50a5"
+  },
+  "_source": "git://github.com/ExpandJS/xp-referral-behavior.git",
+  "_target": "0.9.10",
+  "_originalSource": "ExpandJS/xp-referral-behavior"
+}

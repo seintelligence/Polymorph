@@ -1,0 +1,44 @@
+<dom-module is="toolbar-dashboard-cpt">
+    <style>
+        paper-toolbar {
+            --paper-toolbar-background: var(--paper-grey-400);
+        }
+    </style>
+    <template>
+        
+        <!-- content of the toolbar -->
+        <h2>Home</h2>
+        <div on-click="openRoute('myhomepage')">Access my homepage</div>
+        <h2>Views</h2>
+        <div on-click="openRoute('myviews')">Access my views</div>
+        <h2>Change Requests</h2>
+        <div on-click="openRoute('mychangerequests')">Access my change requests</div>
+        <h2>Actions</h2>
+        <div on-click="openRoute('myactions')">Access my actions</div>
+        <h2>Activities</h2>
+        <div on-click="openRoute('myactivities')">Access current activities</div>
+        
+        <more-route id="navigateNodesRoute" name="navigate-nodes"></more-route>
+        <more-route id="visuNodesRoute" name="visu-nodes"></more-route>
+        
+    </template>
+    <script>
+		Polymer({
+			is: 'toolbar-dashboard-cpt',
+            
+            properties: {
+                
+                title: {
+                    type: String,
+                    value: "header"
+                }
+                
+            },
+            
+            openRoute: function(route) {
+                Polymer.dom(this.root).querySelector('#' + route).navigateTo();
+                event.stopPropagation();
+            }
+        });    
+    </script>
+</dom-module>

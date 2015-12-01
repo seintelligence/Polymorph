@@ -1,0 +1,435 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../components/h1-cpt.html">
+<link rel="import" href="../components/text-cpt.html">
+<link rel="import" href="data-transfer-cpt.html">
+
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="../components/cpt_icon-cpt.html">
+
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-signals/iron-signals.html">
+
+<link rel="import" href="../behaviours/DropBehavior.html">
+<link rel="import" href="../behaviours/ModeChangedBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/ToasterTxBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/UtilitiesBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/exportBehavior.html">
+
+<dom-module id="operational-layout-cpt">
+    <style>
+        
+		.development::hover {
+			border-radius: 5px;
+			box-shadow: inset 0 0 10px #95FF68;
+		}
+			
+		.acceptingContainer {
+			border-radius: 5px;
+			box-shadow: inset 0 0 10px #95FF68;
+			margin: 5px;
+			padding: 5px;
+		}
+		
+		.development {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 16px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 300;
+			background-color:white;
+			font-family: "Open Sans";
+			margin: 1px;
+			padding: 5px;
+			height: auto;
+		};
+		
+		.development .icons {
+			border: none;
+			cursor: pointer;
+		}
+		
+		.development .container {		
+			background-color:rgb(250, 250, 250);
+			border: 1px dotted rgb(150, 150, 150);
+			padding: 5px;
+			margin: 10px;
+		}
+		
+		.operational {
+			font-family: RobotoDraft, Helvetica, Arial, sans-serif;
+			font-kerning: auto;
+			font-size: 16px;
+			font-stretch: normal;
+			font-style: normal;
+			font-variant: normal;
+			font-variant-ligatures: normal;
+			font-weight: 300;
+			background-color:rgb(250, 250, 250);
+			font-family: "Open Sans";
+			margin: 1px;
+			padding: 5px;
+			min-height: 200px;
+			border-radius: 4px;
+			border-width: 1px;
+            min-width: 100px;
+		}
+        
+    </style>
+    <template>
+        <div draggable="false">
+            <paper-material elevation="1">
+                <div id="operational" class="layout operational">
+                    <content>
+                    </content>
+                </div>
+            </paper-material>
+        </div>
+    </template>
+    <script>
+		Polymer({
+			is: 'operational-layout-cpt',
+			
+			behaviors: [ToasterTxBehavior, DropBehavior, ModeChangedBehavior, UtilitiesBehavior, exportBehavior],
+			
+			extends: 'div',
+            
+            properties: {
+                
+                contentData: {
+                    type: Array,
+                    value: [],
+                    observer: 'writeDynContent'
+                },
+                
+                structureData: {
+                   type: Object,
+                    value: {},
+                    observer: 'writeDynContent'
+                },
+                
+				// accepts data type
+				accepts:
+				{
+					type: String,
+					value: "*",
+					notify: true
+				},
+				
+				// provides data type
+				provides:
+				{
+					type: String,
+					value: "",
+					notify: true
+				},
+                
+                // receives data type
+				receives:
+				{
+					type: String,
+					value: "",
+                    observer: 'oo'
+				},
+				
+				// current filter on the jsondata of the computed parents nodes
+				pathData:
+				{
+					type: Object,
+					value: {},
+					observer: 'updateProvides'
+				},
+                
+                pathDataArr:
+				{
+					type: Array,
+					value: []
+				},
+                
+                // current filter on the jsondata of the computed parents nodes
+				pathDataValidated:
+				{
+					type: String,
+					value: ""
+				},
+                
+                treeData:
+                {
+                    type: Object,
+                    value: {},
+                    observer: 'changedTreeData'
+                },
+								
+				// 0: horiz, 1: vert
+				layoutHorizVert:
+				{
+					type: Boolean,
+					value: false,
+                    observer: 'setLayoutHorizVert'
+				},
+                
+                exportLayoutHorizVert:
+                {
+                    type: String,
+                    value: 'horizontal'
+                },
+				
+				// 1: flex
+				layoutFlex:
+				{
+					type: Boolean,
+					value: false,
+                    observer: 'setLayoutFlex'
+				},
+                exportLayoutFlex:
+                {
+                    type: String,
+                    value: 'flex'
+                },
+				
+				// 1: iterate
+				layoutIterate:
+				{
+					type: Boolean,
+					value:false,
+                    observer: 'setLayoutIterate'
+				}
+            },
+            
+            observers: ['updatePathData(pathDataValidated.*)'],
+            
+            listeners: {'readyExport': 'getCleanHtml'},
+            
+            changedTreeData: function() {
+                console.log("/changedTreeData");           
+            },
+            
+            writeDynContent: function() {
+                console.log("/writeDynContent");
+                var that = this;
+                
+                Polymer.dom(this).innerHTML = "";
+                
+                // data json
+                var strContentData = JSON.stringify(this.contentData);
+                
+                var strStructureData = JSON.stringify(this.structureData); 
+                
+                if ( strContentData === undefined || strContentData == null || strStructureData === undefined || strStructureData == null ) 
+                    return;
+                
+                // domBind
+                var domBind = document.createElement('template', 'dom-bind');
+                domBind.id = "domBin";
+                var doc = domBind.content.ownerDocument;
+                
+                // Sub elements
+                var nodeChildren = this.structureData.nodeChildren;
+                var nodeElements = [];
+                
+                for (var key in nodeChildren)
+                {
+                    if (nodeChildren.hasOwnProperty(key))
+                    {
+                        var elt = this.createJSONelements(doc, nodeChildren[key]);
+                        domBind.content.appendChild(elt);
+                        //elt.setAttribute('host-ref', this);
+                        nodeElements.push(elt);
+                    }
+                }
+                         
+                // Element transfer data               
+                var transferContentData = doc.createElement('data-transfer-cpt');
+                transferContentData.setAttribute('initial-data', strContentData);
+                transferContentData.setAttribute('transfered-data', '{{contentData}}');
+                
+                var transferStructureData = doc.createElement('data-transfer-cpt');
+                transferStructureData.setAttribute('initial-data', strStructureData);
+                transferStructureData.setAttribute('transfered-data', '{{structureData}}');
+                
+                //domBind.content.appendChild(layout);
+                domBind.content.appendChild(transferContentData);
+                domBind.content.appendChild(transferStructureData);
+                
+                Polymer.dom(this.$.operational).appendChild(domBind);
+            },
+            
+            createJSONelements: function(doc, JSONelt) {
+                var elt = doc.createElement('div', JSONelt.is);
+                elt.setAttribute('id', JSONelt.id);
+                elt.className = 'export';
+                
+                var config = JSONelt.config;
+                
+                for (var key in config)
+                {
+                    if (config.hasOwnProperty(key))
+                    {
+                        var obj = config[key];
+
+                        // Function to make sure the format of polymer/js caps variable is converted to hmtl ones
+                        key = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();                      
+                        elt.setAttribute(key, obj);
+                    }
+                }
+                
+                return elt;
+            },
+			
+			/* Layout config */
+			switchLayoutHorizVert: function(ev) {
+                console.log("/switchLayoutHorizVert");
+                
+                // Toggle value
+				this.layoutHorizVert = !this.layoutHorizVert;
+				                
+                // Change icon
+				this.$.iconLayoutHorizVert.icon = "icons:swap-" + (this.layoutHorizVert?"vert":"horiz");
+				
+				// update the structure to propagate the update to the parents
+                this.set('config.layoutHorizVert', this.layoutHorizVert);
+			},
+			
+			switchLayoutFlex: function(ev) {
+				console.log("/switchLayoutFlex");
+				
+                // Toggle value
+                this.layoutFlex = !this.layoutFlex;
+				
+                // Change icon
+                if (this.layoutFlex)
+					this.$.iconLayoutFlex.icon = "icons:fullscreen";
+				else
+                    this.$.iconLayoutFlex.icon = "icons:fullscreen-exit";
+                
+				// update the structure to propagate the update to the parents
+                this.set('config.layoutFlex', this.layoutFlex);
+			},
+			
+			switchLayoutIterate: function(ev) {
+				console.log("/switchLayoutIterate");
+                
+                // Toggle value
+				this.layoutIterate = !this.layoutIterate;
+				
+                // Change icon
+				this.$.iconLayoutIterate.icon = (this.layoutIterate?"icons:remove":"icons:autorenew");
+				
+				// update the structure to propagate the update to the parents
+                this.set('config.layoutIterate', this.layoutIterate);
+			},
+            
+            // setLayoutHorizVert
+            setLayoutHorizVert: function() {
+				var sOld = (this.layoutHorizVert?"horizontal":"vertical"),
+					sNew = (this.layoutHorizVert?"vertical":"horizontal");
+				
+                // trigger toaster information
+				this.sendToasterMsgDisplayRequest("Layout changed from " + sOld + " to " + sNew, "information");
+				
+                // Set the layout effect
+                this.removeContainersClass(sOld);
+                this.addContainersClass(sNew);
+			},
+            
+            // setLayoutFlex
+            setLayoutFlex: function() {
+                // trigger toaster information
+                this.sendToasterMsgDisplayRequest("Layout changed to " + (this.layoutFlex?"flex":"not flex", "information"));
+					
+                var strClass = "flex";
+                
+                // Set the layout effect
+				if (this.layoutFlex)
+                    this.addContainersClass(strClass);
+					//$(this).addClass("flex");
+				else
+                    this.removeContainersClass(strClass);
+					//$(this).removeClass("flex");
+			},
+            
+            // setLayoutFlex
+            setLayoutIterate: function() {
+                // trigger toaster information
+				this.sendToasterMsgDisplayRequest("Layout changed to " + (this.layoutIterate?"iterate":"not iterate"), "information");
+                
+                // Set the layout effect (..)
+			},
+            
+            // Remove the class of both dev and op containers            
+            removeContainersClass: function(strClass) {
+                $(this.$.container).removeClass(strClass);
+                $(this.$.operational).removeClass(strClass);
+            },
+            
+            // Add the class of both dev and op containers  
+            addContainersClass: function(strClass) {
+                $(this.$.container).addClass(strClass);
+                $(this.$.operational).addClass(strClass);
+            },
+			
+			/* sert a rien pour l'instant Non Op */
+			_currentDragIsCompatible: function(type) {
+				if (type === 0)	return 1;
+				else return 0;
+			},
+            
+            // Hide the "Delete" control if it is UItopContainer (top container)
+            isUItopContainer: function(id) { return (id == 'UItopContainer');},
+			
+			/************** Path data **************/
+			txPathJsonEditorRequest: function(ev) {
+                console.log("/txPathJsonEditorRequest"); 
+                this.fire('pathJsonEditorRequest', { 'pathData': this.pathData, 'treeData': this.treeData });
+            },
+            
+            updatePathData: function(value) {
+                console.log("/updatePathData");
+                var pathData = {};
+                
+                if (this.pathDataValidated)
+                    this.pathData = JSON.parse(this.pathDataValidated);
+                
+				// update the structure to propagate the update to the parents
+                this.set('config.pathData', this.pathData);
+                
+            },
+			
+			updateProvides: function(ev) {
+                console.log("/updateProvides");
+                var strProvides = "";
+                var coma = false;
+                var pathData = this.pathData;
+                
+                for (var key in pathData) {
+                   if (pathData.hasOwnProperty(key))
+                   {
+                       if (coma) strProvides += ", ";
+                       strProvides += pathData[key].provides;
+                       coma = true;
+                   }
+                }
+                
+                this.set('provides', strProvides);
+                
+                var childNodes = Polymer.dom(this.$.container).childNodes;
+                if(childNodes) childNodes.forEach(function(e) {
+                    console.log(Polymer.dom(e));
+                    console.log(strProvides);
+                    e.setAttribute('receives', strProvides);
+                });
+			},
+            
+            getDivAttributes: function() { return '"layout ' + this.exportLayoutHorizVert + ' ' + this.exportLayoutFlex + '"';},
+            
+            getExportChildNodes: function() { return Polymer.dom(this.$.operational).querySelectorAll(".export");}
+            
+        });
+    </script>
+</dom-module>

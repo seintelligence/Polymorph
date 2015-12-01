@@ -1,0 +1,150 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+
+<link rel="import" href="../data-filtering/filter-data-cpt.html">
+<link rel="import" href="../data-exchanges/get-db-items-cpt.html">
+
+<script src="../../scripts/alasql.min.js"></script>
+
+<dom-module id="filter-block2-cpt">
+   
+    <style>
+    </style>
+    
+    <template>
+        <paper-card heading="[[heading]]" on-click="showFilters" on-mouseleave="hideFilters" style="[[computedWidth]]">
+            <div class="card-content" style="[[computedWidth]]">[[description]]</div>
+            <div id="all" class="card-actions">
+                <paper-icon-item>
+                    <paper-checkbox name="*" item-icon on-change="filterChanged" checked="{{all_checked}}"></paper-checkbox>
+                    <div class="flex" style="[[computedWidth]]">All <span>[[sItems]]</span></div>
+                </paper-icon-item>
+            </div>
+            <div class="card-actions" hidden$="[[all_checked]]">
+                <filter-data-cpt width="15" label="[[searchBarLabel]]" wide-filter="{{wideFilter}}"></filter-data-cpt>
+            </div>
+            <div id="filters" class="card-actions" hidden$="[[all_checked]]">
+                <template is="dom-repeat" items="[[items]]" as="item">
+                    <paper-icon-item >
+                        <paper-checkbox name="[[item.id]]" item-icon on-change="filterChanged"></paper-checkbox>
+                        <div class="flex">[[item.name]]</div>
+                    </paper-icon-item>
+                </template>
+            </div>
+        </paper-card>
+        
+    </template>
+    
+    <script>
+		Polymer({
+			is: 'filter-block2-cpt',
+            
+            extends: 'div',
+            
+            properties: {
+                
+                db: {},
+                
+                heading: {
+                    type: String,
+                    value: ""
+                },
+                
+                width: {
+                    type: Number,
+                    value: 275
+                },
+                
+                computedWidth: {
+                    type: String,
+                    computed: 'getComputedWidth(width)'                    
+                },
+                
+                items: {
+                    type: Array,
+                    observer: 'itemsChanged'
+                },
+                
+                sItems: {
+                    type: String,
+                    value: ""
+                },
+                
+                description: {
+                    type: String,
+                    value: ""
+                },
+                
+                all_checked:{
+                    type: Boolean,
+                    value: true,
+                    notify: true                    
+                },
+                
+                searchBarLabel: {
+                    type: String,
+                    computed: 'getLabel(sItems)'
+                },
+                
+                filter: {
+                    type: Array,
+                    value: ["*"],
+                    notify: true,
+                    readOnly: true
+                }
+                
+            },
+            
+            ready: function() {
+                this._setFilter(['*']);
+            },
+            
+            getComputedWidth: function(width) { return "width: " + width + "px;"},
+            
+            itemsChanged: function() {
+                console.log('/itemsChanged')
+               this.width = Math.max(this.offsetWidth, this.width);
+            },
+            
+            filterChanged: function(ev) {
+                var changedElt = ev.srcElement.name,
+                    checked = ev.srcElement.checked,
+                    filter = [];
+                
+                if (changedElt === '*' || this.all_checked)
+                    filter = ['*'];
+                
+                else
+                    filter = this.getAllFiltersCheckboxes();
+                
+                console.log(filter);
+                this._setFilter(filter);
+            },
+            
+            getAllFiltersCheckboxes: function() {
+                var filter = [],
+                    checkboxes = this.$.filters.querySelectorAll('paper-checkbox');
+                
+                // else go through and add the checked ones
+                for(prop in checkboxes) {
+                    var cb = checkboxes[prop];
+                    console.log(cb.name);
+                    if (cb.checked)
+                        filter.push(cb.name)
+                }
+                return filter;
+            },
+            
+            getLabel: function(sItems) { return "filter on " + sItems;},
+            
+            showFilters: function() { Polymer.dom(this.root).querySelectorAll(".card-actions").forEach(function(e) {e.hidden = false;}) },
+            
+            hideFilters: function() { Polymer.dom(this.root).querySelectorAll(".card-actions").forEach(function(e) {e.hidden = true;})}
+        });
+    </script>
+    
+</dom-module>

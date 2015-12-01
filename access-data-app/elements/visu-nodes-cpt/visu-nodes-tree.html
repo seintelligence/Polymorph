@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <script src="../../../scripts/underscore-min.js"></script>
+        <script src="../../../scripts/jquery.min.js"></script>
+        
+        
+        <link rel="import" href="../../../generic-app/data-exchanges/get-db-cpt.html">
+
+        <link rel="import" href="../../../bower_components/polymer/polymer.html">
+        <link rel="import" href="../../../bower_components/more-routing/more-route.html">
+        <link rel="import" href="../../../bower_components/iron-meta/iron-meta.html">
+        <link rel="import" href="../../../bower_components/iron-signals/iron-signals.html">
+        <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+        <link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
+        <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+        <link rel="import" href="../../../generic-app/data-filtering/filter-block-items-cpt.html">
+        <link rel="import" href="../../../generic-app/data-filtering/filter-block-cpt.html">
+        <link rel="import" href="../../../generic-app/data-exchanges/get-db-cpt.html">
+        <link rel="import" href="../../../bower_components/paper-styles/typography.html">
+        <link rel="import" href="../../../bower_components/paper-styles/typography.html">
+        <link rel="import" href="../../../generic-app/behaviours/PathQueryBehavior.html">
+        <link rel="import" href="../../../generic-app/behaviours/UtilitiesBehavior.html">
+        <link rel="import" href="../../../generic-app/behaviours/suscribeDbBehavior.html">
+        <link rel="import" href="../../../generic-app/item-homepage/item-home-page.html">
+
+        <link rel="stylesheet" type="text/css" href="../../../scripts/jquery.qtip.min.css">
+
+        <script src="../../../scripts/underscore-min.js"></script>
+        <script src="../../../scripts/jquery.min.js"></script>
+        <script src="../../../scripts/jquery.qtip.min.js"></script>
+        <script src="../../../scripts/cytoscape/cytoscape.min.js"></script>
+        <script src="../../../scripts/cytoscape/cytoscape-qtip.js"></script>
+        <script src="../../../scripts/cytoscape/cytoscape-cxtmenu.js"></script>
+        <script src="../../../scripts/cytoscape/dagre.js"></script>
+        <script src="../../../scripts/cytoscape/cytoscape-dagre.js"></script>
+        
+        <style>
+            #cy {
+              width: 800px;
+              height: 600px;
+              display: block;
+            }
+        </style>
+    </head>
+
+    <style>
+        .qtip-wiki{
+            border-color: darkblue;
+            font-family: Roboto;
+            max-width: 385px;
+            background-color: white;
+            border-color: rgb(0,148,255);
+            border-width: 1.5px;
+        }
+
+        .qtip-wiki .qtip-titlebar{
+            background-color:transparent; 
+            background-color: #f1f1f1;
+        }
+
+        .qtip-wiki .qtip-content{
+            background-color: transparent;
+        }
+
+        .qtip-wiki p{
+            margin: 0 0 6px;
+        }
+
+        .qtip-wiki h1{
+            font-size: 20px;
+            line-height: 1.1;
+            margin: 0 0 5px;
+        }
+
+        .qtip-wiki img{
+            float: left;
+            margin: 10px 10px 10px 0;
+        }
+
+        .qtip-wiki .info{
+            overflow: hidden;
+        }
+
+        .qtip-wiki p.note{
+            font-weight: 700;
+        }
+    </style>
+    
+    <visu-nodes-cpt></visu-nodes-cpt>
+
+    <dom-module id="visu-nodes-cpt">  <!-- Define your custom element -->
+
+        <style>
+            @font-face {
+                font-family: "Roboto Condensed";
+                font-style: normal;
+                src: local('Roboto Regular'), local('Roboto-Regular'), url('styles/Roboto/Roboto-Regular.ttf') format('truetype');
+            }
+
+            @font-face {
+                font-family: "Roboto Light";
+                src: local('Roboto Light'), local('Roboto-Light'), url('styles/Roboto/Roboto-Light.ttf') format('truetype');
+            }
+
+            * { font-family: "Roboto Condensed"; font-weight:300}
+
+            #cy {
+              width: 800px;
+              height: 600px;
+              display: block;
+                border: 0.5px lightgrey solid;
+            }
+
+            div#cy ::content .firstFocusedElements {
+                background-color:aquamarine;
+                opacity: 100%
+            }
+
+            div#cy ::content  .secondFocusedElements {
+                background-color:aqua;
+                opacity: 50%
+            }
+
+            body{
+                padding: 50px;
+            }
+
+            .separator {
+               margin: 20px; 
+            }
+
+            paper-card {
+               margin: 20px; 
+            }
+
+        </style>
+        <template>
+            
+
+            <style>
+                div#cy ::content  .firstFocusedElements {
+                    background-color:aquamarine;
+                    opacity: 100%
+                }
+
+                div#cy ::content  .secondFocusedElements {
+                    background-color:aqua;
+                    opacity: 50%
+                }
+                
+                div#cy ::content  cxtmenu-content {
+                    
+                }
+            </style>
+            
+            <iron-meta id="meta" key="db"></iron-meta>
+            
+            <get-db-cpt db_source="../db2.json" db="{{db2}}"></get-db-cpt>
+
+            <item-home-page id="itemHomePage" db="[[db]]"></item-home-page>
+
+            <div class="horizontal flex layout">
+                <div class="layout vertical separator">
+                    <div>
+                        <h1>options</h1>
+                        <paper-checkbox checked on-change="displayTypeLink">display the type of link</paper-checkbox>
+                    </div>
+
+                    <div is="filter-block-items-cpt" 
+                         db="[[db]]" 
+                         heading="By node"
+                         s-items="nodes"
+                         description="Search by nodes"
+                         filter="{{filterNodeTypes}}"
+                         type="nodesSchema"></div>
+
+                    <div is="filter-block-items-cpt" 
+                         db="[[db]]" 
+                         heading="By link"
+                         s-items="links"
+                         description="Search by links"
+                         filter="{{filterLinkTypes}}"
+                         type="linksSchema"></div>
+                    
+                </div>
+                <div id="cy">
+                    <div id="box"></div>
+                </div>
+                
+                <button on-click="addElements">1</button>
+                
+                <button on-click="addElements2">2</button>
+            </div>
+
+        </template>
+
+        <script>        
+
+            Polymer({
+
+                is: 'visu-nodes-cpt',
+
+                properties: {
+
+                    cy: {
+
+                    },
+
+                    elements: {
+                        type: Array,
+                        value: []
+                    },
+
+                    searchedNodes: {
+                        type: Array,
+                        computed: 'search_nodes(filterNodeTypes, filterLinkTypes, db, cy)'
+                    },
+
+                    filterGetProjects: {
+                        type: Array,
+                        value: ["type='Project'"]
+                    },
+
+                    filterNodes: {
+                        type: Array,
+                        value: []
+                    },
+
+                    filterNodeTypes: {
+                        type: Array
+                    },
+
+                    filterLinkTypes: {
+                        type: Array
+                    },
+
+                    currentSchema: {
+                        type: Object
+                    },
+
+                    currentData: {
+                        type: Object
+                    },
+                    
+                    db2: {
+                        type: Object,
+                        observer: 'transferDb'
+                    }
+
+                },
+
+                behaviors: [UtilitiesBehavior, PathQueryBehavior, suscribeDbBehavior],
+                
+                observers: ['dbUpdated(db)'],
+
+                ready: function() {
+                    console.log("/ready visu-nodes");
+                    this.cyContainer = this.$.cy;
+                },
+                
+                transferDb: function() {
+                    this.db = this.db2;
+                    console.log(this.db2)
+                },
+                
+                addElements: function() {
+                    this.elements.push(
+                        {
+                            "data":{
+                                "id":"ID2",
+                                "name":"To Sense APS position",
+                                "type":"Feature",
+                                "description":"This feature aims at sensing"
+                            }
+                        }
+                    );
+                    
+                    this.elements.push(
+                        {
+                            "data":{
+                                "id":"ID3",
+                                "name":"Drive By Wire",
+                                "type":"Feature",
+                                "description":"This feature aims at sensing"
+                            }
+                        }
+                    );
+                    
+                    this.elements.push(
+                        {
+                            "data":{
+                                "id":"ID11",
+                                "source":"ID3",
+                                "target":"ID1",
+                                "type":"owns_function"
+                            }
+                        }
+                    );
+                    
+                    this.cytoUpdate();
+                },
+                
+                addElements2: function() {
+                    
+                    this.elements.push(
+                        {
+                            "data":{
+                                "id":"ID12",
+                                "source":"ID1",
+                                "target":"ID2",
+                                "type":"owns_function"
+                            }
+                        }
+                    );
+                    
+                    this.cytoUpdate();
+                },
+
+                // I want to highlight the filtered nodes, change their weight
+                search_nodes: function(filterNodeTypes, filterLinkTypes, db, cy) {
+                    console.log("/search_nodes", db, this.cy, this.filterNodeTypes, this.filterLinkTypes);
+                    if( _.isEmpty(db) || !this.cy) return;
+                    console.log("/search_nodes");
+                    console.log(filterNodeTypes);
+                    console.log(filterLinkTypes);
+                    var that = this,
+                        strFoundFilterNodeTypes = [],
+                        strFoundFilterLinkTypes = [],
+                        selectedFullNodes = [],
+                        selectedNodes = [],
+                        connectedNodes = [],
+                        filters = [];
+
+                    // Get the id of the complete list of items
+                    var items_id = this.extractOnlyId(this.db.items);
+
+                    // by default, set each filter to the complete list of views id
+                    var foundFilterNodeTypes = items_id,
+                        foundFilterLinkTypes = items_id;
+
+                    // Get the node types
+                    //var strFilterNodeTypes = ['id IN ' + this._reconstructSQLqueryArray(filterNodeTypes)];
+                    //var strFilterLinkTypes = ['id IN ' + this._reconstructSQLqueryArray(filterLinkTypes)];
+                    if (filterNodeTypes.indexOf('*') != -1)
+                        strFilterNodeTypes = [];
+                    else
+                        strFilterNodeTypes = ['id IN ' + this._reconstructSQLqueryArray(filterNodeTypes)];
+
+                    if (filterLinkTypes.indexOf('*') != -1)
+                        strFilterLinkTypes = [];
+                    else
+                        strFilterLinkTypes = ['id IN ' + this._reconstructSQLqueryArray(filterLinkTypes)];
+
+                    console.log(strFilterNodeTypes);
+                    console.log(strFilterLinkTypes);
+
+                    //if (filterLinkTypes.indexOf('*') != -1) strFilterLinkTypes = [];
+
+                    var nodePathData = [
+                            {
+                                "path": "*",
+                                "filters": strFilterNodeTypes
+                            }
+                        ],
+                        linkPathData = [
+                            {
+                                "path": "*",
+                                "filters": strFilterLinkTypes
+                            }
+                        ];
+
+                    nodePathData.forEach(function(e) {
+                        foundFilterNodeTypes = foundFilterNodeTypes.concat.apply([], that.getNodesSchema(_.clone(e)));
+                    });
+
+                    linkPathData.forEach(function(e) {
+                        foundFilterLinkTypes = foundFilterLinkTypes.concat.apply([], that.getLinksSchema(_.clone(e)));
+                    });
+
+                    foundFilterNodeTypes.forEach(function(e) {
+                        strFoundFilterNodeTypes.push(e.name);
+                    });
+                    console.log(strFoundFilterNodeTypes);
+                    foundFilterLinkTypes.forEach(function(e) {
+                        strFoundFilterLinkTypes.push(e.name);
+                    });
+                    console.log(strFoundFilterLinkTypes);
+
+                    if(this.removedNodes)
+                        this.removedNodes.restore();
+
+                    var firstFocusedNodes = this.cy.nodes().filterFn(function(e, i) {
+                        return (strFoundFilterNodeTypes.indexOf(e.data('type')) >= 0);
+                    });
+                    firstFocusedNodes.css({'opacity': 1});
+                    console.log(firstFocusedNodes);
+
+                    var firstFocusedLinks = firstFocusedNodes.edgesTo(firstFocusedNodes);
+                    firstFocusedLinks.css({'opacity': 1});
+                    console.log(firstFocusedLinks);
+                    //strFoundFilterLinkTypes = ['owns_function'];
+
+                    var secondFocusedLinks = firstFocusedNodes.connectedEdges().filterFn(function(e, i) {
+                        console.log(strFoundFilterLinkTypes.indexOf(e.data('type')) >= 0);
+                        return (strFoundFilterLinkTypes.indexOf(e.data('type')) >= 0);
+                    }).difference(firstFocusedLinks);
+                    secondFocusedLinks.css({'opacity': .5});
+                    console.log(secondFocusedLinks);
+
+                    var secondFocusedNodes = secondFocusedLinks.connectedNodes().difference(firstFocusedNodes);
+                    secondFocusedNodes.css({'opacity': .5});
+                    console.log(secondFocusedLinks);
+
+                    var toBeRemoved = firstFocusedNodes.union(firstFocusedLinks).union(secondFocusedLinks).union( secondFocusedNodes);
+                    console.log(toBeRemoved)
+                    var toBeRemoved = this.cy.elements().difference(toBeRemoved);
+                    this.removedNodes = this.cy.remove(toBeRemoved);
+                    //this.cy.layout();
+                },
+
+                extractOnlyId: function(arr) {
+                    var arr_id = [];
+                    arr.forEach(function(e) { arr_id.push(e.id); });
+                    return arr_id;
+                },            
+
+                dbUpdated: function() {
+                    if (_.isEmpty(this.db)) return;
+
+                    console.log('/dbUpdated')
+
+                    var that = this;
+                    elements = JSON.parse(JSON.stringify(this.db));
+                    elements.links.forEach(function(l){
+                        var lNew = {};
+                        lNew.id = l.id;
+                        lNew.source = l.origin;
+                        lNew.target = l.destination;
+                        lNew.type = l.type;
+
+                        elements.items.push(lNew);
+                    });
+
+                    elements = elements.items;
+
+                    this.elements = [];
+                    elements.forEach(function(e) {
+                        e.data = _.clone(e);
+                        that.push('elements', _.pick(e, 'data'));
+                    });
+                    
+                    console.log(JSON.stringify(this.get('elements')))
+                    
+                    this.elements = [
+                        {
+                            "data":{
+                                "id":"ID1",
+                                "name":"*",
+                                "type":"Feature",
+                                "description":"This feature aims at computing"
+                            }
+                        }
+                    ];
+
+                    this.cytoUpdate();
+                },
+
+                cytoUpdate: function() {
+                    var that = this;
+                    this.cy = cytoscape({
+                        container: $(this.$.cy), // container to render in
+                        elements: this.elements,
+
+                        style: [ // the stylesheet for the graph
+                            {
+                              selector: 'node',
+                              style: {
+                                'background-color': 'white',
+                                'label': 'data(name)',
+                                'background-opacity': '0.5',
+                                'border-color': 'rgb(0,148,255)',
+                                'border-width': '1.5px'
+                              }
+                            },
+
+                            {
+                              selector: 'edge',
+                              style: {
+                                'width': 3,
+                                'label':'data(type)',
+                                'line-color': '#ccc',
+                                'target-arrow-color': '#ccc',
+                                'target-arrow-shape': 'triangle'
+                              }
+                            }
+                        ],
+
+                        layout: {
+                            name: 'dagre',
+                            // dagre algo options, uses default value on undefined
+                            nodeSep: 50, // the separation between adjacent nodes in the same rank
+                            edgeSep: 10, // the separation between adjacent edges in the same rank
+                            rankSep: 40, // the separation between adjacent nodes in the same rank
+                            rankDir: 'TB', // 'TB' for top to bottom flow, 'LR' for left to right
+                            align: 'U',
+                            minLen: function( edge ){ return 2; }, // number of ranks to keep between the source and target of the edge
+                            edgeWeight: function( edge ){ return 1; }, // higher weight edges are generally made shorter and straighter than lower weight edges
+
+                            // general layout options
+                            fit: true, // whether to fit to viewport
+                            padding: 30, // fit padding
+                            animate: false, // whether to transition the node positions
+                            animationDuration: 500, // duration of animation in ms if enabled
+                            animationEasing: undefined, // easing of animation if enabled
+                            boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+                            ready: function(){}, // on layoutready
+                            stop: function(){} // on layoutstop
+                        },
+
+                            // initial viewport state:
+                            zoom: 1,
+                            pan: { x: 0, y: 0 },
+
+                            // interaction options:
+                            minZoom: 1e-50,
+                            maxZoom: 1e50,
+                            zoomingEnabled: true,
+                            userZoomingEnabled: true,
+                            panningEnabled: true,
+                            userPanningEnabled: true,
+                            boxSelectionEnabled: true,
+                            selectionType: 'single',
+                            touchTapThreshold: 8,
+                            desktopTapThreshold: 4,
+                            autolock: false,
+                            autoungrabify: false,
+                            autounselectify: false,
+
+                            // rendering options:
+                            headless: false,
+                            styleEnabled: true,
+                            hideEdgesOnViewport: false,
+                            hideLabelsOnViewport: false,
+                            textureOnViewport: false,
+                            motionBlur: false,
+                            motionBlurOpacity: 0.2,
+                            wheelSensitivity: 1,
+                            pixelRatio: 1,
+                            initrender: function(evt){ /* ... */ },
+                            renderer: { /* ... */ }
+
+                        });
+
+                    this.cy.on('click', 'node', function(event) {
+                        console.log("clickkkkkkkkkk")
+                        var target = event.cyTarget;
+                        var name = target.data("name");
+                        var id = target.data("id");
+                        var pathData = [
+                            {
+                                "path": name,
+                                "filters": [],
+                                "subPathData": {
+                                    "path": "*",
+                                    "inverted": false,
+                                    "filters": []
+                                }
+                            }
+                        ];
+                        
+                        var foundItems = [];
+                        // Get the objects of the container
+                        pathData.forEach(function(e) {
+                            foundItems = foundItems.concat.apply([], that.getNodesSchema(_.clone(e)));
+                        });
+                        
+                        var ID = 1;
+                        var links = [],
+                            nodes = [];
+                        foundItems.forEach(function(link) {
+                            console.log(link)
+                            ID = ID + 1;
+                            var newLink = {};
+                            newLink.id = ID;
+                            newLink.source = id;
+                            newLink.type = link.name
+                            
+                            var foundNodes = [];
+                            var pathData = [
+                                {
+                                    "path": link.name,
+                                    "filters": [],
+                                    "subPathData": {
+                                        "path": "*",
+                                        "inverted": false,
+                                        "filters": []
+                                    }
+                                }
+                            ];
+                            
+                            // Get the objects of the container
+                            pathData.forEach(function(e) {
+                                foundNodes = foundNodes.concat.apply([], that.getLinksSchema(_.clone(e)));
+                            });
+                            
+                            foundNodes.forEach(function(node) {
+                                var newNode = {"data": {}};
+                                newNode.data = node;
+                                newLink.target = node.id;
+                                links.push(newLink);
+                                nodes.push(newNode);
+                            });
+                            
+                        });
+                        
+                        console.log(links, nodes);
+                    });
+
+                    
+                        this.cy.on('mouseover', 'node', function(event) {
+                            var target = event.cyTarget;
+                            var name = target.data("name");
+                            var type = target.data("type");
+                            var description = target.data("description");
+
+                            that.$.itemHomePage.setAttribute('item-id', target.data("id"));
+                            var x=event.originalEvent.x;
+                            var y=event.originalEvent.y;
+
+                            $("#box").qtip({
+                                content: {
+                                    title: "<paper-icon-button id='iconHomePage' icon='menu'></paper-icon-button>" + name,
+                                    text: "<b>Type:</b><br>" + type + "<br><br><b>Description:</b><br>" + $('<div/>').html(description).text()
+                                },
+                                show: {
+                                    delay: 0,
+                                    event: false,
+                                    ready: true,
+                                    effect:false
+
+                                },
+                                position: {
+                                    adjust: { y: 10},
+                                    my: 'top center',
+                                    target: [x, y]
+                                },
+
+                                hide: {
+                                    fixed: true,
+                                    event: false,
+                                    inactive: 2000
+                                },
+
+                                style: {
+                                    classes: 'ui-tooltip-shadow qtip-rounded qtip-wiki',
+                                    tip:
+                                    {
+                                        corner: true,
+                                        width: 24,         // resize the caret
+                                        height: 24         // resize the caret
+                                    }
+
+                                }
+
+                            });
+
+                            console.log($('#iconHomePage'), that.openHomePage);
+                            iconHomePage = $('#iconHomePage').bind('click', function() {
+                                $("#box").qtip('hide');
+                                that.$.itemHomePage.openModal();
+                            });
+
+                        });
+                    
+                        // the default values of each option are outlined below:
+                        var defaults = {
+                            menuRadius: 100, // the radius of the circular menu in pixels
+                            selector: 'node', // elements matching this Cytoscape.js selector will trigger cxtmenus
+                            commands: [ // an array of commands to list in the menu
+                                /*
+                                { // example command
+                                    content: 'a command name', // html/text content to be displayed in the menu
+                                    select: function(){ // a function to execute when the command is selected
+                                        console.log( this.id() ) // `this` holds the reference to the active element
+                                    }
+                                }
+                                */
+                                { // example command
+                                    content: 'a command name', // html/text content to be displayed in the menu
+                                    select: function(){ // a function to execute when the command is selected
+                                        console.log( this.id() ) // `this` holds the reference to the active element
+                                    }
+                                },
+                                { // example command
+                                    content: 'another', // html/text content to be displayed in the menu
+                                    select: function(){ // a function to execute when the command is selected
+                                        console.log( this.id() ) // `this` holds the reference to the active element
+                                    }
+                                }
+                            ], 
+                            fillColor: 'rgba(0, 0, 0, 0.5)', // the background colour of the menu
+                            activeFillColor: 'rgba(92, 194, 237, 0.75)', // the colour used to indicate the selected command
+                            activePadding: 20, // additional size in pixels for the active command
+                            indicatorSize: 10, // the size in pixels of the pointer to the active command
+                            separatorWidth: 10, // the empty spacing in pixels between successive commands
+                            spotlightPadding: 4, // extra spacing in pixels between the element and the spotlight
+                            minSpotlightRadius: 20, // the minimum radius in pixels of the spotlight
+                            maxSpotlightRadius: 28, // the maximum radius in pixels of the spotlight
+                            itemColor: 'white', // the colour of text in the command's content
+                            itemTextShadowColor: 'black', // the text shadow colour of the command's content
+                            zIndex: 9999 // the z-index of the ui div
+                        };
+
+                       this.cy.cxtmenu( defaults );
+                    },
+
+                    displayTypeLink: function() {
+                        this.cy.nodes().css({'label': ''});
+                    },
+
+                    openHomePage: function() {
+                        console.log(this)
+                        this.$.itemHomePage.openModal();
+                    }
+            });
+        //eles.restore() restore the removed nodes
+        </script>
+    </dom-module>
+</html>

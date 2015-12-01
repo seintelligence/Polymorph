@@ -1,0 +1,115 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="cpt_icon-cpt.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/editor-icons.html">
+
+<!-- Behaviours -->
+<link rel="import" href="../behaviours/DropBehavior.html">
+<link rel="import" href="../behaviours/ModeChangedBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/ToasterTxBehavior.html">
+<link rel="import" href="../../../generic-app/behaviours/UtilitiesBehavior.html">
+
+<link rel="stylesheet" href="../../../scripts/mdl/material.min.css">
+<script src="../../../scripts/mdl/material.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+<!-- To render correctly under mobile device http://www.getmdl.io/started/index.html#general-rules -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<dom-module id='table_header-cpt'>
+	<style>
+		.development .icons {
+			border: none;
+			cursor: pointer;
+		}
+		
+		:host {
+			width: 150px;
+		}
+	</style>
+	<template>		
+		<!-- Development -->
+		<div class="layout vertical" hidden$='[[!isMode("Development", mode)]]'>
+			<div>
+				<span>[[headerTitle]]</span>
+			</div>
+			
+			<!-- Parent Source control -->
+			<div hidden$='[[isFirstHeaderCol(id)]]'>
+				<iron-icon id="parentSource_icon" title="Select the related parent column source" icon="icons:trending-down" data-dialog="modal" on-click="sendSelectParentColSourceRequest"></iron-icon>
+				<span>is </span><span>[[currentParentColSource.title]]</span>
+			</div>
+			
+			<!-- Editor control -->
+			<div>
+				<iron-icon id="editor_icon" title="Edit the header title" icon="editor:mode-edit" data-dialog="modal" on-click="editHeaderTitle"></iron-icon>
+			</div>
+			
+			<!-- Filter control -->
+			<div>
+				<iron-icon id="filter_icon" title="Filter the parent source of data provided by this component to sub-component" icon="filter-list" data-dialog="modal" on-click="filter"></iron-icon>
+			</div>
+			
+			<!-- Delete control -->
+			<div>
+				<iron-icon id="delete_icon" title="Delete this column" icon="icons:delete" data-dialog="modal" on-click="removeHeaderCol"></iron-icon>
+			</div>
+		</div>
+		
+		<!-- Operational -->
+		<div hidden$='[[!isMode("Operational", mode)]]'>
+			<div class="layout horizontal flex">Table</div>
+		</div>
+		
+		<!-- Icon -->
+		<div hidden$='[[!isMode("Icon", mode)]]'>
+			<div draggable="false" is="cpt_icon-icon"></div>
+		</div>
+		
+	</template>
+	<script>
+		Polymer({
+			is: 'table_header-cpt',
+			
+			behaviors: [DropBehavior, ModeChangedBehavior, ToasterTxBehavior, UtilitiesBehavior],
+			
+			extends: 'th',
+			
+			properties: {
+				headerTitle: String,
+				
+				id: {
+					type: Number,
+					value: 0,
+					reflectToAttribute: true
+				},
+				
+				currentParentColSource: {
+					type: Object,
+					value: { 'id': 0, 'title': 'header 0'},
+					notify: true,
+					reflectToAttribute: true,
+					observer: "_getProvides"
+				},
+			},
+			
+			isFirstHeaderCol: function() { if (this.id == 0) return true; },
+			
+			removeHeaderCol: function() {
+				console.log("removeHeaderCol");
+				this.fire('removeHeaderCol', { "id": this.id });
+			},
+			
+			sendSelectParentColSourceRequest: function() {
+				this.fire('selectParentColSourceRequest', {'id': this.id, 'ParentColSource': this.currentParentColSource});
+			},
+			
+			_getProvides: function() {
+				console.log("_getProvides");
+			}
+			
+		});
+	</script>
+<dom-module>

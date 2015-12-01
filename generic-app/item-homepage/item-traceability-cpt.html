@@ -1,0 +1,84 @@
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+
+<link rel="import" href="item-section-cpt.html">
+<link rel="import" href="item-data-cpt.html">
+
+<dom-module is="item-traceability-cpt">
+    
+    <template>
+        <template is="dom-repeat" items="[[schema]]" as="field">
+            <item-section-cpt>
+                <h4>[[removeUnderScore(field.name)]]</h4>
+            </item-section-cpt>
+            <iron-collapse id="collapse">
+                <template is="dom-repeat" items="[[getNodes(field)]]" as="field">
+                    <item-section-cpt>
+                        <item-data-cpt data="[[formatData(data, schema, field.0)]]"></item-data-cpt>
+                    </item-section-cpt>
+                </template>
+            </iron-collapse>
+        </template>
+    </template>
+    
+    <script>
+		Polymer({
+			is: 'item-traceability-cpt',
+            
+            properties: {                
+                data: {
+                    type: Object,
+                    value: {}
+                },
+                
+                schema: {
+                    type: Array,
+                    value: []
+                }
+            },
+            
+            ready: function() {
+                console.log("/ready")
+            },
+            
+            formatData: function(data, schema, elt) {
+                //if (schema.attributes === undefined) return;
+                console.log(schema, schema.attributes[elt], elt, data);
+                //return {'name': elt, 'type': schema.attributes[elt].type, 'value':data[elt]};
+            },
+            
+            arrayIfyReduced: function(obj) {
+                console.log( _.pairs(obj))
+                return _.pairs(obj);
+            },
+            
+            reduceObj: function(obj) {
+                console.log(_.omit(obj, ['id','name', 'type']));
+                return _.omit(obj, ['id', 'name', 'type']);
+            },
+            
+            arrayItem: function(change, elt) {
+                console.log(change, change[elt]);
+                return change[elt];
+            },
+            
+            getNodes: function(linkName) {
+                console.log('/getNodes')
+                linksFilters =
+                {
+                    "path": "*",
+                    "filters": [
+                        "name='" + linkName + "'",
+                        "origin='" + this.data.id + "'"
+                    ]
+                };
+                console.log(linksFilters);
+                this.nodesSchema = this.getLinks(_.clone(linksFilters));
+            },
+            
+            removeUnderScore: function(str) { return str.replace(/_/g , " "); }
+            
+        });
+    </script>
+    
+</dom-module>
